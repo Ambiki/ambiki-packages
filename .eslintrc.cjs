@@ -16,4 +16,10 @@ module.exports = {
     node: true,
     browser: true,
   },
+  overrides: [
+    {
+      files: '**/spec/**/*.ts',
+      globals: { describe: true, it: true, beforeEach: true },
+    },
+  ],
 };

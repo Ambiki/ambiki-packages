@@ -1,7 +1,9 @@
 {
   "name": "@ambiki/clippy-copy-element",
   "version": "0.1.0",
-  "description": "Single and multi clippy-copy component.",
+  "description": "A clipboard element to copy text content, input values, and more.",
+  "homepage": "https://github.com/Ambiki/ambiki-packages/tree/main/custom-elements/clippy-copy-element",
+  "bugs": "https://github.com/Ambiki/ambiki-packages/issues?q=is%3Aopen+is%3Aissue+label%3Aclippy-copy",
   "repository": {
     "type": "git",
     "url": "https://github.com/Ambiki/ambiki-packages",
@@ -15,6 +17,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
+    "start": "web-dev-server --open examples/",
     "build": "tsc && node esbuild.config.mjs --watch",
     "clean": "rm -rf ./dist",
     "prepublishOnly": "tsc && node esbuild.config.mjs"
@@ -23,8 +26,8 @@
     "dist"
   ],
   "keywords": [
-    "select",
-    "autocomplete"
+    "clipboard",
+    "copy"
   ],
   "license": "MIT"
 }
