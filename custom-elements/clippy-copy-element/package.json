@@ -1,0 +1,30 @@
+{
+  "name": "@ambiki/clippy-copy-element",
+  "version": "0.1.0",
+  "description": "Single and multi clippy-copy component.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ambiki/ambiki-packages",
+    "directory": "custom-elements/clippy-copy-element"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "module": "dist/index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc && node esbuild.config.mjs --watch",
+    "clean": "rm -rf ./dist",
+    "prepublishOnly": "tsc && node esbuild.config.mjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "select",
+    "autocomplete"
+  ],
+  "license": "MIT"
+}

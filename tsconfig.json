@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "paths": {
+      "@ambiki/clippy-copy-element": ["./custom-elements/clippy-copy-element/src"]
+    }
+  },
+  "include": [
+    "./custom-elements/clippy-copy-element/src/**/.ts"
+  ]
+}

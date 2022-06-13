@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "module": "es2020",
+    "target": "es2017",
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "strict": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true
+  },
+  "exclude": ["node_modules", "./custom-elements/**/spec/", "./custom-elements/**/dist/"]
+}
