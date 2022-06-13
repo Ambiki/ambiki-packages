@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Clippy Copy Element</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <style>
+      clippy-copy {
+        display: inline-block;
+        border: 1px solid;
+        padding: 4px 8px;
+        cursor: pointer;
+      }
+
+      section {
+        margin-top: 40px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <section>
+      <input type="text" id="input" value="Something to copy from the input">
+      <clippy-copy for="input">Copy it!</clippy-copy>
+    </section>
+
+    <script src="../dist/index.js"></script>
+  </body>
+</html>
