@@ -11,7 +11,7 @@ npm install @ambiki/clippy-copy-element
 ## Usage
 
 ```js
-import '@ambiki/clippy-copy-element'
+import '@ambiki/clippy-copy-element';
 ```
 
 ### Copying an input's value

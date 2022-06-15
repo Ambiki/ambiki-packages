@@ -11,7 +11,7 @@ npm install @ambiki/auto-complete-element
 ## Usage
 
 ```js
-import '@ambiki/auto-complete-element'
+import '@ambiki/auto-complete-element';
 ```
 
 ### Markup
