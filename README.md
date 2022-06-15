@@ -1,11 +1,14 @@
 # Ambiki packages
 
-A collection of everyday web-components.
+A collection of everyday web-components and libraries.
 
 ## Collections within the repository
 
 - Custom elements
   - [clippy-copy-element](https://github.com/Ambiki/ambiki-packages/tree/main/custom-elements/clippy-copy-element)
+
+- Packages
+  - [combobox](./packages/combobox)
 
 ## Contributing
 
