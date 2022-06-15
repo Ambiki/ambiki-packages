@@ -11,5 +11,5 @@
     "moduleResolution": "node",
     "resolveJsonModule": true
   },
-  "exclude": ["node_modules", "./custom-elements/**/spec/", "./custom-elements/**/dist/"]
+  "exclude": ["node_modules", "/**/spec/", "/**/dist/"]
 }
