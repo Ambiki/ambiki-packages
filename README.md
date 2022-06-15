@@ -9,7 +9,7 @@ A collection of everyday web-components and libraries.
   - [clippy-copy-element](./custom-elements/clippy-copy-element/) - A clipboard element to copy text content, input values, and more.
 
 - Packages
-  - [combobox](./packages/combobox)
+  - [combobox](./packages/combobox) - Extend your autocomplete and command palette using the Combobox, which provides robust keyboard navigation and accessibility out of the box.
 
 ## Contributing
 
