@@ -9,7 +9,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@ambiki/auto-complete-element@workspace:custom-elements/auto-complete-element"
   dependencies:
-    "@ambiki/combobox": "workspace:^"
+    "@ambiki/combobox": ^0.1.0
     "@ambiki/utils": "workspace:^"
   languageName: unknown
   linkType: soft
@@ -20,7 +20,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@ambiki/combobox@workspace:^, @ambiki/combobox@workspace:packages/combobox":
+"@ambiki/combobox@^0.1.0, @ambiki/combobox@workspace:packages/combobox":
   version: 0.0.0-use.local
   resolution: "@ambiki/combobox@workspace:packages/combobox"
   dependencies:
