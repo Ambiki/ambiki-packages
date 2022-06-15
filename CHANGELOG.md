@@ -1,4 +1,6 @@
 # Changelog
 
 Each package has its own changelog.
-- [@ambiki/clippy-copy-element](https://github.com/Ambiki/ambiki-packages/blob/main/custom-elements/clippy-copy-element/CHANGELOG.md)
+- [@ambiki/auto-complete-element](./custom-elements/auto-complete-element/CHANGELOG.md)
+- [@ambiki/clippy-copy-element](./custom-elements/clippy-copy-element/CHANGELOG.md)
+- [@ambiki/combobox](./packages/combobox/CHANGELOG.md)
