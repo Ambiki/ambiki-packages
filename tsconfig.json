@@ -1,10 +1,14 @@
 {
   "compilerOptions": {
     "paths": {
-      "@ambiki/clippy-copy-element": ["./custom-elements/clippy-copy-element/src"]
+      "@ambiki/clippy-copy-element": ["./custom-elements/clippy-copy-element/src"],
+      "@ambiki/combobox": ["./packages/combobox/src"],
+      "@ambiki/utils": ["./packages/utils/src"]
     }
   },
   "include": [
-    "./custom-elements/clippy-copy-element/src/**/.ts"
+    "./custom-elements/clippy-copy-element/src/**/.ts",
+    "./packages/combobox/src/**/.ts",
+    "./packages/utils/src/**/.ts"
   ]
 }

@@ -1,7 +1,8 @@
 {
   "private": "true",
   "workspaces": [
-    "custom-elements/**"
+    "custom-elements/*",
+    "packages/*"
   ],
   "scripts": {
     "test": "web-test-runner --watch",
