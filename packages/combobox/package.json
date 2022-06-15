@@ -29,6 +29,6 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@ambiki/utils": "1.0.0"
+    "@ambiki/utils": "workspace:^"
   }
 }

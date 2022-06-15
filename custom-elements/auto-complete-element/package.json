@@ -17,7 +17,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "start": "web-dev-server --open examples/",
+    "start": "web-dev-server --node-resolve --open --watch examples/",
     "build": "tsc && node esbuild.config.mjs --watch",
     "clean": "rm -rf ./dist",
     "prepublishOnly": "tsc && node esbuild.config.mjs"
@@ -31,9 +31,9 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@ambiki/combobox": "^0.1.0"
+    "@ambiki/combobox": "workspace:^"
   },
   "devDependencies": {
-    "@ambiki/utils": "1.0.0"
+    "@ambiki/utils": "workspace:^"
   }
 }
