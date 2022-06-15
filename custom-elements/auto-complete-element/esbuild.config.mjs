@@ -7,6 +7,5 @@ esbuild
     watch: process.argv.includes('--watch'),
     bundle: true,
     minify: true,
-    format: 'esm',
   })
   .catch(() => process.exit(1));
