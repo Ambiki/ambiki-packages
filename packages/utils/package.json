@@ -1,6 +1,6 @@
 {
   "name": "@ambiki/utils",
   "version": "1.0.0",
-  "description": "A set of utilities/helpers used within the packages.",
+  "description": "A set of utilities/helpers used within the repository.",
   "license": "MIT"
 }
