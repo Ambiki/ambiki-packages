@@ -19,7 +19,7 @@
   "scripts": {
     "build": "tsc && node esbuild.config.mjs --watch",
     "clean": "rm -rf ./dist",
-    "prepublishOnly": "tsc && node esbuild.config.mjs --production"
+    "prepublishOnly": "tsc && node esbuild.config.mjs"
   },
   "files": [
     "dist"

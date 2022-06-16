@@ -7,6 +7,7 @@ esbuild
     watch: process.argv.includes('--watch'),
     bundle: true,
     minify: true,
-    external: process.argv.includes('--production') ? ['@ambiki/combobox'] : [],
+    external: ['@ambiki/combobox'],
+    format: 'esm',
   })
   .catch(() => process.exit(1));
