@@ -1,6 +1,6 @@
 {
   "name": "@ambiki/auto-complete-element",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Single and multi auto-complete component.",
   "homepage": "https://github.com/Ambiki/ambiki-packages/tree/main/custom-elements/auto-complete-element",
   "bugs": "https://github.com/Ambiki/ambiki-packages/issues?q=is%3Aopen+is%3Aissue+label%3Aauto-complete",
