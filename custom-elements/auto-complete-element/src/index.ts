@@ -4,7 +4,7 @@ export default class AutoCompleteElement extends HTMLElement {
   autocomplete: Autocomplete | null = null;
 
   connectedCallback() {
-    const input = this.querySelector('input');
+    const input = this.querySelector<HTMLInputElement>('input:not([type="hidden"])');
     const id = this.getAttribute('for');
     if (!id) return;
 
