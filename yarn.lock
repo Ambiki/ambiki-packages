@@ -28,6 +28,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@ambiki/details-modal-element@workspace:custom-elements/details-modal-element":
+  version: 0.0.0-use.local
+  resolution: "@ambiki/details-modal-element@workspace:custom-elements/details-modal-element"
+  dependencies:
+    "@ambiki/combobox": "workspace:^"
+    "@ambiki/utils": "workspace:^"
+  languageName: unknown
+  linkType: soft
+
 "@ambiki/utils@workspace:^, @ambiki/utils@workspace:packages/utils":
   version: 0.0.0-use.local
   resolution: "@ambiki/utils@workspace:packages/utils"
@@ -1628,12 +1637,6 @@ __metadata:
   checksum: 0acb300b7478a08b92d810ab229d5afe0d2f4399272045ab22affa0d99dbaf12637659411530a6fcd597a9bdac718fc94373a61a95b4651bbc7b83684a565e38
   languageName: node
   linkType: hard
-
-"details-modal-element-a4cec9@workspace:custom-elements/details-modal-element":
-  version: 0.0.0-use.local
-  resolution: "details-modal-element-a4cec9@workspace:custom-elements/details-modal-element"
-  languageName: unknown
-  linkType: soft
 
 "devtools-protocol@npm:0.0.981744":
   version: 0.0.981744

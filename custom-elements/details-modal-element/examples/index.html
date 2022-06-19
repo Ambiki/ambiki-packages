@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Details Modal Element</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 40px;
+      }
+
+      details[open] > summary::before {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 80;
+        display: block;
+        cursor: default;
+        content: ' ';
+        background: rgba(0, 0, 0, 0.4);
+      }
+
+      details > summary {
+        list-style: none;
+      }
+
+      details > summary::before {
+        display: none;
+      }
+
+      details > summary::-webkit-details-marker {
+        display: none;
+      }
+
+      details-modal {
+        display: block;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 100;
+        background-color: #fff;
+        max-width: 448px;
+        width: 100%;
+        padding: 16px;
+      }
+
+      summary {
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+    <details>
+      <summary>Open dialog</summary>
+      <details-modal>
+        hello world
+      </details-modal>
+    </details>
+
+    <script type="module" src="../dist/index.js"></script>
+  </body>
+</html>
