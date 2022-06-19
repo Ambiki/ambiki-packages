@@ -1629,6 +1629,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"details-modal-element-a4cec9@workspace:custom-elements/details-modal-element":
+  version: 0.0.0-use.local
+  resolution: "details-modal-element-a4cec9@workspace:custom-elements/details-modal-element"
+  languageName: unknown
+  linkType: soft
+
 "devtools-protocol@npm:0.0.981744":
   version: 0.0.981744
   resolution: "devtools-protocol@npm:0.0.981744"
