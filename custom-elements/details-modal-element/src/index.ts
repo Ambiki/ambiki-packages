@@ -78,7 +78,10 @@ function interceptTabbing(event: KeyboardEvent) {
 
   const movement: MoveDirection = event.shiftKey ? -1 : 1;
   const nextActiveElement = move(focusableElements as HTMLElement[], activeElement, movement);
-  nextActiveElement.focus();
+
+  if (nextActiveElement !== document.activeElement) {
+    nextActiveElement.focus();
+  }
 }
 
 function open(details: HTMLDetailsElement) {
