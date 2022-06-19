@@ -28,5 +28,8 @@
     "dialog",
     "modal"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "tabbable": "^5.3.3"
+  }
 }

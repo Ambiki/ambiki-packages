@@ -1,3 +1,5 @@
+import { FocusableElement, isTabbable, tabbable } from 'tabbable';
+
 export default class DetailsModalElement extends HTMLElement {
   details: HTMLDetailsElement | null = null;
 
@@ -59,31 +61,24 @@ function onClick(event: Event) {
 
 function interceptTabbing(event: KeyboardEvent) {
   if (event.key !== 'Tab') return;
-  const modal = event.currentTarget as DetailsModalElement;
+  const { currentTarget: modal } = event;
+  if (!(modal instanceof DetailsModalElement)) return;
 
-  event.preventDefault();
+  event.preventDefault(); // Trap focus from this point onwards
 
-  const focusableElements = Array.from(modal.querySelectorAll<HTMLElement>('*')).filter(focusable);
+  const focusableElements = Array.from(tabbable(modal));
   if (focusableElements.length === 0) return;
 
   const movement = event.shiftKey ? -1 : 1;
-  const currentFocus = modal.contains(document.activeElement) ? document.activeElement : null;
-  let targetIndex = movement === -1 ? -1 : 0;
+  const activeElement = modal.contains(document.activeElement) ? document.activeElement : null;
+  if (!(activeElement instanceof HTMLElement)) return;
 
-  if (currentFocus instanceof HTMLElement) {
-    const currentIndex = focusableElements.indexOf(currentFocus);
-    if (currentIndex !== -1) {
-      targetIndex = currentIndex + movement;
-    }
+  const activeIndex = focusableElements.indexOf(activeElement);
+  const nextActiveElement = wrap(focusableElements, activeIndex + movement);
+
+  if (nextActiveElement !== document.activeElement) {
+    nextActiveElement.focus();
   }
-
-  if (targetIndex < 0) {
-    targetIndex = focusableElements.length - 1;
-  } else {
-    targetIndex %= focusableElements.length;
-  }
-
-  focusableElements[targetIndex].focus();
 }
 
 function open(details: HTMLDetailsElement) {
@@ -123,27 +118,24 @@ function checkFormSubmission(event: Event) {
 }
 
 function focusFirstElement(modal: DetailsModalElement) {
-  const autofocusable = Array.from(modal.querySelectorAll<HTMLElement>('[autofocus]')).filter(focusable)[0] as
-    | HTMLElement
-    | undefined;
-  if (autofocusable) {
-    autofocusable.focus();
+  const autofocus = modal.querySelector<HTMLElement>('[autofocus]');
+  const firstFocusableElement = [autofocus, ...tabbable(modal)].filter(Boolean)[0];
+
+  if (firstFocusableElement instanceof HTMLElement && isTabbable(firstFocusableElement)) {
+    firstFocusableElement.focus();
   } else {
     modal.setAttribute('tabindex', '-1');
     modal.focus();
   }
 }
 
-function focusable(element: HTMLElement) {
-  return element.tabIndex >= 0 && !element.hasAttribute('disabled') && visible(element);
-}
+function wrap(array: FocusableElement[], currentActiveIndex: number) {
+  const indexOfFirstElement = 0;
+  const indexOfLastElement = array.length - 1;
 
-function visible(element: HTMLElement) {
-  return (
-    !element.hidden &&
-    element.getAttribute('type') !== 'hidden' &&
-    (element.offsetWidth > 0 || element.offsetHeight > 0)
-  );
+  if (currentActiveIndex < indexOfFirstElement) return array[indexOfLastElement];
+  if (currentActiveIndex > indexOfLastElement) return array[indexOfFirstElement];
+  return array[currentActiveIndex];
 }
 
 declare global {

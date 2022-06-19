@@ -14,7 +14,7 @@ describe('DetailsModalElement', () => {
           <summary>Summary</summary>
           <details-modal>
             <h1>A modal</h1>
-            <button type="button" autofocus data-modal-close>Button</button>
+            <button type="button" data-modal-close>Button</button>
           </details-modal>
         </details>
       `);
@@ -73,7 +73,7 @@ describe('DetailsModalElement', () => {
             <summary>Summary</summary>
             <details-modal>
               <h1>A modal</h1>
-              <button type="button" autofocus>Button</button>
+              <button type="button">Button</button>
               <input type="text" />
             </details-modal>
           </details>
@@ -124,6 +124,7 @@ describe('DetailsModalElement', () => {
           <summary>Summary</summary>
           <details-modal>
             <h1>A modal</h1>
+            <input type="text" />
             <button type="button" autofocus>Button</button>
           </details-modal>
         </details>
@@ -148,7 +149,7 @@ describe('DetailsModalElement', () => {
     });
   });
 
-  describe('without autofocus element', () => {
+  describe('without any focusable elements', () => {
     let el: HTMLDetailsElement;
     let modal: DetailsModalElement;
 
