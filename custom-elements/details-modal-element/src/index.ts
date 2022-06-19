@@ -1,4 +1,5 @@
-import { FocusableElement, isTabbable, tabbable } from 'tabbable';
+import { isTabbable, tabbable } from 'tabbable';
+import { move, MoveDirection } from '@ambiki/utils/src/dom';
 
 export default class DetailsModalElement extends HTMLElement {
   details: HTMLDetailsElement | null = null;
@@ -40,7 +41,9 @@ function onToggle(event: Event) {
 }
 
 function onKeydown(event: KeyboardEvent) {
-  const details = event.currentTarget as HTMLDetailsElement;
+  const { currentTarget: details } = event;
+  if (!(details instanceof HTMLDetailsElement)) return;
+
   if (event.key === 'Escape') {
     close(details);
     event.preventDefault();
@@ -54,6 +57,7 @@ function onClick(event: Event) {
 
   const details = target.closest('details');
   if (!details) return;
+
   if (target.closest('[data-modal-close]')) {
     close(details);
   }
@@ -69,16 +73,12 @@ function interceptTabbing(event: KeyboardEvent) {
   const focusableElements = Array.from(tabbable(modal));
   if (focusableElements.length === 0) return;
 
-  const movement = event.shiftKey ? -1 : 1;
   const activeElement = modal.contains(document.activeElement) ? document.activeElement : null;
   if (!(activeElement instanceof HTMLElement)) return;
 
-  const activeIndex = focusableElements.indexOf(activeElement);
-  const nextActiveElement = wrap(focusableElements, activeIndex + movement);
-
-  if (nextActiveElement !== document.activeElement) {
-    nextActiveElement.focus();
-  }
+  const movement: MoveDirection = event.shiftKey ? -1 : 1;
+  const nextActiveElement = move(focusableElements as HTMLElement[], activeElement, movement);
+  nextActiveElement.focus();
 }
 
 function open(details: HTMLDetailsElement) {
@@ -127,15 +127,6 @@ function focusFirstElement(modal: DetailsModalElement) {
     modal.setAttribute('tabindex', '-1');
     modal.focus();
   }
-}
-
-function wrap(array: FocusableElement[], currentActiveIndex: number) {
-  const indexOfFirstElement = 0;
-  const indexOfLastElement = array.length - 1;
-
-  if (currentActiveIndex < indexOfFirstElement) return array[indexOfLastElement];
-  if (currentActiveIndex > indexOfLastElement) return array[indexOfFirstElement];
-  return array[currentActiveIndex];
 }
 
 declare global {

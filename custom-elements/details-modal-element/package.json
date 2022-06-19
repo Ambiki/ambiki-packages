@@ -31,5 +31,8 @@
   "license": "MIT",
   "dependencies": {
     "tabbable": "^5.3.3"
+  },
+  "devDependencies": {
+    "@ambiki/utils": "workspace:^"
   }
 }
