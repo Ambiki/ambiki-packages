@@ -31,9 +31,6 @@ __metadata:
 "@ambiki/details-modal-element@workspace:custom-elements/details-modal-element":
   version: 0.0.0-use.local
   resolution: "@ambiki/details-modal-element@workspace:custom-elements/details-modal-element"
-  dependencies:
-    "@ambiki/combobox": "workspace:^"
-    "@ambiki/utils": "workspace:^"
   languageName: unknown
   linkType: soft
 

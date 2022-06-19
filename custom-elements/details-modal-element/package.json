@@ -28,11 +28,5 @@
     "dialog",
     "modal"
   ],
-  "license": "MIT",
-  "dependencies": {
-    "@ambiki/combobox": "workspace:^"
-  },
-  "devDependencies": {
-    "@ambiki/utils": "workspace:^"
-  }
+  "license": "MIT"
 }
