@@ -7,6 +7,7 @@ describe('DetailsModalElement', () => {
     let el: HTMLDetailsElement;
     let summary: HTMLElement;
     let modal: DetailsModalElement;
+    let button: HTMLButtonElement;
 
     beforeEach(async () => {
       el = await fixture(html`
@@ -21,12 +22,20 @@ describe('DetailsModalElement', () => {
 
       summary = el.querySelector('summary');
       modal = el.querySelector('details-modal');
+      button = el.querySelector('button');
     });
 
     it('sets the default attributes', () => {
       expect(summary).to.have.attribute('role', 'button');
       expect(modal).to.have.attribute('role', 'dialog');
       expect(modal).to.have.attribute('aria-modal', 'true');
+    });
+
+    it('focuses on the first valid focusable element after opening the modal', async () => {
+      el.open = true;
+      await waitForToggle(el);
+
+      expect(document.activeElement).to.equal(button);
     });
 
     it('focuses on the summary after closing the modal', async () => {
