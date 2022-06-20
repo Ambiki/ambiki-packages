@@ -5,7 +5,7 @@ export default class DetailsModalElement extends HTMLElement {
   details: HTMLDetailsElement | null = null;
 
   connectedCallback() {
-    this.details = this.parentElement as HTMLDetailsElement;
+    this.details = this.closest('details');
     if (!this.details) return;
 
     this.setAttribute('role', 'dialog');
