@@ -1,0 +1,38 @@
+{
+  "name": "@ambiki/details-modal-element",
+  "version": "0.1.0",
+  "description": "A modal component that works with the <details> tag.",
+  "homepage": "https://github.com/Ambiki/ambiki-packages/tree/main/custom-elements/details-modal-element",
+  "bugs": "https://github.com/Ambiki/ambiki-packages/issues?q=is%3Aopen+is%3Aissue+label%3Adetails-modal",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ambiki/ambiki-packages",
+    "directory": "custom-elements/details-modal-element"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "type": "module",
+  "module": "dist/index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc && node esbuild.config.mjs --watch",
+    "clean": "rm -rf ./dist",
+    "prepublishOnly": "tsc && node esbuild.config.mjs"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [
+    "dialog",
+    "modal"
+  ],
+  "license": "MIT",
+  "dependencies": {
+    "tabbable": "^5.3.3"
+  },
+  "devDependencies": {
+    "@ambiki/utils": "workspace:^"
+  }
+}

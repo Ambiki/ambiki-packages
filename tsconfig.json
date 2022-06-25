@@ -3,6 +3,7 @@
     "paths": {
       "@ambiki/auto-complete-element": ["./custom-elements/auto-complete-element/src"],
       "@ambiki/clippy-copy-element": ["./custom-elements/clippy-copy-element/src"],
+      "@ambiki/details-modal-element": ["./custom-elements/details-modal-element/src"],
       "@ambiki/combobox": ["./packages/combobox/src"],
       "@ambiki/utils": ["./packages/utils/src"]
     }
@@ -10,6 +11,7 @@
   "include": [
     "./custom-elements/auto-complete-element/src/**/.ts",
     "./custom-elements/clippy-copy-element/src/**/.ts",
+    "./custom-elements/details-modal-element/src/**/.ts",
     "./packages/combobox/src/**/.ts",
     "./packages/utils/src/**/.ts"
   ]
