@@ -64,6 +64,15 @@ describe('AutoCompleteElement', () => {
       input.blur();
       expect(list).to.have.attribute('hidden');
     });
+
+    it('does not close the menu when clicking inside the list', () => {
+      input.focus();
+      expect(list).not.to.have.attribute('hidden');
+
+      list.click();
+      expect(list).not.to.have.attribute('hidden');
+      expect(document.activeElement).to.equal(input);
+    });
   });
 
   describe('with no previous aria-selected option', () => {
