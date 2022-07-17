@@ -20,6 +20,10 @@
         position: relative;
       }
 
+      .blankslate {
+        display: none;
+      }
+
       ul {
         position: absolute;
         border: 1px solid;
@@ -33,7 +37,11 @@
         z-index: 10;
       }
 
-      li {
+      ul[data-empty] .blankslate {
+        display: block;
+      }
+
+      li[role="option"] {
         padding: 6px 8px;
         cursor: pointer;
       }
@@ -90,6 +98,8 @@
           Option 5
           <span>(checked)</span>
         </li>
+
+        <li class="blankslate">Blankslate <a href="#url">link</a></li>
       </ul>
     </auto-complete>
 

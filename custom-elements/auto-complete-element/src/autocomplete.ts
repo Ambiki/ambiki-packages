@@ -26,6 +26,7 @@ export default class Autocomplete {
 
     this.input.setAttribute('spellcheck', 'false');
     this.input.setAttribute('autocomplete', 'off');
+    this.list.setAttribute('tabindex', '-1');
 
     // Reset button
     this.resetButton = this.element.querySelector('[data-autocomplete-reset]');
@@ -158,9 +159,9 @@ export default class Autocomplete {
       return;
     }
 
-    const option = relatedTarget.closest<HTMLElement>('[role="option"]');
-    if (option) {
-      this.input.focus(); // Always keep focus on the input field when selecting an option
+    const list = relatedTarget.closest<HTMLElement>('[role="listbox"]');
+    if (list) {
+      this.input.focus(); // Always keep focus on the input field when interacting with the list
     } else {
       this.list.hidden = true; // Hide the list for other elements that triggered the blur
     }
