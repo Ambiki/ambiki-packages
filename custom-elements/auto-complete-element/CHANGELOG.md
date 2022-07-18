@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Unreleased
 ### Added
 - Allow clicking inside the list
+- Fire events such as `auto-complete:show`, `auto-complete:shown`, `auto-complete:hide`, and `auto-complete:hidden`
 
 ## [0.1.2] - 2022-06-18
 

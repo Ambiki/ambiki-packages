@@ -73,6 +73,52 @@ describe('AutoCompleteElement', () => {
       expect(list).not.to.have.attribute('hidden');
       expect(document.activeElement).to.equal(input);
     });
+
+    it('dispatches show and shown event in order', () => {
+      let count = 0;
+      document.addEventListener(
+        'auto-complete:show',
+        () => {
+          count += 1;
+          expect(count).to.equal(1);
+        },
+        { once: true }
+      );
+
+      document.addEventListener(
+        'auto-complete:shown',
+        () => {
+          count += 1;
+          expect(count).to.equal(2);
+        },
+        { once: true }
+      );
+
+      input.focus();
+    });
+
+    it('dispatches hide and hidden event in order', () => {
+      let count = 0;
+      document.addEventListener(
+        'auto-complete:hide',
+        () => {
+          count += 1;
+          expect(count).to.equal(1);
+        },
+        { once: true }
+      );
+
+      document.addEventListener(
+        'auto-complete:hidden',
+        () => {
+          count += 1;
+          expect(count).to.equal(2);
+        },
+        { once: true }
+      );
+
+      input.focus();
+    });
   });
 
   describe('with no previous aria-selected option', () => {
