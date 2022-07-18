@@ -103,7 +103,7 @@ export default class Combobox {
     const option = getClosestOptionFrom(event.target);
     if (!option) return;
 
-    this.setActive(option);
+    this.setActive(option, { scroll: false });
   }
 
   onListMouseMove(event: Event) {
@@ -113,7 +113,7 @@ export default class Combobox {
     const option = getClosestOptionFrom(event.target);
     if (!option) return;
 
-    this.setActive(option);
+    this.setActive(option, { scroll: false });
   }
 
   move(index: MoveDirection) {
@@ -131,7 +131,7 @@ export default class Combobox {
     }
   }
 
-  setActive(option: HTMLElement | undefined) {
+  setActive(option: HTMLElement | undefined, { scroll = true }: { scroll?: boolean } = {}) {
     if (!option) {
       this.clearActiveOption();
       return;
@@ -142,7 +142,7 @@ export default class Combobox {
       if (el === option) {
         this.input.setAttribute('aria-activedescendant', el.id);
         el.setAttribute('data-tracking', '');
-        el.scrollIntoView({ block: 'nearest' });
+        if (scroll) el.scrollIntoView({ block: 'nearest' });
       } else {
         el.removeAttribute('data-tracking');
       }
