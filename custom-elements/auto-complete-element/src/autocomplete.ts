@@ -68,11 +68,15 @@ export default class Autocomplete {
 
   onListToggle() {
     if (this.list.hidden) {
+      dispatchEvent(this.element, 'hide');
       this.combobox.stop();
       this.list.removeAttribute(DATA_EMPTY_ATTR);
+      dispatchEvent(this.element, 'hidden');
       syncSelection(this);
     } else {
+      dispatchEvent(this.element, 'show');
       this.combobox.start();
+      dispatchEvent(this.element, 'shown');
     }
   }
 
@@ -144,12 +148,7 @@ export default class Autocomplete {
       this.list.hidden = true;
     }
 
-    this.list.dispatchEvent(
-      new CustomEvent('auto-complete:selected', {
-        detail: { relatedTarget: option },
-        bubbles: true,
-      })
-    );
+    dispatchEvent(this.element, 'selected', { detail: { relatedTarget: option } });
   }
 
   onBlur(event: FocusEvent) {
@@ -182,7 +181,7 @@ export default class Autocomplete {
     }
 
     // Should fire after closing the list
-    this.list.dispatchEvent(new CustomEvent('auto-complete:reset', { bubbles: true }));
+    dispatchEvent(this.element, 'reset');
   }
 
   openAndInitializeList() {
@@ -235,4 +234,8 @@ function syncSelection(autocomplete: Autocomplete) {
 
 function selected(option: HTMLElement) {
   return option.getAttribute('aria-selected') === 'true';
+}
+
+function dispatchEvent(element: HTMLElement, name: string, options: CustomEventInit = {}) {
+  element.dispatchEvent(new CustomEvent(`auto-complete:${name}`, { bubbles: true, ...options }));
 }

@@ -124,7 +124,11 @@ li[role="option"][aria-selected="true"] > span {
 ```
 
 ### Events
-`auto-complete:selected` is fired after an option is selected. You can find which option was selected
+- `auto-complete:show` is fired immediately after removing the `hidden` attribute.
+- `auto-complete:shown` is fired after attaching the combobox functionality.
+- `auto-complete:hide` is fired immediately after adding the `hidden` attribute.
+- `auto-complete:hidden` is fired after removing the combobox functionality.
+- `auto-complete:selected` is fired after an option is selected. You can find which option was selected
 by:
 
 ```js
@@ -136,7 +140,7 @@ autocomplete.addEventListener('auto-complete:selected', (event) => {
 });
 ```
 
-`auto-complete:reset` is fired after `data-autocomplete-reset` has been clicked.
+- `auto-complete:reset` is fired after `data-autocomplete-reset` has been clicked.
 
 ## License
 Distributed under the MIT license.
