@@ -71,8 +71,8 @@ export default class Autocomplete {
       dispatchEvent(this.element, 'hide');
       this.combobox.stop();
       this.list.removeAttribute(DATA_EMPTY_ATTR);
-      dispatchEvent(this.element, 'hidden');
       syncSelection(this);
+      dispatchEvent(this.element, 'hidden');
     } else {
       dispatchEvent(this.element, 'show');
       this.combobox.start();
