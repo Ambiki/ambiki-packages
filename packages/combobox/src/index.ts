@@ -87,7 +87,7 @@ export default class Combobox {
   }
 
   onClick(event: Event) {
-    const option = getClosestOptionFrom(event.target);
+    const option = getClosestOptionFrom(event.target as HTMLElement);
     if (!option || !enabled(option)) return;
 
     this.selectOption(option);
@@ -100,7 +100,7 @@ export default class Combobox {
       return;
     }
 
-    const option = getClosestOptionFrom(event.target);
+    const option = getClosestOptionFrom(event.target as HTMLElement);
     if (!option) return;
 
     this.setActive(option, { scroll: false });
@@ -110,7 +110,7 @@ export default class Combobox {
     if (this.isMouseMoving) return;
 
     this.isMouseMoving = true;
-    const option = getClosestOptionFrom(event.target);
+    const option = getClosestOptionFrom(event.target as HTMLElement);
     if (!option) return;
 
     this.setActive(option, { scroll: false });
@@ -189,7 +189,7 @@ function commit(list: HTMLElement) {
   return true;
 }
 
-function getClosestOptionFrom(target: HTMLElement | EventTarget | null) {
+function getClosestOptionFrom(target: HTMLElement | null) {
   if (!(target instanceof HTMLElement)) return false;
 
   const option = target.closest<HTMLElement>('[role="option"]');
