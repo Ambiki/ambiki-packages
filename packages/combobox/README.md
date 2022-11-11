@@ -71,13 +71,13 @@ const combobox = new Combobox(input, list, { multiple: true, max: 3 });
 
 - `combobox:commit` (bubbles) - This event is fired on the `option` when an option is selected or unselected
 
-```js
-const list = document.querySelector('ul');
+  ```js
+  const list = document.querySelector('ul');
 
-list.addEventListener('combobox:commit', (event) => {
-  console.log('Option: ', event.target);
-});
-```
+  list.addEventListener('combobox:commit', (event) => {
+    console.log('Option: ', event.target);
+  });
+  ```
 
 ## License
 
