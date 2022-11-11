@@ -76,6 +76,7 @@ export default class Autocomplete {
     } else {
       dispatchEvent(this.element, 'show');
       this.combobox.start();
+      this.list.toggleAttribute(DATA_EMPTY_ATTR, this.combobox.visibleOptions.length === 0);
       dispatchEvent(this.element, 'shown');
     }
   }
