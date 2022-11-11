@@ -36,6 +36,7 @@ export default class Combobox {
     this.input.setAttribute('aria-controls', this.list.id);
     this.input.setAttribute('aria-autocomplete', 'list');
     this.list.setAttribute('role', 'listbox');
+    this.list.setAttribute('aria-orientation', 'vertical');
     if (this.isMultiple) {
       this.input.setAttribute('aria-multiselectable', 'true');
     }

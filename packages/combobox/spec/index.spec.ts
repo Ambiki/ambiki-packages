@@ -52,6 +52,7 @@ describe('Combobox', () => {
       expect(input).to.have.attribute('aria-autocomplete', 'list');
       expect(input).not.to.have.attribute('aria-multiselectable');
       expect(list).to.have.attribute('role', 'listbox');
+      expect(list).to.have.attribute('aria-orientation', 'vertical');
     });
 
     it('on starting combobox', () => {
