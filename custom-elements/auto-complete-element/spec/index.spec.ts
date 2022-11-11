@@ -37,6 +37,7 @@ describe('AutoCompleteElement', () => {
       input.focus();
 
       expect(list).not.to.have.attribute('hidden');
+      expect(list).not.to.have.attribute('data-empty');
     });
 
     it('opens the menu on pointerdown if already focused', () => {
@@ -366,6 +367,33 @@ describe('AutoCompleteElement', () => {
       options[0].dispatchEvent(new CustomEvent('combobox:commit', { bubbles: true }));
       expect(input.value).to.equal(''); // does not update the input value
       expect(list).not.to.have.attribute('hidden'); // does not hide the input
+    });
+  });
+
+  describe('rendering with no options', () => {
+    let el: AutoCompleteElement;
+    let input: HTMLInputElement;
+    let list: HTMLElement;
+
+    beforeEach(async () => {
+      el = await fixture(html`
+        <auto-complete for="list" multiple>
+          <input type="text" />
+          <ul id="list"></ul>
+        </auto-complete>
+      `);
+
+      input = el.querySelector('input');
+      list = el.querySelector('ul');
+    });
+
+    it('adds the data-empty attribute after opening the options', async () => {
+      expect(list).not.to.have.attribute('data-empty');
+      input.focus();
+      await nextTick();
+
+      expect(list).not.to.have.attribute('hidden');
+      expect(list).to.have.attribute('data-empty');
     });
   });
 });
