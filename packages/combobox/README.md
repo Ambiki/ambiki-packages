@@ -48,6 +48,7 @@ combobox.clearActiveOption(); // Clear active option
 
 combobox.activeOption; // Get the current active option
 combobox.visibleOptions; // Get all the visible options within the `list`
+combobox.selectedOptions; // Get all the selected (`aria-selected="true"`) options within the `list`
 combobox.options; // Get all the options within the `list`
 ```
 
