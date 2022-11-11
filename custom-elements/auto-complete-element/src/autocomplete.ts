@@ -10,7 +10,6 @@ export default class Autocomplete {
   input: HTMLInputElement;
   list: HTMLElement;
   resetButton: HTMLElement | null;
-  isMultiple: boolean;
   combobox: Combobox;
   listObserver: MutationObserver;
 
@@ -20,12 +19,12 @@ export default class Autocomplete {
     this.list = list;
 
     this.list.hidden = true;
-    this.isMultiple = this.element.hasAttribute('multiple');
-    this.combobox = new Combobox(this.input, this.list, { isMultiple: this.isMultiple });
+    this.combobox = new Combobox(this.input, this.list, { multiple: this.element.multiple, max: this.element.max });
 
     this.input.setAttribute('spellcheck', 'false');
     this.input.setAttribute('autocomplete', 'off');
     this.list.setAttribute('tabindex', '-1');
+    this.list.setAttribute('aria-orientation', 'vertical');
 
     // Reset button
     this.resetButton = this.element.querySelector('[data-autocomplete-reset]');
@@ -137,7 +136,7 @@ export default class Autocomplete {
     if (!(option instanceof HTMLElement)) return;
 
     const value = (option.getAttribute(AUTOCOMPLETE_VALUE_ATTR) || option.textContent) as string;
-    if (this.isMultiple) {
+    if (this.element.multiple) {
       if (this.input.value) {
         this.inputValue = '';
         this.filterListWithQuery();
@@ -221,10 +220,10 @@ function filterOptions(query: string, { matching }: { matching: string }) {
 }
 
 function syncSelection(autocomplete: Autocomplete) {
-  const { combobox, isMultiple } = autocomplete;
+  const { combobox, element } = autocomplete;
   const selectedOption = combobox.options.filter(selected)[0];
 
-  if (isMultiple || !selectedOption) {
+  if (element.multiple || !selectedOption) {
     autocomplete.inputValue = '';
   } else {
     autocomplete.inputValue = (selectedOption.getAttribute(AUTOCOMPLETE_VALUE_ATTR) ||
