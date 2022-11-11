@@ -189,25 +189,24 @@ export default class Autocomplete {
   openAndInitializeList() {
     this.list.hidden = false;
     this.filterListWithQuery();
-    activateFirstOption(this);
+    this.activateFirstOption();
   }
 
   filterListWithQuery(query = '') {
     this.combobox.options.forEach(filterOptions(query, { matching: AUTOCOMPLETE_VALUE_ATTR }));
   }
 
+  async activateFirstOption() {
+    const selectedOption = this.combobox.options.filter(selected)[0];
+    const firstOption = selectedOption || this.combobox.visibleOptions[0];
+    await nextTick(); // `aria-activedescendant` on input field isn't always set, so we need to wait for the next tick
+    this.combobox.setActive(firstOption);
+  }
+
   set inputValue(value: string) {
     this.input.value = value;
     this.input.dispatchEvent(new Event('change'));
   }
-}
-
-async function activateFirstOption(autocomplete: Autocomplete) {
-  const { combobox } = autocomplete;
-  const selectedOption = combobox.options.filter(selected)[0];
-  const firstOption = selectedOption || combobox.visibleOptions[0];
-  await nextTick(); // `aria-activedescendant` on input field isn't always set, so we need to wait for the next tick
-  combobox.setActive(firstOption);
 }
 
 function filterOptions(query: string, { matching }: { matching: string }) {
