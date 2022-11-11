@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - Auto complete does not close when clicking outside on Firefox - [#19](https://github.com/Ambiki/ambiki-packages/pull/19)
+- `data-empty` not added after opening when list is empty - [#20](https://github.com/Ambiki/ambiki-packages/pull/20)
 
 ## [0.2.0] - 2022-07-18
 
