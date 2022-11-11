@@ -4,14 +4,14 @@ import { MAX_SAFE_INTEGER, move, MoveDirection } from '@ambiki/utils';
 const ctrlBindings = !!navigator.userAgent.match(/Macintosh/);
 
 type ComboboxOptions = {
-  isMultiple?: boolean;
+  multiple?: boolean;
   max?: number;
 };
 
 export default class Combobox {
   input: HTMLInputElement;
   list: HTMLElement;
-  isMultiple: boolean;
+  multiple: boolean;
   max: number;
   // Combobox does not use an actual hover/focus because it is not possible to focus input and options elements at the
   // same time. So for the options, it uses `data-tracking` to mimic mouse hover. But `data-tracking` is also activated
@@ -21,11 +21,11 @@ export default class Combobox {
   constructor(
     input: HTMLInputElement,
     list: HTMLElement,
-    { isMultiple = false, max = MAX_SAFE_INTEGER }: ComboboxOptions = {}
+    { multiple = false, max = MAX_SAFE_INTEGER }: ComboboxOptions = {}
   ) {
     this.input = input;
     this.list = list;
-    this.isMultiple = isMultiple;
+    this.multiple = multiple;
     this.max = max;
 
     if (!this.list.id) this.list.id = brandedId();
@@ -36,7 +36,7 @@ export default class Combobox {
     this.input.setAttribute('aria-controls', this.list.id);
     this.input.setAttribute('aria-autocomplete', 'list');
     this.list.setAttribute('role', 'listbox');
-    if (this.isMultiple) {
+    if (this.multiple) {
       this.input.setAttribute('aria-multiselectable', 'true');
     }
 
@@ -134,10 +134,10 @@ export default class Combobox {
   }
 
   selectOption(option: HTMLElement): boolean {
-    if (this.isMultiple) {
+    if (this.multiple) {
       const isSelected = option.getAttribute('aria-selected') === 'true';
       // Having a max attribute on single select combobox doesn't make sense, so we only do this check inside the
-      // `isMultiple` block
+      // `multiple` block
       if (!isSelected && this.selectedOptions.length >= this.max) return false;
 
       option.setAttribute('aria-selected', (option.getAttribute('aria-selected') !== 'true').toString());

@@ -56,7 +56,7 @@ combobox.options; // Get all the options within the `list`
 Allows multiple options to have `aria-selected="true"` attribute.
 
 ```js
-const combobox = new Combobox(input, list, { isMultiple: true });
+const combobox = new Combobox(input, list, { multiple: true });
 ```
 
 ### Adding a max constraint
@@ -64,7 +64,7 @@ const combobox = new Combobox(input, list, { isMultiple: true });
 Allow a max of 3 options to be selected. Only works for multi-select combobox.
 
 ```js
-const combobox = new Combobox(input, list, { isMultiple: true, max: 3 });
+const combobox = new Combobox(input, list, { multiple: true, max: 3 });
 ```
 
 ## Events

@@ -343,7 +343,7 @@ describe('Combobox', () => {
       input = el.querySelector('input');
       list = el.querySelector('ul');
       options = list.querySelectorAll<HTMLElement>('[role="option"]');
-      combobox = new Combobox(input, list, { isMultiple: true });
+      combobox = new Combobox(input, list, { multiple: true });
     });
 
     afterEach(() => {
@@ -368,7 +368,7 @@ describe('Combobox', () => {
     });
 
     it('cannot select more than the max count', () => {
-      combobox = new Combobox(input, list, { isMultiple: true, max: 1 });
+      combobox = new Combobox(input, list, { multiple: true, max: 1 });
       combobox.start();
 
       let expectedOption: string | null = null;

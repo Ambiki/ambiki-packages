@@ -19,7 +19,7 @@ export default class Autocomplete {
     this.list = list;
 
     this.list.hidden = true;
-    this.combobox = new Combobox(this.input, this.list, { isMultiple: this.element.multiple, max: this.element.max });
+    this.combobox = new Combobox(this.input, this.list, { multiple: this.element.multiple, max: this.element.max });
 
     this.input.setAttribute('spellcheck', 'false');
     this.input.setAttribute('autocomplete', 'off');

@@ -11,6 +11,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Support `max` option for multi-select
 
+### Changed
+
+- `isMultiple` renamed to `multiple`
+  ```js
+  new Combobox(input, list, { multiple: true });
+  ```
+
 ## [0.1.1] - 2022-07-18
 
 ### Fixed
