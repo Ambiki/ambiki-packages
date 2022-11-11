@@ -103,6 +103,33 @@
       </ul>
     </auto-complete>
 
+    <h3 style="margin-top: 40px">Multi select with max constraint (2)</h3>
+    <auto-complete for="options-max" multiple style="display: block" max="2">
+      <div style="display: flex">
+        <input type="text" class="form-control" />
+        <button type="button" data-autocomplete-reset>Reset</button>
+      </div>
+
+      <ul id="options-max" hidden>
+        <li role="option" data-autocomplete-value="Option 1">
+          Option 1
+          <span>(checked)</span>
+        </li>
+        <li role="option" data-autocomplete-value="Option 2">
+          Option 2
+          <span>(checked)</span>
+        </li>
+        <li role="option" data-autocomplete-value="Option 4">
+          Option 4
+          <span>(checked)</span>
+        </li>
+        <li role="option" data-autocomplete-value="Option 5">
+          Option 5
+          <span>(checked)</span>
+        </li>
+      </ul>
+    </auto-complete>
+
     <h3 style="margin-top: 40px">Single select</h3>
     <auto-complete for="users" style="display: block">
       <div style="display: flex">

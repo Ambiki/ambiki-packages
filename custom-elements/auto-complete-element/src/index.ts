@@ -1,3 +1,4 @@
+import { MAX_SAFE_INTEGER } from '@ambiki/utils';
 import Autocomplete from './autocomplete';
 
 export default class AutoCompleteElement extends HTMLElement {
@@ -16,6 +17,22 @@ export default class AutoCompleteElement extends HTMLElement {
 
   disconnectedCallback() {
     this.autocomplete?.destroy();
+  }
+
+  get multiple() {
+    return this.hasAttribute('multiple');
+  }
+
+  get max() {
+    if (this.hasAttribute('max') && !Number.isNaN(this.getAttribute('max'))) {
+      return Number(this.getAttribute('max'));
+    }
+
+    return MAX_SAFE_INTEGER;
+  }
+
+  set max(value: number) {
+    this.setAttribute('max', value.toString());
   }
 }
 

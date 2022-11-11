@@ -27,6 +27,10 @@ describe('AutoCompleteElement', () => {
       options = list.querySelectorAll('[role="option"]');
     });
 
+    it('#multiple returns false', () => {
+      expect(el.multiple).to.equal(false);
+    });
+
     it('sets the default attributes', () => {
       expect(input).to.have.attribute('spellcheck', 'false');
       expect(input).to.have.attribute('autocomplete', 'off');
@@ -359,6 +363,10 @@ describe('AutoCompleteElement', () => {
       input = el.querySelector('input');
       list = el.querySelector('ul');
       options = list.querySelectorAll('[role="option"]');
+    });
+
+    it('#multiple returns true', () => {
+      expect(el.multiple).to.equal(true);
     });
 
     it('does not close the list and does not update the input value', () => {

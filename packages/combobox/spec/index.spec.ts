@@ -269,6 +269,59 @@ describe('Combobox', () => {
     });
   });
 
+  describe('single selection', () => {
+    let el: HTMLElement;
+    let input: HTMLInputElement;
+    let list: HTMLElement;
+    let options: NodeListOf<HTMLElement>;
+    let combobox: Combobox;
+
+    beforeEach(async () => {
+      el = await fixture(html`
+        <div>
+          <input type="text" />
+          <ul>
+            <li role="option">Player</li>
+            <li role="option">Taxi</li>
+          </ul>
+        </div>
+      `);
+
+      input = el.querySelector('input');
+      list = el.querySelector('ul');
+      options = list.querySelectorAll<HTMLElement>('[role="option"]');
+      combobox = new Combobox(input, list);
+    });
+
+    afterEach(() => {
+      combobox.stop();
+    });
+
+    // Does not make sense to have max constraint on single select combobox. Instead if we want to restrict any option
+    // from being selected, we can set 'aria-disabled' to 'true' on all of the options.
+    it('can select more than the max count', () => {
+      combobox = new Combobox(input, list, { max: 0 });
+      combobox.start();
+
+      let expectedOption: string | null = null;
+
+      list.addEventListener('combobox:commit', (event) => {
+        expectedOption = (event.target as HTMLElement).id;
+      });
+
+      options[0].click();
+      expect(options[0]).to.have.attribute('aria-selected', 'true');
+      expect(expectedOption).to.equal(options[0].id);
+      expect(options[1]).to.have.attribute('aria-selected', 'false');
+
+      expectedOption = null;
+      options[1].click();
+      expect(options[1]).to.have.attribute('aria-selected', 'true');
+      expect(expectedOption).to.equal(options[1].id);
+      expect(options[0]).to.have.attribute('aria-selected', 'false');
+    });
+  });
+
   describe('multiple selections', () => {
     let el: HTMLElement;
     let input: HTMLInputElement;
@@ -312,6 +365,39 @@ describe('Combobox', () => {
 
       options[1].click();
       expect(options[1]).to.have.attribute('aria-selected', 'true');
+    });
+
+    it('cannot select more than the max count', () => {
+      combobox = new Combobox(input, list, { isMultiple: true, max: 1 });
+      combobox.start();
+
+      let expectedOption: string | null = null;
+
+      list.addEventListener('combobox:commit', (event) => {
+        expectedOption = (event.target as HTMLElement).id;
+      });
+
+      options[0].click();
+      expect(options[0]).to.have.attribute('aria-selected', 'true');
+      expect(expectedOption).to.equal(options[0].id);
+
+      // Cannot select the second option
+      expectedOption = null;
+      options[1].click();
+      expect(options[1]).not.to.have.attribute('aria-selected', 'true');
+      expect(expectedOption).to.equal(null);
+
+      // Deselect the first option
+      expectedOption = null;
+      options[0].click();
+      expect(options[0]).to.have.attribute('aria-selected', 'false');
+      expect(expectedOption).to.equal(options[0].id);
+
+      // Select the desired option
+      expectedOption = null;
+      options[1].click();
+      expect(options[1]).to.have.attribute('aria-selected', 'true');
+      expect(expectedOption).to.equal(options[1].id);
     });
   });
 });

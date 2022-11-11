@@ -1,21 +1,32 @@
 import { brandedId } from '@ambiki/utils/src/random-id';
-import { move, MoveDirection } from '@ambiki/utils';
+import { MAX_SAFE_INTEGER, move, MoveDirection } from '@ambiki/utils';
 
 const ctrlBindings = !!navigator.userAgent.match(/Macintosh/);
+
+type ComboboxOptions = {
+  isMultiple?: boolean;
+  max?: number;
+};
 
 export default class Combobox {
   input: HTMLInputElement;
   list: HTMLElement;
   isMultiple: boolean;
+  max: number;
   // Combobox does not use an actual hover/focus because it is not possible to focus input and options elements at the
   // same time. So for the options, it uses `data-tracking` to mimic mouse hover. But `data-tracking` is also activated
   // when ArrowDown and ArrowUp key is pressed. This distinction will help us know how the tracking is done.
   isMouseMoving = false;
 
-  constructor(input: HTMLInputElement, list: HTMLElement, { isMultiple = false } = {}) {
+  constructor(
+    input: HTMLInputElement,
+    list: HTMLElement,
+    { isMultiple = false, max = MAX_SAFE_INTEGER }: ComboboxOptions = {}
+  ) {
     this.input = input;
     this.list = list;
     this.isMultiple = isMultiple;
+    this.max = max;
 
     if (!this.list.id) this.list.id = brandedId();
 
@@ -90,8 +101,9 @@ export default class Combobox {
     const option = getClosestOptionFrom(event.target as HTMLElement);
     if (!option || !enabled(option)) return;
 
-    this.selectOption(option);
-    option.dispatchEvent(new CustomEvent('combobox:commit', { bubbles: true }));
+    if (this.selectOption(option)) {
+      option.dispatchEvent(new CustomEvent('combobox:commit', { bubbles: true }));
+    }
   }
 
   onListMouseOver(event: Event) {
@@ -121,14 +133,21 @@ export default class Combobox {
     this.setActive(option);
   }
 
-  selectOption(option: HTMLElement) {
+  selectOption(option: HTMLElement): boolean {
     if (this.isMultiple) {
+      const isSelected = option.getAttribute('aria-selected') === 'true';
+      // Having a max attribute on single select combobox doesn't make sense, so we only do this check inside the
+      // `isMultiple` block
+      if (!isSelected && this.selectedOptions.length >= this.max) return false;
+
       option.setAttribute('aria-selected', (option.getAttribute('aria-selected') !== 'true').toString());
     } else {
       for (const el of this.options.filter(enabled)) {
         el.setAttribute('aria-selected', (el === option).toString());
       }
     }
+
+    return true;
   }
 
   setActive(option: HTMLElement | undefined, { scroll = true }: { scroll?: boolean } = {}) {
@@ -173,6 +192,10 @@ export default class Combobox {
 
   get visibleOptions() {
     return this.options.filter(visible);
+  }
+
+  get selectedOptions() {
+    return this.options.filter((option) => option.getAttribute('aria-selected') === 'true');
   }
 
   get options() {
