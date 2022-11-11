@@ -151,7 +151,7 @@ export default class Autocomplete {
     dispatchEvent(this.element, 'selected', { detail: { relatedTarget: option } });
   }
 
-  onBlur(event: FocusEvent) {
+  async onBlur(event: FocusEvent) {
     const { relatedTarget } = event;
     if (!(relatedTarget instanceof HTMLElement)) {
       this.list.hidden = true;
@@ -160,6 +160,7 @@ export default class Autocomplete {
 
     const list = relatedTarget.closest<HTMLElement>('[role="listbox"]');
     if (list) {
+      await nextTick(); // Wait for nextTick before focusing (Firefox edge case)
       this.input.focus(); // Always keep focus on the input field when interacting with the list
     } else {
       this.list.hidden = true; // Hide the list for other elements that triggered the blur
