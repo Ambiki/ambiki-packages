@@ -274,10 +274,11 @@ describe('AutoCompleteElement', () => {
       expect(relatedTarget).to.equal(options[1]);
     });
 
-    it('retains focus on the input field', () => {
+    it('retains focus on the input field', async () => {
       input.focus();
       options[1].focus();
       options[1].click();
+      await nextTick();
 
       expect(document.activeElement).to.equal(input);
     });
