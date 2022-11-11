@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { nextTick } from '@ambiki/utils/src/timing';
+import { nextTick } from '@ambiki/utils';
 import '../src';
 import type AutoCompleteElement from '../src';
 

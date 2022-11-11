@@ -1,5 +1,5 @@
 import { brandedId } from '@ambiki/utils/src/random-id';
-import { move, MoveDirection } from '@ambiki/utils/src/dom';
+import { move, MoveDirection } from '@ambiki/utils';
 
 const ctrlBindings = !!navigator.userAgent.match(/Macintosh/);
 
