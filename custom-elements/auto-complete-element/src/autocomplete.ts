@@ -1,7 +1,6 @@
 import type AutoCompleteElement from './index';
 import Combobox from '@ambiki/combobox';
-import { debounce } from '@ambiki/utils/src/delay';
-import { nextTick } from '@ambiki/utils/src/timing';
+import { debounce, nextTick } from '@ambiki/utils';
 
 const AUTOCOMPLETE_VALUE_ATTR = 'data-autocomplete-value';
 const DATA_EMPTY_ATTR = 'data-empty';

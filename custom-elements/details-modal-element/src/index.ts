@@ -1,5 +1,5 @@
 import { isTabbable, tabbable } from 'tabbable';
-import { move, MoveDirection } from '@ambiki/utils/src/dom';
+import { move, MoveDirection } from '@ambiki/utils';
 
 export default class DetailsModalElement extends HTMLElement {
   details: HTMLDetailsElement | null = null;
