@@ -18,7 +18,7 @@ import '@ambiki/auto-complete-element';
 
 ```html
 <auto-complete for="list">
-  <input type="text">
+  <input type="text" />
   <ul id="list" hidden>
     <li role="option">Option 1</li>
     <li role="option">Option 2</li>
@@ -33,12 +33,23 @@ You can set the `multiple` attribute on the `<auto-complete>` to allow selection
 
 ```html
 <auto-complete for="list" multiple>
-  <input type="text">
+  <input type="text" />
   <ul id="list" hidden>
     <li role="option">Option 1</li>
     <li role="option">Option 2</li>
     <li role="option">Option 3</li>
   </ul>
+</auto-complete>
+```
+
+### Max constraint
+
+You can set the `max` attribute on the `<auto-complete>` to restrict a fixed number of selections. This only works if
+the element has `multiple` attribute set.
+
+```html
+<auto-complete for="list" multiple max="2">
+  <!-- markup -->
 </auto-complete>
 ```
 
@@ -49,7 +60,8 @@ The default filtering logic is substring.
 The `data-autocomplete-value` can be used to customize the search term.
 
 ```html
-<li role="option" data-autocomplete-value="Battlestar">Option<li>
+<li role="option" data-autocomplete-value="Battlestar">Option</li>
+<li></li>
 ```
 
 #### Blankslate
@@ -59,7 +71,7 @@ the blankslate like this:
 
 ```html
 <auto-complete for="list">
-  <input type="text">
+  <input type="text" />
   <ul id="list" class="container" hidden>
     <li role="option">Option 1</li>
     <li class="blankslate">No results found!</li>
@@ -83,7 +95,7 @@ Add `data-autocomplete-reset` attribute to an element and it will reset all the 
 
 ```html
 <auto-complete for="list">
-  <input type="text">
+  <input type="text" />
   <button type="button" data-autocomplete-reset>Reset</button>
 
   <ul id="list" class="container" hidden>
@@ -99,7 +111,7 @@ the non-selected elements visually via CSS.
 
 ```html
 <auto-complete for="list">
-  <input type="text">
+  <input type="text" />
   <ul id="list" hidden>
     <li role="option" aria-selected="true">
       Option 1
@@ -114,22 +126,23 @@ the non-selected elements visually via CSS.
 ```
 
 ```css
-li[role="option"] > span {
+li[role='option'] > span {
   display: none;
 }
 
-li[role="option"][aria-selected="true"] > span {
+li[role='option'][aria-selected='true'] > span {
   display: inline-block;
 }
 ```
 
 ### Events
+
 - `auto-complete:show` is fired immediately after removing the `hidden` attribute.
 - `auto-complete:shown` is fired after attaching the combobox functionality.
 - `auto-complete:hide` is fired immediately after adding the `hidden` attribute.
 - `auto-complete:hidden` is fired after removing the combobox functionality.
 - `auto-complete:selected` is fired after an option is selected. You can find which option was selected
-by:
+  by:
 
 ```js
 const autocomplete = document.querySelector('auto-complete');
@@ -143,4 +156,5 @@ autocomplete.addEventListener('auto-complete:selected', (event) => {
 - `auto-complete:reset` is fired after `data-autocomplete-reset` has been clicked.
 
 ## License
+
 Distributed under the MIT license.
