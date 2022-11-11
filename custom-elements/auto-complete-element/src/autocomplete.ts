@@ -24,6 +24,7 @@ export default class Autocomplete {
     this.input.setAttribute('spellcheck', 'false');
     this.input.setAttribute('autocomplete', 'off');
     this.list.setAttribute('tabindex', '-1');
+    this.list.setAttribute('aria-orientation', 'vertical');
 
     // Reset button
     this.resetButton = this.element.querySelector('[data-autocomplete-reset]');

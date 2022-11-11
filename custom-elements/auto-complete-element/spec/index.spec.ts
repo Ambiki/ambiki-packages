@@ -34,6 +34,8 @@ describe('AutoCompleteElement', () => {
     it('sets the default attributes', () => {
       expect(input).to.have.attribute('spellcheck', 'false');
       expect(input).to.have.attribute('autocomplete', 'off');
+      expect(list).to.have.attribute('tabindex', '-1');
+      expect(list).to.have.attribute('aria-orientation', 'vertical');
     });
 
     it('opens the menu on focus', () => {
