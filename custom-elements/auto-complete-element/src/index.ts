@@ -23,6 +23,14 @@ export default class AutoCompleteElement extends HTMLElement {
     return this.hasAttribute('multiple');
   }
 
+  set multiple(value: boolean) {
+    if (value) {
+      this.setAttribute('multiple', '');
+    } else {
+      this.removeAttribute('multiple');
+    }
+  }
+
   get max() {
     if (this.hasAttribute('max') && !Number.isNaN(this.getAttribute('max'))) {
       return Number(this.getAttribute('max'));
@@ -33,6 +41,22 @@ export default class AutoCompleteElement extends HTMLElement {
 
   set max(value: number) {
     this.setAttribute('max', value.toString());
+  }
+
+  get src() {
+    return this.getAttribute('src') || '';
+  }
+
+  set src(value: string) {
+    this.setAttribute('src', value);
+  }
+
+  get value() {
+    return this.getAttribute('value') || '';
+  }
+
+  set value(value: string) {
+    this.setAttribute('value', value);
   }
 }
 

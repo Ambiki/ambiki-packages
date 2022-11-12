@@ -24,6 +24,10 @@
         display: none;
       }
 
+      .loading {
+        display: none;
+      }
+
       ul {
         position: absolute;
         border: 1px solid;
@@ -41,16 +45,20 @@
         display: block;
       }
 
+      ul[loading] .loading {
+        display: block;
+      }
+
       li[role='option'] {
         padding: 6px 8px;
         cursor: pointer;
       }
 
-      li > span {
+      li > .select-menu-icon-check {
         display: none;
       }
 
-      li[aria-selected='true'] > span {
+      li[aria-selected='true'] > .select-menu-icon-check {
         display: inline-block;
       }
 
@@ -66,92 +74,104 @@
   </head>
 
   <body class="container-sm py-6">
-    <h3>Multi select</h3>
-    <auto-complete for="options" multiple style="display: block">
-      <div style="display: flex">
-        <input type="text" class="form-control" />
-        <button type="button" data-autocomplete-reset>Reset</button>
-      </div>
-
-      <ul id="options" hidden>
-        <li role="option" data-autocomplete-value="Option 1">
-          Option 1
-          <span>(checked)</span>
-        </li>
-        <li role="option" data-autocomplete-value="Option 2">
-          Option 2
-          <span>(checked)</span>
-        </li>
-        <li role="option" aria-disabled="true" data-autocomplete-value="Disabled option 1">
-          Disabled option 1
-          <span>(checked)</span>
-        </li>
-        <li role="option" disabled data-autocomplete-value="Disabled option 2">
-          Disabled option 2
-          <span>(checked)</span>
-        </li>
-        <li role="option" data-autocomplete-value="Option 4">
-          Option 4
-          <span>(checked)</span>
-        </li>
-        <li role="option" data-autocomplete-value="Option 5">
-          Option 5
-          <span>(checked)</span>
-        </li>
-
-        <li class="blankslate">Blankslate <a href="#url">link</a></li>
-      </ul>
-    </auto-complete>
-
-    <h3 style="margin-top: 40px">Multi select with max constraint (2)</h3>
-    <auto-complete for="options-max" multiple style="display: block" max="2">
-      <div style="display: flex">
-        <input type="text" class="form-control" />
-        <button type="button" data-autocomplete-reset>Reset</button>
-      </div>
-
-      <ul id="options-max" hidden>
-        <li role="option" data-autocomplete-value="Option 1">
-          Option 1
-          <span>(checked)</span>
-        </li>
-        <li role="option" data-autocomplete-value="Option 2">
-          Option 2
-          <span>(checked)</span>
-        </li>
-        <li role="option" data-autocomplete-value="Option 4">
-          Option 4
-          <span>(checked)</span>
-        </li>
-        <li role="option" data-autocomplete-value="Option 5">
-          Option 5
-          <span>(checked)</span>
-        </li>
-      </ul>
-    </auto-complete>
+    <!-- <h3>Multi select</h3> -->
+    <!-- <auto-complete for="options" multiple style="display: block"> -->
+    <!--   <div style="display: flex"> -->
+    <!--     <input type="text" class="form-control" /> -->
+    <!--     <button type="button" data-autocomplete-reset>Reset</button> -->
+    <!--   </div> -->
+    <!---->
+    <!--   <ul id="options" hidden> -->
+    <!--     <li role="option" data-autocomplete-value="Option 1"> -->
+    <!--       Option 1 -->
+    <!--       <span class="select-menu-icon-check">(checked)</span> -->
+    <!--     </li> -->
+    <!--     <li role="option" data-autocomplete-value="Option 2"> -->
+    <!--       Option 2 -->
+    <!--       <span class="select-menu-icon-check">(checked)</span> -->
+    <!--     </li> -->
+    <!--     <li role="option" aria-disabled="true" data-autocomplete-value="Disabled option 1"> -->
+    <!--       Disabled option 1 -->
+    <!--       <span class="select-menu-icon-check">(checked)</span> -->
+    <!--     </li> -->
+    <!--     <li role="option" disabled data-autocomplete-value="Disabled option 2"> -->
+    <!--       Disabled option 2 -->
+    <!--       <span class="select-menu-icon-check">(checked)</span> -->
+    <!--     </li> -->
+    <!--     <li role="option" data-autocomplete-value="Option 4"> -->
+    <!--       Option 4 -->
+    <!--       <span class="select-menu-icon-check">(checked)</span> -->
+    <!--     </li> -->
+    <!--     <li role="option" data-autocomplete-value="Option 5"> -->
+    <!--       Option 5 -->
+    <!--       <span class="select-menu-icon-check">(checked)</span> -->
+    <!--     </li> -->
+    <!---->
+    <!--     <li class="blankslate">Blankslate <a href="#url">link</a></li> -->
+    <!--   </ul> -->
+    <!-- </auto-complete> -->
+    <!---->
+    <!-- <h3 style="margin-top: 40px">Multi select with max constraint (2)</h3> -->
+    <!-- <auto-complete for="options-max" multiple style="display: block" max="2"> -->
+    <!--   <div style="display: flex"> -->
+    <!--     <input type="text" class="form-control" /> -->
+    <!--     <button type="button" data-autocomplete-reset>Reset</button> -->
+    <!--   </div> -->
+    <!---->
+    <!--   <ul id="options-max" hidden> -->
+    <!--     <li role="option" data-autocomplete-value="Option 1"> -->
+    <!--       Option 1 -->
+    <!--       <span class="select-menu-icon-check">(checked)</span> -->
+    <!--     </li> -->
+    <!--     <li role="option" data-autocomplete-value="Option 2"> -->
+    <!--       Option 2 -->
+    <!--       <span class="select-menu-icon-check">(checked)</span> -->
+    <!--     </li> -->
+    <!--     <li role="option" data-autocomplete-value="Option 4"> -->
+    <!--       Option 4 -->
+    <!--       <span class="select-menu-icon-check">(checked)</span> -->
+    <!--     </li> -->
+    <!--     <li role="option" data-autocomplete-value="Option 5"> -->
+    <!--       Option 5 -->
+    <!--       <span class="select-menu-icon-check">(checked)</span> -->
+    <!--     </li> -->
+    <!--   </ul> -->
+    <!-- </auto-complete> -->
 
     <h3 style="margin-top: 40px">Single select</h3>
-    <auto-complete for="users" style="display: block">
+    <auto-complete for="users" style="display: block" value='{"id": 2, "value":"Mike"}'>
       <div style="display: flex">
         <input type="text" class="form-control" />
-        <button type="button" data-autocomplete-reset>Reset</button>
+        <button type="button" data-autocomplete-clear>Clear</button>
       </div>
 
       <ul id="users" hidden>
-        <li role="option" data-autocomplete-value="Tim">
+        <li role="option" data-autocomplete-value="Tim" id="1">
           Tim
-          <span>(checked)</span>
+          <span class="select-menu-icon-check">(checked)</span>
         </li>
-        <li role="option" data-autocomplete-value="Mike">
+        <li role="option" data-autocomplete-value="Mike" id="2">
           Mike
-          <span>(checked)</span>
+          <span class="select-menu-icon-check">(checked)</span>
         </li>
-        <li role="option" data-autocomplete-value="Molly">
+        <li role="option" data-autocomplete-value="Molly" id="3">
           Molly
-          <span>(checked)</span>
+          <span class="select-menu-icon-check">(checked)</span>
         </li>
       </ul>
     </auto-complete>
+
+    <!-- <h3 style="margin-top: 40px">Single select with ajax</h3> -->
+    <!-- <auto-complete for="users-ajax" style="display: block" src="http://localhost:3001/auto_complete/patients"> -->
+    <!--   <div style="display: flex"> -->
+    <!--     <input type="text" class="form-control" /> -->
+    <!--     <button type="button" data-autocomplete-reset>Reset</button> -->
+    <!--   </div> -->
+    <!---->
+    <!--   <ul id="users-ajax" hidden> -->
+    <!--     <span class="loading">Loading...</span> -->
+    <!--   </ul> -->
+    <!-- </auto-complete> -->
 
     <script type="module" src="../dist/index.js"></script>
   </body>
