@@ -1,6 +1,11 @@
 import { MAX_SAFE_INTEGER } from '@ambiki/utils';
 import Autocomplete from './autocomplete';
 
+export type SelectedOption = {
+  id: string;
+  value: string;
+};
+
 export default class AutoCompleteElement extends HTMLElement {
   autocomplete: Autocomplete | null = null;
 

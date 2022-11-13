@@ -1,14 +1,10 @@
-import type AutoCompleteElement from './index';
 import Combobox from '@ambiki/combobox';
 import { debounce, handleOutsideClick, nextTick } from '@ambiki/utils';
+import type AutoCompleteElement from './index';
+import type { SelectedOption } from './index';
 
 const AUTOCOMPLETE_VALUE_ATTR = 'data-autocomplete-value';
 const DATA_EMPTY_ATTR = 'data-empty';
-
-type SelectedOption = {
-  id: string;
-  value: string;
-};
 
 export default class Autocomplete {
   element: AutoCompleteElement;
@@ -27,14 +23,11 @@ export default class Autocomplete {
     this.selectedOptions = this.value; // Fill array with user passed value
 
     this.list.hidden = true;
-    this.combobox = new Combobox(this.input, this.list, { multiple: this.element.multiple, max: this.element.max });
+    this.combobox = new Combobox(this.input, this.list, { multiple: this.multiple });
     this.initialClickTarget = null;
     this.currentQuery = null;
 
-    const option = this.getMatchingOption(this.selectedOptions);
-    if (option) {
-      this.input.value = option.value;
-    }
+    if (!this.multiple) this.populateInputWithSelectedValue();
 
     this.input.setAttribute('spellcheck', 'false');
     this.input.setAttribute('autocomplete', 'off');
@@ -93,7 +86,7 @@ export default class Autocomplete {
 
     // Trick to keep focus on the input field after clicking on the option. We could've used `this.input.focus()`,
     // but that blurs the input for a moment and then focuses back which causes a noticeable transition between
-    // the state.
+    // the state
     await nextTick();
     this.input.focus();
   }
@@ -113,28 +106,27 @@ export default class Autocomplete {
   async onOpen() {
     this.combobox.start();
 
-    const option = this.getMatchingOption(this.selectedOptions);
-    const optionItem = this.combobox.options.find((o) => o.id === option?.id.toString());
-    if (optionItem) this.combobox.selectOption(optionItem);
-
     await this.fetchResults();
     this.activateFirstOrSelectedOption();
-    this.list.toggleAttribute(DATA_EMPTY_ATTR, this.combobox.visibleOptions.length === 0);
+    this.checkIfListIsEmpty();
   }
 
   onClose() {
     this.combobox.stop();
     this.list.removeAttribute(DATA_EMPTY_ATTR);
 
-    const option = this.getMatchingOption(this.selectedOptions);
-    if (option) {
-      this.input.value = option.value;
+    // Clear out input field after closing the list for multi-select element
+    if (this.multiple) {
+      this.input.value = '';
+      return;
     }
+
+    this.populateInputWithSelectedValue();
   }
 
   onPointerdown() {
     if (!this.list.hidden) return;
-    // If it's not already active, then `onFocus` logic will apply
+    // Return early so that `onFocus` logic can be called
     if (document.activeElement !== this.input) return;
 
     this.list.hidden = false;
@@ -148,7 +140,7 @@ export default class Autocomplete {
     const query = (event.target as HTMLInputElement).value.trim();
     await this.fetchResults(query);
     this.combobox.setActive(this.combobox.visibleOptions[0]);
-    this.list.toggleAttribute(DATA_EMPTY_ATTR, this.combobox.visibleOptions.length === 0);
+    this.checkIfListIsEmpty();
   }
 
   onCommit(event: Event): void {
@@ -157,10 +149,11 @@ export default class Autocomplete {
 
     const value = option.getAttribute(AUTOCOMPLETE_VALUE_ATTR) || option.textContent || '';
     this.addOrRemoveOption({ id: option.id, value });
-    this.element.value = JSON.stringify(this.selectedOptions[0]);
-    this.list.hidden = true;
+    this.updateValueWithSelectedOptions();
+    // We want to hide the list after selecting an option for single-select auto-complete
+    if (!this.multiple) this.list.hidden = true;
 
-    dispatchEvent(this.element, 'selected', { detail: { relatedTarget: option } });
+    dispatchEvent(this.element, 'commit', { detail: { relatedTarget: option } });
   }
 
   onMousedown(event: MouseEvent): void {
@@ -185,20 +178,84 @@ export default class Autocomplete {
   }
 
   async activateFirstOrSelectedOption(): Promise<void> {
-    const selectedOption = this.getMatchingOption(this.combobox.options);
+    const selectedOption = this.getFirstSelectedOption(this.combobox.options);
     const firstOption = selectedOption || this.combobox.visibleOptions[0];
     await nextTick(); // `aria-activedescendant` on input field isn't always set, so we need to wait for the next tick
     this.combobox.setActive(firstOption);
   }
 
   addOrRemoveOption(object: SelectedOption): void {
-    this.selectedOptions = [];
-    this.selectedOptions.push(object);
+    if (this.multiple) {
+      const optionIndex = this.selectedOptions.findIndex((o) => o.id === object.id);
+
+      if (optionIndex !== -1) {
+        this.selectedOptions.splice(optionIndex, 1);
+      } else {
+        this.selectedOptions.push(object);
+      }
+    } else {
+      this.selectedOptions = [];
+      this.selectedOptions.push(object);
+    }
   }
 
-  getMatchingOption<T extends { id: string }>(options: T[]): T | undefined {
-    const valueIds = this.value.map(({ id }) => id.toString());
-    return options.find((o) => valueIds.includes(o.id.toString()));
+  populateInputWithSelectedValue() {
+    const option = this.getFirstSelectedOption(this.selectedOptions);
+    if (!option) return;
+
+    this.input.value = option.value;
+  }
+
+  updateValueWithSelectedOptions() {
+    const value = JSON.stringify(this.multiple ? this.selectedOptions : this.selectedOptions[0]);
+    this.element.value = value;
+  }
+
+  getFirstSelectedOption<T extends { id: string }>(options: T[]): T | undefined {
+    return options.find((o) => this.selectedOptionIds.includes(o.id.toString()));
+  }
+
+  checkIfListIsEmpty() {
+    this.list.toggleAttribute(DATA_EMPTY_ATTR, this.combobox.visibleOptions.length === 0);
+  }
+
+  async fetchResults(query = '') {
+    // If there's no src, then we need that all the options are present inside the list. So just filter them
+    if (!this.src) {
+      this.combobox.options.forEach(filterOptions(query, { matching: AUTOCOMPLETE_VALUE_ATTR }));
+      // Select the option(s) which matches the value
+      this.combobox.setInitialAttributesOnOptions(this.selectedOptionIds);
+      return;
+    }
+
+    // Cache query so that we don't make network request for the same `query`
+    if (this.currentQuery === query) return;
+    this.currentQuery = query;
+
+    const url = new URL(this.src, window.location.href);
+    const params = new URLSearchParams(url.search.slice(1));
+    params.append('q', query);
+    url.search = params.toString();
+
+    dispatchEvent(this.element, 'loadstart');
+    try {
+      const response = await fetch(url.toString(), {
+        credentials: 'same-origin',
+        headers: {
+          accept: 'text/fragment+html',
+        },
+      });
+      const html = await response.text();
+      this.list.innerHTML = html;
+      // Select the option(s) which matches the value
+      this.combobox.setInitialAttributesOnOptions(this.selectedOptionIds);
+
+      dispatchEvent(this.element, 'success');
+      dispatchEvent(this.element, 'loadend');
+    } catch (error) {
+      dispatchEvent(this.element, 'error');
+      dispatchEvent(this.element, 'loadend');
+    }
   }
 
   get multiple(): boolean {
@@ -223,41 +280,8 @@ export default class Autocomplete {
     }
   }
 
-  private async fetchResults(query = '') {
-    // If there's no src, then we need that all the options are present inside the list. So just filter them.
-    if (!this.src) {
-      this.combobox.options.forEach(filterOptions(query, { matching: AUTOCOMPLETE_VALUE_ATTR }));
-      return;
-    }
-
-    // Cache query so that we don't make network request for the same `query`.
-    if (this.currentQuery === query) return;
-    this.currentQuery = query;
-
-    const url = new URL(this.src, window.location.href);
-    const params = new URLSearchParams(url.search.slice(1));
-    params.append('q', query);
-    url.search = params.toString();
-
-    dispatchEvent(this.element, 'loadstart');
-    try {
-      const response = await fetch(url.toString(), {
-        credentials: 'same-origin',
-        headers: {
-          accept: 'text/fragment+html',
-        },
-      });
-      const html = await response.text();
-      this.list.innerHTML = html;
-      const selectedIds = this.value.map(({ id }) => id.toString());
-      this.combobox.setInitialAttributesOnOptions(selectedIds);
-
-      dispatchEvent(this.element, 'success');
-      dispatchEvent(this.element, 'loadend');
-    } catch (error) {
-      dispatchEvent(this.element, 'error');
-      dispatchEvent(this.element, 'loadend');
-    }
+  get selectedOptionIds() {
+    return this.value.map(({ id }) => id.toString());
   }
 }
 
