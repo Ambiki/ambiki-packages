@@ -24,7 +24,7 @@ export default class Autocomplete {
     this.selectedOptions = this.value; // Fill array with user passed value
 
     this.list.hidden = true;
-    this.combobox = new Combobox(this.input, this.list, { multiple: this.multiple });
+    this.combobox = new Combobox(this.input, this.list, { multiple: this.multiple, max: this.max });
     this.initialClickTarget = null;
     this.currentQuery = null;
 
@@ -336,6 +336,10 @@ export default class Autocomplete {
 
   get multiple(): boolean {
     return this.element.multiple;
+  }
+
+  get max(): number {
+    return this.element.max;
   }
 
   get src(): string {
