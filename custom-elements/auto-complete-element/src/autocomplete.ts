@@ -78,8 +78,10 @@ export default class Autocomplete {
 
   async onBlur(event: FocusEvent) {
     const { relatedTarget } = event;
-    if (!(relatedTarget instanceof HTMLElement)) {
-      // Need to test this out. Does this work when `<ul>` is outside the `<auto-complete>` element?
+    if (!(relatedTarget instanceof HTMLElement)) return;
+
+    // Close list when the focus moves outside of the auto-complete element
+    if (!this.element.contains(relatedTarget) && !this.list.contains(relatedTarget)) {
       this.list.hidden = true;
       return;
     }
@@ -90,7 +92,7 @@ export default class Autocomplete {
     // Trick to keep focus on the input field after clicking on the option. We could've used `this.input.focus()`,
     // but that blurs the input for a moment and then focuses back which causes a noticeable transition between
     // the state
-    await nextTick();
+    await nextTick(); // Wait for nextTick before focusing (Firefox edge case)
     this.input.focus();
   }
 
@@ -209,10 +211,9 @@ export default class Autocomplete {
     }
   }
 
-  async activateFirstOrSelectedOption(): Promise<void> {
+  activateFirstOrSelectedOption(): void {
     const selectedOption = this.getFirstSelectedOption(this.combobox.options);
     const firstOption = selectedOption || this.combobox.visibleOptions[0];
-    await nextTick(); // `aria-activedescendant` on input field isn't always set, so we need to wait for the next tick
     this.combobox.setActive(firstOption);
   }
 
