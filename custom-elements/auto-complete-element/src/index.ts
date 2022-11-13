@@ -60,8 +60,12 @@ export default class AutoCompleteElement extends HTMLElement {
     return this.getAttribute('value') || '';
   }
 
-  set value(value: string) {
-    this.setAttribute('value', value);
+  set value(value: string | undefined) {
+    if (typeof value === 'undefined') {
+      this.removeAttribute('value');
+    } else {
+      this.setAttribute('value', value);
+    }
   }
 }
 

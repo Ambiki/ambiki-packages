@@ -14,6 +14,7 @@ export default class Autocomplete {
   combobox: Combobox;
   initialClickTarget: EventTarget | null;
   currentQuery: string | null;
+  clearButton: HTMLButtonElement | null;
   listObserver: MutationObserver;
 
   constructor(element: AutoCompleteElement, input: HTMLInputElement, list: HTMLElement) {
@@ -26,6 +27,12 @@ export default class Autocomplete {
     this.combobox = new Combobox(this.input, this.list, { multiple: this.multiple });
     this.initialClickTarget = null;
     this.currentQuery = null;
+
+    // Reset button
+    this.clearButton = this.element.querySelector('[data-autocomplete-clear]');
+    if (this.clearButton && !this.clearButton.hasAttribute('aria-label')) {
+      this.clearButton.setAttribute('aria-label', 'Clear autocomplete');
+    }
 
     if (!this.multiple) this.populateInputWithSelectedValue();
 
@@ -42,6 +49,7 @@ export default class Autocomplete {
     this.onInput = debounce(this.onInput.bind(this), 300);
     this.onKeydown = this.onKeydown.bind(this);
     this.onPointerdown = this.onPointerdown.bind(this);
+    this.onClear = this.onClear.bind(this);
 
     this.input.addEventListener('focus', this.onFocus);
     this.input.addEventListener('blur', this.onBlur);
@@ -49,6 +57,7 @@ export default class Autocomplete {
     this.input.addEventListener('pointerdown', this.onPointerdown);
     this.input.addEventListener('keydown', this.onKeydown);
     this.list.addEventListener('combobox:commit', this.onCommit);
+    this.clearButton?.addEventListener('click', this.onClear);
 
     document.addEventListener('mousedown', this.onMousedown, true);
     document.addEventListener('click', this.onOutsideInteraction, true);
@@ -58,12 +67,16 @@ export default class Autocomplete {
   }
 
   destroy(): void {
+    this.list.hidden = true;
+    this.combobox.stop();
+
     this.input.removeEventListener('focus', this.onFocus);
     this.input.removeEventListener('blur', this.onBlur);
     this.input.removeEventListener('input', this.onInput);
     this.input.removeEventListener('pointerdown', this.onPointerdown);
     this.input.removeEventListener('keydown', this.onKeydown);
     this.list.removeEventListener('combobox:commit', this.onCommit);
+    this.clearButton?.removeEventListener('click', this.onClear);
 
     document.removeEventListener('mousedown', this.onMousedown, true);
     document.removeEventListener('click', this.onOutsideInteraction, true);
@@ -143,8 +156,12 @@ export default class Autocomplete {
       this.list.hidden = false;
     }
 
+    // We have to wait for the `nextTick` because when the list is closed and the input is still focused and the user
+    // types on the input field, it will not filter the options
+    await nextTick();
     const query = (event.target as HTMLInputElement).value.trim();
     await this.fetchResults(query);
+
     this.combobox.setActive(this.combobox.visibleOptions[0]);
     this.checkIfListIsEmpty();
   }
@@ -160,6 +177,29 @@ export default class Autocomplete {
     if (!this.multiple) this.list.hidden = true;
 
     dispatchEvent(this.element, 'commit', { detail: { relatedTarget: option } });
+  }
+
+  onClear(event: Event) {
+    event.preventDefault();
+
+    // Clear state
+    this.selectedOptions = [];
+    this.updateValueWithSelectedOptions();
+    // Deselect selected options
+    for (const option of this.combobox.options.filter(selected)) {
+      option.setAttribute('aria-selected', 'false');
+    }
+
+    this.input.value = '';
+    this.input.focus();
+
+    // We don't want the list to open after focusing on the `input` field
+    if (!this.list.hidden) {
+      this.list.hidden = true;
+    }
+
+    // Should fire after closing the list
+    dispatchEvent(this.element, 'clear');
   }
 
   onMousedown(event: MouseEvent): void {
@@ -234,7 +274,10 @@ export default class Autocomplete {
 
   populateInputWithSelectedValue() {
     const option = this.getFirstSelectedOption(this.selectedOptions);
-    if (!option) return;
+    if (!option) {
+      this.input.value = '';
+      return;
+    }
 
     this.input.value = option.value;
   }
@@ -601,10 +644,10 @@ function filterOptions(query: string, { matching }: { matching: string }) {
 //
 //   autocomplete.inputValue = autocomplete.element.value;
 // }
-//
-// function selected(option: HTMLElement) {
-//   return option.getAttribute('aria-selected') === 'true';
-// }
+
+function selected(option: HTMLElement) {
+  return option.getAttribute('aria-selected') === 'true';
+}
 
 function dispatchEvent(element: HTMLElement, name: string, options: CustomEventInit = {}) {
   element.dispatchEvent(new CustomEvent(`auto-complete:${name}`, { bubbles: true, ...options }));
