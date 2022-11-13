@@ -170,15 +170,26 @@ export default class Autocomplete {
     }
   }
 
-  onCommit(event: Event): void {
+  async onCommit(event: Event): Promise<void> {
     const option = event.target;
     if (!(option instanceof HTMLElement)) return;
 
     const value = option.getAttribute(AUTOCOMPLETE_VALUE_ATTR) || option.textContent || '';
     this.addOrRemoveOption({ id: option.id, value });
     this.updateValueWithSelectedOptions();
-    // We want to hide the list after selecting an option for single-select auto-complete
-    if (!this.multiple) this.list.hidden = true;
+
+    if (this.multiple) {
+      // Clear out the input field and activate the selected option or the first visible option
+      this.input.value = '';
+      await this.fetchResults();
+      const selectedOrFirstOption =
+        this.combobox.options.find((o) => o.id === option.id) || this.combobox.visibleOptions[0];
+      this.combobox.setActive(selectedOrFirstOption);
+      this.checkIfListIsEmpty();
+    } else {
+      // We want to hide the list after selecting an option for single-select auto-complete
+      this.list.hidden = true;
+    }
 
     dispatchEvent(this.element, 'commit', { detail: { relatedTarget: option } });
   }
