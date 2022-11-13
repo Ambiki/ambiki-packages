@@ -40,12 +40,14 @@ export default class Autocomplete {
     this.onOutsideInteraction = this.onOutsideInteraction.bind(this);
     this.onCommit = this.onCommit.bind(this);
     this.onInput = debounce(this.onInput.bind(this), 300);
+    this.onKeydown = this.onKeydown.bind(this);
     this.onPointerdown = this.onPointerdown.bind(this);
 
     this.input.addEventListener('focus', this.onFocus);
     this.input.addEventListener('blur', this.onBlur);
     this.input.addEventListener('input', this.onInput);
     this.input.addEventListener('pointerdown', this.onPointerdown);
+    this.input.addEventListener('keydown', this.onKeydown);
     this.list.addEventListener('combobox:commit', this.onCommit);
 
     document.addEventListener('mousedown', this.onMousedown, true);
@@ -60,6 +62,7 @@ export default class Autocomplete {
     this.input.removeEventListener('blur', this.onBlur);
     this.input.removeEventListener('input', this.onInput);
     this.input.removeEventListener('pointerdown', this.onPointerdown);
+    this.input.removeEventListener('keydown', this.onKeydown);
     this.list.removeEventListener('combobox:commit', this.onCommit);
 
     document.removeEventListener('mousedown', this.onMousedown, true);
@@ -176,6 +179,34 @@ export default class Autocomplete {
     );
 
     this.initialClickTarget = null;
+  }
+
+  onKeydown(event: KeyboardEvent) {
+    switch (event.key) {
+      case 'Escape':
+        if (!this.list.hidden) {
+          this.list.hidden = true;
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        break;
+      case 'ArrowDown':
+        if (event.altKey && this.list.hidden) {
+          this.list.hidden = false;
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        break;
+      case 'ArrowUp':
+        if (event.altKey && !this.list.hidden) {
+          this.list.hidden = true;
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        break;
+      default:
+        break;
+    }
   }
 
   async activateFirstOrSelectedOption(): Promise<void> {
