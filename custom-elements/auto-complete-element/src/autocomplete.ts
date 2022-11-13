@@ -91,14 +91,15 @@ export default class Autocomplete {
     this.input.focus();
   }
 
-  onListToggle(): void {
+  async onListToggle(): Promise<void> {
     if (this.list.hidden) {
       dispatchEvent(this.element, 'hide');
       this.onClose();
       dispatchEvent(this.element, 'hidden');
     } else {
       dispatchEvent(this.element, 'show');
-      this.onOpen();
+      await this.onOpen();
+      // Fire `shown` event after we fetch all the options
       dispatchEvent(this.element, 'shown');
     }
   }
