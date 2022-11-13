@@ -125,7 +125,14 @@ export default class Autocomplete {
   async onOpen() {
     this.combobox.start();
 
-    await this.fetchResults();
+    // Only fetch results with empty query when the input is blank or if it contains a value that has already been
+    // selected. This is kind of dirty, but it works.
+    const inputValue = this.input.value.trim();
+    const selectedValues = this.value.map(({ value }) => value.trim());
+    if (inputValue.length === 0 || selectedValues.includes(inputValue)) {
+      await this.fetchResults();
+    }
+
     this.activateFirstOrSelectedOption();
     this.checkIfListIsEmpty();
   }
@@ -152,18 +159,15 @@ export default class Autocomplete {
   }
 
   async onInput(event: Event) {
-    if (this.list.hidden) {
-      this.list.hidden = false;
-    }
-
-    // We have to wait for the `nextTick` because when the list is closed and the input is still focused and the user
-    // types on the input field, it will not filter the options
-    await nextTick();
     const query = (event.target as HTMLInputElement).value.trim();
     await this.fetchResults(query);
 
     this.combobox.setActive(this.combobox.visibleOptions[0]);
     this.checkIfListIsEmpty();
+
+    if (this.list.hidden) {
+      this.list.hidden = false;
+    }
   }
 
   onCommit(event: Event): void {
