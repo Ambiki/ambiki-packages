@@ -314,7 +314,7 @@ export default class Autocomplete {
 
     const url = new URL(this.src, window.location.href);
     const params = new URLSearchParams(url.search.slice(1));
-    params.append('q', query);
+    params.append(this.element.param, query);
     url.search = params.toString();
 
     dispatchEvent(this.element, 'loadstart');
