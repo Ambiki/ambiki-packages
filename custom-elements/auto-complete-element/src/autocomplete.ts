@@ -300,7 +300,7 @@ export default class Autocomplete {
   }
 
   async fetchResults(query = '') {
-    // If there's no src, then we need that all the options are present inside the list. So just filter them
+    // If there's no `src`, then we know that all the options are present inside the list
     if (!this.src) {
       this.combobox.options.forEach(filterOptions(query, { matching: AUTOCOMPLETE_VALUE_ATTR }));
       // Select the option(s) which matches the value
