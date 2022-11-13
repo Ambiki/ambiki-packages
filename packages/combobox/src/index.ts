@@ -175,11 +175,15 @@ export default class Combobox {
     }
   }
 
-  setInitialAttributesOnOptions() {
+  setInitialAttributesOnOptions(selectedIds: string[] = []) {
     for (const option of this.options) {
       option.setAttribute('tabindex', '-1');
       if (enabled(option) && !option.hasAttribute('aria-selected')) {
         option.setAttribute('aria-selected', 'false');
+      }
+
+      if (selectedIds.includes(option.id)) {
+        option.setAttribute('aria-selected', 'true');
       }
 
       if (!option.id) option.id = brandedId();

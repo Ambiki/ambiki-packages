@@ -17,6 +17,7 @@ export default class Autocomplete {
   selectedOptions: SelectedOption[];
   combobox: Combobox;
   initialClickTarget: EventTarget | null;
+  currentQuery: string | null;
   listObserver: MutationObserver;
 
   constructor(element: AutoCompleteElement, input: HTMLInputElement, list: HTMLElement) {
@@ -28,6 +29,7 @@ export default class Autocomplete {
     this.list.hidden = true;
     this.combobox = new Combobox(this.input, this.list, { multiple: this.element.multiple, max: this.element.max });
     this.initialClickTarget = null;
+    this.currentQuery = null;
 
     const option = this.getMatchingOption(this.selectedOptions);
     if (option) {
@@ -108,14 +110,14 @@ export default class Autocomplete {
     }
   }
 
-  onOpen() {
+  async onOpen() {
     this.combobox.start();
 
     const option = this.getMatchingOption(this.selectedOptions);
     const optionItem = this.combobox.options.find((o) => o.id === option?.id.toString());
     if (optionItem) this.combobox.selectOption(optionItem);
 
-    this.fetchResults();
+    await this.fetchResults();
     this.activateFirstOrSelectedOption();
     this.list.toggleAttribute(DATA_EMPTY_ATTR, this.combobox.visibleOptions.length === 0);
   }
@@ -138,13 +140,13 @@ export default class Autocomplete {
     this.list.hidden = false;
   }
 
-  onInput(event: Event) {
+  async onInput(event: Event) {
     if (this.list.hidden) {
       this.list.hidden = false;
     }
 
     const query = (event.target as HTMLInputElement).value.trim();
-    this.fetchResults(query);
+    await this.fetchResults(query);
     this.combobox.setActive(this.combobox.visibleOptions[0]);
     this.list.toggleAttribute(DATA_EMPTY_ATTR, this.combobox.visibleOptions.length === 0);
   }
@@ -203,6 +205,10 @@ export default class Autocomplete {
     return this.element.multiple;
   }
 
+  get src(): string {
+    return this.element.src;
+  }
+
   get value(): SelectedOption[] {
     const { value } = this.element;
     if (!value) return [];
@@ -217,8 +223,41 @@ export default class Autocomplete {
     }
   }
 
-  private fetchResults(query = '') {
-    this.combobox.options.forEach(filterOptions(query, { matching: AUTOCOMPLETE_VALUE_ATTR }));
+  private async fetchResults(query = '') {
+    // If there's no src, then we need that all the options are present inside the list. So just filter them.
+    if (!this.src) {
+      this.combobox.options.forEach(filterOptions(query, { matching: AUTOCOMPLETE_VALUE_ATTR }));
+      return;
+    }
+
+    // Cache query so that we don't make network request for the same `query`.
+    if (this.currentQuery === query) return;
+    this.currentQuery = query;
+
+    const url = new URL(this.src, window.location.href);
+    const params = new URLSearchParams(url.search.slice(1));
+    params.append('q', query);
+    url.search = params.toString();
+
+    dispatchEvent(this.element, 'loadstart');
+    try {
+      const response = await fetch(url.toString(), {
+        credentials: 'same-origin',
+        headers: {
+          accept: 'text/fragment+html',
+        },
+      });
+      const html = await response.text();
+      this.list.innerHTML = html;
+      const selectedIds = this.value.map(({ id }) => id.toString());
+      this.combobox.setInitialAttributesOnOptions(selectedIds);
+
+      dispatchEvent(this.element, 'success');
+      dispatchEvent(this.element, 'loadend');
+    } catch (error) {
+      dispatchEvent(this.element, 'error');
+      dispatchEvent(this.element, 'loadend');
+    }
   }
 }
 
