@@ -69,9 +69,12 @@ describe('Combobox', () => {
 
     it('on stopping combobox', () => {
       combobox.start();
+      options[0].click();
+      expect(options[0]).to.have.attribute('aria-selected', 'true');
       combobox.stop();
 
       expect(input).to.have.attribute('aria-expanded', 'false');
+      expect(options[0]).to.have.attribute('aria-selected', 'false');
       expect(input).not.to.have.attribute('aria-activedescendant');
       expect(options[0]).not.to.have.attribute('data-tracking');
     });
