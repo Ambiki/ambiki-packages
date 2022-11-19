@@ -193,7 +193,7 @@ export default class Autocomplete {
     dispatchEvent(this.element, 'commit', { detail: { relatedTarget: option } });
   }
 
-  onClear(event: Event) {
+  onClear(event: MouseEvent) {
     event.preventDefault();
 
     // Clear state
