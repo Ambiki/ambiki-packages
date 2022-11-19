@@ -25,7 +25,7 @@ export default class Autocomplete {
     this.selectedOptions = [];
     this.setSelectedOptions(this.value); // Fill the array with user passed value
 
-    this.list.hidden = true;
+    this.hideList();
     this.combobox = new Combobox(this.input, this.list, { multiple: this.element.multiple, max: this.element.max });
     this.currentQuery = null;
 
@@ -61,7 +61,7 @@ export default class Autocomplete {
   }
 
   destroy(): void {
-    this.list.hidden = true;
+    this.hideList();
     this.combobox.stop();
 
     this.input.removeEventListener('focus', this.onFocus);
@@ -76,14 +76,13 @@ export default class Autocomplete {
   }
 
   onFocus(): void {
-    if (!this.list.hidden) return;
-    this.list.hidden = false;
+    this.showList();
   }
 
   async onBlur(event: FocusEvent) {
     const { relatedTarget } = event;
     if (!(relatedTarget instanceof HTMLElement)) {
-      this.list.hidden = true;
+      this.hideList();
       return;
     }
 
@@ -98,7 +97,7 @@ export default class Autocomplete {
       await nextTick();
       this.input.focus();
     } else {
-      this.list.hidden = true;
+      this.hideList();
     }
   }
 
@@ -149,7 +148,7 @@ export default class Autocomplete {
     // Return early so that `onFocus` logic can be called
     if (document.activeElement !== this.input) return;
 
-    this.list.hidden = false;
+    this.showList();
   }
 
   async onInput(event: Event) {
@@ -159,9 +158,7 @@ export default class Autocomplete {
     this.combobox.setActive(this.combobox.visibleOptions[0]);
     this.checkIfListIsEmpty();
 
-    if (this.list.hidden) {
-      this.list.hidden = false;
-    }
+    this.showList();
   }
 
   async onCommit(event: Event): Promise<void> {
@@ -182,7 +179,7 @@ export default class Autocomplete {
       this.checkIfListIsEmpty();
     } else {
       // We want to hide the list after selecting an option for single-select auto-complete
-      this.list.hidden = true;
+      this.hideList();
     }
 
     dispatchEvent(this.element, 'commit', { detail: { relatedTarget: option } });
@@ -196,10 +193,7 @@ export default class Autocomplete {
     this.input.focus();
 
     // We don't want the list to open after focusing on the `input` field
-    if (!this.list.hidden) {
-      this.list.hidden = true;
-    }
-
+    this.hideList();
     // Should fire after closing the list
     dispatchEvent(this.element, 'clear');
   }
@@ -208,21 +202,21 @@ export default class Autocomplete {
     switch (event.key) {
       case 'Escape':
         if (!this.list.hidden) {
-          this.list.hidden = true;
+          this.hideList();
           event.preventDefault();
           event.stopPropagation();
         }
         break;
       case 'ArrowDown':
         if (event.altKey && this.list.hidden) {
-          this.list.hidden = false;
+          this.showList();
           event.preventDefault();
           event.stopPropagation();
         }
         break;
       case 'ArrowUp':
         if (event.altKey && !this.list.hidden) {
-          this.list.hidden = true;
+          this.hideList();
           event.preventDefault();
           event.stopPropagation();
         }
@@ -354,6 +348,16 @@ export default class Autocomplete {
 
   get selectedOptionIds() {
     return this.value.map(({ id }) => id.toString());
+  }
+
+  showList() {
+    if (!this.list.hidden) return;
+    this.list.hidden = false;
+  }
+
+  hideList() {
+    if (this.list.hidden) return;
+    this.list.hidden = true;
   }
 }
 
