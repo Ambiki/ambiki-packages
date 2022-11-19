@@ -24,7 +24,7 @@ export default class Autocomplete {
     this.selectedOptions = this.value; // Fill array with user passed value
 
     this.list.hidden = true;
-    this.combobox = new Combobox(this.input, this.list, { multiple: this.multiple, max: this.max });
+    this.combobox = new Combobox(this.input, this.list, { multiple: this.element.multiple, max: this.element.max });
     this.initialClickTarget = null;
     this.currentQuery = null;
 
@@ -34,7 +34,7 @@ export default class Autocomplete {
       this.clearButton.setAttribute('aria-label', 'Clear autocomplete');
     }
 
-    if (!this.multiple) this.populateInputWithSelectedValue();
+    if (!this.element.multiple) this.populateInputWithSelectedValue();
 
     this.input.setAttribute('spellcheck', 'false');
     this.input.setAttribute('autocomplete', 'off');
@@ -141,7 +141,7 @@ export default class Autocomplete {
     this.list.removeAttribute(DATA_EMPTY_ATTR);
 
     // Clear out input field after closing the list for multi-select element
-    if (this.multiple) {
+    if (this.element.multiple) {
       this.input.value = '';
       return;
     }
@@ -177,7 +177,7 @@ export default class Autocomplete {
     this.addOrRemoveOption({ id: option.id, value });
     this.updateValueWithSelectedOptions();
 
-    if (this.multiple) {
+    if (this.element.multiple) {
       // Clear out the input field and activate the selected option or the first visible option
       this.input.value = '';
       await this.fetchResults();
@@ -272,7 +272,7 @@ export default class Autocomplete {
   }
 
   addOrRemoveOption(object: SelectedOption): void {
-    if (this.multiple) {
+    if (this.element.multiple) {
       const optionIndex = this.selectedOptions.findIndex((o) => o.id === object.id);
 
       if (optionIndex !== -1) {
@@ -297,7 +297,7 @@ export default class Autocomplete {
   }
 
   updateValueWithSelectedOptions() {
-    const value = JSON.stringify(this.multiple ? this.selectedOptions : this.selectedOptions[0]);
+    const value = JSON.stringify(this.element.multiple ? this.selectedOptions : this.selectedOptions[0]);
     this.element.value = value;
   }
 
@@ -311,7 +311,7 @@ export default class Autocomplete {
 
   async fetchResults(query = '') {
     // If there's no `src`, then we know that all the options are present inside the list
-    if (!this.src) {
+    if (!this.element.src) {
       this.combobox.options.forEach(filterOptions(query, { matching: AUTOCOMPLETE_VALUE_ATTR }));
       // Select the option(s) which matches the value
       this.combobox.setInitialAttributesOnOptions(this.selectedOptionIds);
@@ -322,7 +322,7 @@ export default class Autocomplete {
     if (this.currentQuery === query) return;
     this.currentQuery = query;
 
-    const url = new URL(this.src, window.location.href);
+    const url = new URL(this.element.src, window.location.href);
     const params = new URLSearchParams(url.search.slice(1));
     params.append(this.element.param, query);
     url.search = params.toString();
@@ -346,18 +346,6 @@ export default class Autocomplete {
       dispatchEvent(this.element, 'error');
       dispatchEvent(this.element, 'loadend');
     }
-  }
-
-  get multiple(): boolean {
-    return this.element.multiple;
-  }
-
-  get max(): number {
-    return this.element.max;
-  }
-
-  get src(): string {
-    return this.element.src;
   }
 
   get value(): SelectedOption[] {
