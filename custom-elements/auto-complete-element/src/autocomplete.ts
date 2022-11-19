@@ -93,20 +93,19 @@ export default class Autocomplete {
     const { relatedTarget } = event;
     if (!(relatedTarget instanceof HTMLElement)) return;
 
-    // Close list when the focus moves outside of the auto-complete element
-    if (!this.element.contains(relatedTarget) && !this.list.contains(relatedTarget)) {
+    /**
+     * Trick to keep focus on the input field after clicking inside the list. We could've used `this.input.focus()`,
+     * but that blurs the input for a moment and then focuses back which causes a noticeable transition between
+     * the state
+     */
+    const list = relatedTarget.closest<HTMLElement>('[role="listbox"]');
+    if (list) {
+      // Wait for nextTick before focusing (Firefox edge case)
+      await nextTick();
+      this.input.focus();
+    } else {
       this.list.hidden = true;
-      return;
     }
-
-    const option = relatedTarget.closest<HTMLElement>('[role="option"]');
-    if (!option) return;
-
-    // Trick to keep focus on the input field after clicking on the option. We could've used `this.input.focus()`,
-    // but that blurs the input for a moment and then focuses back which causes a noticeable transition between
-    // the state
-    await nextTick(); // Wait for nextTick before focusing (Firefox edge case)
-    this.input.focus();
   }
 
   async onListToggle(): Promise<void> {
