@@ -61,7 +61,7 @@ export default class AutoCompleteElement extends HTMLElement {
   }
 
   set value(value: string | undefined) {
-    if (typeof value === 'undefined') {
+    if (typeof value === 'undefined' || value === '[]') {
       this.removeAttribute('value');
     } else {
       this.setAttribute('value', value);
