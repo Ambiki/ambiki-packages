@@ -1,5 +1,5 @@
 import Combobox from '@ambiki/combobox';
-import { debounce, handleOutsideClick, nextTick } from '@ambiki/utils';
+import { debounce, nextTick } from '@ambiki/utils';
 import type AutoCompleteElement from './index';
 import type { SelectedOption } from './index';
 
@@ -14,7 +14,6 @@ export default class Autocomplete {
   list: HTMLElement;
   selectedOptions: SelectedOption[];
   combobox: Combobox;
-  initialClickTarget: EventTarget | null;
   currentQuery: string | null;
   clearButton: HTMLButtonElement | null;
   listObserver: MutationObserver;
@@ -28,7 +27,6 @@ export default class Autocomplete {
 
     this.list.hidden = true;
     this.combobox = new Combobox(this.input, this.list, { multiple: this.element.multiple, max: this.element.max });
-    this.initialClickTarget = null;
     this.currentQuery = null;
 
     // Reset button
@@ -44,8 +42,6 @@ export default class Autocomplete {
 
     this.onFocus = this.onFocus.bind(this);
     this.onBlur = this.onBlur.bind(this);
-    this.onMousedown = this.onMousedown.bind(this);
-    this.onOutsideInteraction = this.onOutsideInteraction.bind(this);
     this.onCommit = this.onCommit.bind(this);
     this.onInput = debounce(this.onInput.bind(this), 300);
     this.onKeydown = this.onKeydown.bind(this);
@@ -59,9 +55,6 @@ export default class Autocomplete {
     this.input.addEventListener('keydown', this.onKeydown);
     this.list.addEventListener('combobox:commit', this.onCommit);
     this.clearButton?.addEventListener('click', this.onClear);
-
-    document.addEventListener('mousedown', this.onMousedown, true);
-    document.addEventListener('click', this.onOutsideInteraction, true);
 
     this.listObserver = new MutationObserver(this.onListToggle.bind(this));
     this.listObserver.observe(this.list, { attributes: true, attributeFilter: ['hidden'] });
@@ -79,9 +72,6 @@ export default class Autocomplete {
     this.list.removeEventListener('combobox:commit', this.onCommit);
     this.clearButton?.removeEventListener('click', this.onClear);
 
-    document.removeEventListener('mousedown', this.onMousedown, true);
-    document.removeEventListener('click', this.onOutsideInteraction, true);
-
     this.listObserver.disconnect();
   }
 
@@ -92,7 +82,10 @@ export default class Autocomplete {
 
   async onBlur(event: FocusEvent) {
     const { relatedTarget } = event;
-    if (!(relatedTarget instanceof HTMLElement)) return;
+    if (!(relatedTarget instanceof HTMLElement)) {
+      this.list.hidden = true;
+      return;
+    }
 
     /**
      * Trick to keep focus on the input field after clicking inside the list. We could've used `this.input.focus()`,
@@ -209,27 +202,6 @@ export default class Autocomplete {
 
     // Should fire after closing the list
     dispatchEvent(this.element, 'clear');
-  }
-
-  onMousedown(event: MouseEvent): void {
-    this.initialClickTarget = event.composedPath?.()?.[0] || event.target;
-  }
-
-  onOutsideInteraction(event: MouseEvent | FocusEvent): void {
-    if (this.list.hidden || !this.initialClickTarget) return;
-
-    handleOutsideClick(
-      event,
-      () => {
-        return this.initialClickTarget as HTMLElement;
-      },
-      [this.element, this.list],
-      () => {
-        this.list.hidden = true;
-      }
-    );
-
-    this.initialClickTarget = null;
   }
 
   onKeydown(event: KeyboardEvent) {
