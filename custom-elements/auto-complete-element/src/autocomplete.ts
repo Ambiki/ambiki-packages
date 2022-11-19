@@ -6,6 +6,8 @@ import type { SelectedOption } from './index';
 const AUTOCOMPLETE_VALUE_ATTR = 'data-autocomplete-value';
 const DATA_EMPTY_ATTR = 'data-empty';
 
+export type ParsedValue = SelectedOption | SelectedOption[] | null;
+
 export default class Autocomplete {
   element: AutoCompleteElement;
   input: HTMLInputElement;
@@ -21,7 +23,8 @@ export default class Autocomplete {
     this.element = element;
     this.input = input;
     this.list = list;
-    this.selectedOptions = this.value; // Fill array with user passed value
+    this.selectedOptions = [];
+    this.setSelectedOptions(this.value); // Fill the array with user passed value
 
     this.list.hidden = true;
     this.combobox = new Combobox(this.input, this.list, { multiple: this.element.multiple, max: this.element.max });
@@ -33,8 +36,6 @@ export default class Autocomplete {
     if (this.clearButton && !this.clearButton.hasAttribute('aria-label')) {
       this.clearButton.setAttribute('aria-label', 'Clear autocomplete');
     }
-
-    if (!this.element.multiple) this.populateInputWithSelectedValue();
 
     this.input.setAttribute('spellcheck', 'false');
     this.input.setAttribute('autocomplete', 'off');
@@ -132,6 +133,7 @@ export default class Autocomplete {
       await this.fetchResults();
     }
 
+    this.combobox.setInitialAttributesOnOptions(this.selectedOptionIds);
     this.activateFirstOrSelectedOption();
     this.checkIfListIsEmpty();
   }
@@ -146,7 +148,7 @@ export default class Autocomplete {
       return;
     }
 
-    this.populateInputWithSelectedValue();
+    this.setInputValueWithSelectedValue();
   }
 
   onPointerdown() {
@@ -197,14 +199,7 @@ export default class Autocomplete {
     event.preventDefault();
 
     // Clear state
-    this.selectedOptions = [];
-    this.updateValueWithSelectedOptions();
-    // Deselect selected options
-    for (const option of this.combobox.options.filter(selected)) {
-      option.setAttribute('aria-selected', 'false');
-    }
-
-    this.input.value = '';
+    this.element.value = '';
     this.input.focus();
 
     // We don't want the list to open after focusing on the `input` field
@@ -273,7 +268,7 @@ export default class Autocomplete {
 
   addOrRemoveOption(object: SelectedOption): void {
     if (this.element.multiple) {
-      const optionIndex = this.selectedOptions.findIndex((o) => o.id === object.id);
+      const optionIndex = this.selectedOptions.findIndex(({ id }) => id.toString() === object.id.toString());
 
       if (optionIndex !== -1) {
         this.selectedOptions.splice(optionIndex, 1);
@@ -286,7 +281,9 @@ export default class Autocomplete {
     }
   }
 
-  populateInputWithSelectedValue() {
+  setInputValueWithSelectedValue() {
+    if (this.element.multiple) return;
+
     const option = this.getFirstSelectedOption(this.selectedOptions);
     if (!option) {
       this.input.value = '';
@@ -349,17 +346,38 @@ export default class Autocomplete {
   }
 
   get value(): SelectedOption[] {
-    const { value } = this.element;
-    if (!value) return [];
-
     try {
-      const parsedValue = JSON.parse(value) as SelectedOption | SelectedOption[];
+      const parsedValue = JSON.parse(this.element.value) as ParsedValue;
+      if (!parsedValue) throw new Error();
       if (Array.isArray(parsedValue)) return parsedValue;
 
       return [parsedValue];
     } catch {
       return [];
     }
+  }
+
+  set value(value: string | SelectedOption[]) {
+    const _value = typeof value === 'string' ? value : JSON.stringify(value);
+
+    try {
+      const parsedValue = JSON.parse(_value) as ParsedValue;
+      if (!parsedValue) throw new Error();
+
+      if (Array.isArray(parsedValue)) {
+        this.setSelectedOptions(parsedValue);
+        return;
+      }
+
+      this.setSelectedOptions([parsedValue]);
+    } catch {
+      this.setSelectedOptions([]);
+    }
+  }
+
+  setSelectedOptions(options: SelectedOption[]) {
+    this.selectedOptions = options;
+    this.setInputValueWithSelectedValue();
   }
 
   get selectedOptionIds() {
@@ -651,9 +669,9 @@ function filterOptions(query: string, { matching }: { matching: string }) {
 //   autocomplete.inputValue = autocomplete.element.value;
 // }
 
-function selected(option: HTMLElement) {
-  return option.getAttribute('aria-selected') === 'true';
-}
+// function selected(option: HTMLElement) {
+//   return option.getAttribute('aria-selected') === 'true';
+// }
 
 function dispatchEvent(element: HTMLElement, name: string, options: CustomEventInit = {}) {
   element.dispatchEvent(new CustomEvent(`auto-complete:${name}`, { bubbles: true, ...options }));

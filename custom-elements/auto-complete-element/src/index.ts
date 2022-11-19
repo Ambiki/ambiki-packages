@@ -9,7 +9,7 @@ export type SelectedOption = {
 export default class AutoCompleteElement extends HTMLElement {
   autocomplete: Autocomplete | null = null;
 
-  connectedCallback() {
+  connectedCallback(): void {
     const input = this.querySelector<HTMLInputElement>('input:not([type="hidden"])');
     const id = this.getAttribute('for');
     if (!id) return;
@@ -20,11 +20,23 @@ export default class AutoCompleteElement extends HTMLElement {
     this.autocomplete = new Autocomplete(this, input, list);
   }
 
-  disconnectedCallback() {
+  disconnectedCallback(): void {
     this.autocomplete?.destroy();
   }
 
-  get multiple() {
+  static get observedAttributes(): string[] {
+    return ['value'];
+  }
+
+  attributeChangedCallback(_name: string, oldValue: string, newValue: string): void {
+    if (oldValue === newValue) return;
+
+    if (this.autocomplete) {
+      this.autocomplete.value = newValue;
+    }
+  }
+
+  get multiple(): boolean {
     return this.hasAttribute('multiple');
   }
 
@@ -36,7 +48,7 @@ export default class AutoCompleteElement extends HTMLElement {
     }
   }
 
-  get max() {
+  get max(): number {
     if (this.hasAttribute('max') && !Number.isNaN(this.getAttribute('max'))) {
       return Number(this.getAttribute('max'));
     }
@@ -48,7 +60,7 @@ export default class AutoCompleteElement extends HTMLElement {
     this.setAttribute('max', value.toString());
   }
 
-  get src() {
+  get src(): string {
     return this.getAttribute('src') || '';
   }
 
@@ -56,12 +68,12 @@ export default class AutoCompleteElement extends HTMLElement {
     this.setAttribute('src', value);
   }
 
-  get value() {
+  get value(): string {
     return this.getAttribute('value') || '';
   }
 
   set value(value: string | undefined) {
-    if (typeof value === 'undefined' || value === '[]') {
+    if (typeof value === 'undefined' || value === '[]' || !value) {
       this.removeAttribute('value');
     } else {
       this.setAttribute('value', value);

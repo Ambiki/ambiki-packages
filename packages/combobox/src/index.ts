@@ -60,6 +60,7 @@ export default class Combobox {
   stop() {
     this.isMouseMoving = false;
     this.clearActiveOption();
+    this.clearSelectedOptions();
     this.input.setAttribute('aria-expanded', 'false');
 
     this.input.removeEventListener('keydown', this.onKeydown);
@@ -172,6 +173,12 @@ export default class Combobox {
     this.input.removeAttribute('aria-activedescendant');
     for (const option of this.list.querySelectorAll<HTMLElement>('[data-tracking]')) {
       option.removeAttribute('data-tracking');
+    }
+  }
+
+  clearSelectedOptions() {
+    for (const option of this.selectedOptions) {
+      option.setAttribute('aria-selected', 'false');
     }
   }
 
