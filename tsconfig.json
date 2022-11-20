@@ -5,7 +5,8 @@
       "@ambiki/clippy-copy-element": ["./custom-elements/clippy-copy-element/src"],
       "@ambiki/details-modal-element": ["./custom-elements/details-modal-element/src"],
       "@ambiki/combobox": ["./packages/combobox/src"],
-      "@ambiki/utils": ["./packages/utils/src"]
+      "@ambiki/utils": ["./packages/utils/src"],
+      "@ambiki/test-utils": ["./packages/test-utils/src"]
     }
   },
   "include": [
@@ -13,6 +14,7 @@
     "./custom-elements/clippy-copy-element/src/**/.ts",
     "./custom-elements/details-modal-element/src/**/.ts",
     "./packages/combobox/src/**/.ts",
-    "./packages/utils/src/**/.ts"
+    "./packages/utils/src/**/.ts",
+    "./packages/test-utils/**/.ts"
   ]
 }
