@@ -538,9 +538,65 @@ describe('AutoCompleteElement', () => {
       input.dispatchEvent(new MouseEvent('pointerdown'));
       expect(list.hidden).to.be.false;
     });
+
+    it('dispatches show and shown events in order', async () => {
+      const el: AutoCompleteElement = await fixture(html`
+        <auto-complete for="list">
+          <input type="text" />
+          <ul id="list"></ul>
+        </auto-complete>
+      `);
+
+      const input = find('input');
+      const list = find('#list');
+
+      const events: string[] = [];
+      const track = (event: Event) => events.push(event.type);
+
+      el.addEventListener('auto-complete:show', track);
+      el.addEventListener('auto-complete:shown', track);
+
+      const completed = Promise.all([oneEvent(el, 'auto-complete:show'), oneEvent(el, 'auto-complete:shown')]);
+      await triggerFocusFor(input);
+      await nextTick();
+      expect(list.hidden).to.be.false;
+
+      await completed;
+
+      expect(events).to.eql(['auto-complete:show', 'auto-complete:shown']);
+    });
   });
 
   describe('closing the list', () => {
+    it('dispatches hide and hidden events in order', async () => {
+      const el: AutoCompleteElement = await fixture(html`
+        <auto-complete for="list">
+          <input type="text" />
+          <ul id="list"></ul>
+        </auto-complete>
+      `);
+
+      const input = find('input');
+      const list = find('#list');
+
+      const events: string[] = [];
+      const track = (event: Event) => events.push(event.type);
+
+      el.addEventListener('auto-complete:hide', track);
+      el.addEventListener('auto-complete:hidden', track);
+
+      const completed = Promise.all([oneEvent(el, 'auto-complete:hide'), oneEvent(el, 'auto-complete:hidden')]);
+      await triggerFocusFor(input);
+      await nextTick();
+      expect(list.hidden).to.be.false;
+      await triggerBlurFor(input);
+      expect(list.hidden).to.be.true;
+
+      await completed;
+
+      expect(events).to.eql(['auto-complete:hide', 'auto-complete:hidden']);
+    });
+
     it('removes data-empty attribute from the list', async () => {
       await fixture(html`
         <auto-complete for="list">
