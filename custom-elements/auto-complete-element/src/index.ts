@@ -83,6 +83,10 @@ export default class AutoCompleteElement extends HTMLElement {
   get param(): string {
     return this.getAttribute('param') || 'q';
   }
+
+  set param(value: string) {
+    this.setAttribute('param', value);
+  }
 }
 
 declare global {
