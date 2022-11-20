@@ -5,6 +5,54 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Fetch options remotely with `src` attribute
+
+  ```html
+  <auto-complete for="users" multiple src="/users">
+    <input type="text" class="form-control" />
+    <ul id="users" hidden></ul>
+  </auto-complete>
+  ```
+
+  This makes a request to `/users?q=query` endpoint with `query` being the search term. Search param can be changed by
+  setting a `param` attribute on the auto-complete element
+
+- Users can update or watch for `value` attribute changes. Single-select auto-complete element sets a stringified object
+  whereas multi-select sets a stringified array of objects
+
+  ```html
+  <auto-complete value='{ "id": "1", "value": "Some value" }'>
+    <!-- markup -->
+  </auto-complete>
+  ```
+
+- Support for initial selected options
+
+  - Single
+
+    ```html
+    <auto-complete value='{ "id": "1", "value": "Some value" }'>
+      <!-- markup -->
+    </auto-complete>
+    ```
+
+  - Multiple
+    ```html
+    <auto-complete multiple value='[{ "id": "1", "value": "Some value" }, { "id": "2", "value": "Another value" }]'>
+      <!-- markup -->
+    </auto-complete>
+    ```
+
+### Changed
+
+- Renamed `auto-complete:selected` event to `auto-complete:commit`
+- Renamed `auto-complete:reset` event to `auto-complete:clear`
+- Renamed `data-autocomplete-reset` attribute to `data-autocomplete-clear`
+
 ## [0.3.0] - 2022-11-11
 
 ### Added
