@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Fetch options remotely with `src` attribute
+- Fetch options remotely with the `src` attribute
 
   ```html
   <auto-complete for="users" multiple src="/users">
@@ -30,7 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   </auto-complete>
   ```
 
-- Support for initial selected options
+- Support for initially selected options
 
   - Single
 
