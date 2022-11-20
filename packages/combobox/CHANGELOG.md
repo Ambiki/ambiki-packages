@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Ureleased]
 
+### Fixed
+
+- `setActive` function cannot find the option when `option` is a `node`
+
 ### Changed
 
 - `setInitialAttributesOnOptions` API takes an array of selected option ids (`string[]`)
