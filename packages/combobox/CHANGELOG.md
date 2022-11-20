@@ -9,8 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- `setInitialAttributesOnOptions` API takes an array of selected ids (`string[]`)
-- All selected options are unselected when combobox is stopeed
+- `setInitialAttributesOnOptions` API takes an array of selected option ids (`string[]`)
+- All selected options are unselected when combobox is stopped
 
 ## [1.0.0] - 2022-11-11
 
