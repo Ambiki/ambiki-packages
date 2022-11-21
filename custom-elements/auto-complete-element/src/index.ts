@@ -6,7 +6,8 @@ export type SelectedOption = {
   value: string;
 };
 
-export type ParsedValue = SelectedOption | SelectedOption[] | null;
+export type Value = SelectedOption | SelectedOption[];
+export type ParsedValue = Value | null;
 
 export default class AutoCompleteElement extends HTMLElement {
   autocomplete: Autocomplete | null = null;
@@ -70,13 +71,13 @@ export default class AutoCompleteElement extends HTMLElement {
     this.setAttribute('src', value);
   }
 
-  get value(): SelectedOption | SelectedOption[] {
+  get value(): Value {
     const value = this.getAttribute('value') || '';
     if (this.multiple) return getParsedValue(value);
     return getParsedValue(value)[0] ? getParsedValue(value)[0] : <SelectedOption>{};
   }
 
-  set value(value: SelectedOption | SelectedOption[]) {
+  set value(value: Value) {
     const _value = JSON.stringify(value);
 
     if (typeof _value === 'undefined' || _value === '[]' || !_value) {
