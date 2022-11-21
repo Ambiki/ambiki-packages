@@ -69,7 +69,7 @@ In both the above cases, `id` is the `id` of an `option` and `value` is the `inn
 attribute of an `option` item.
 
 You can also use the `value` attribute to set the initially selected options either by inlining or via `JavaScript`.
-Here's how you can do it with `JavaScript`,
+Here's how you can do it with `JavaScript`:
 
 ```js
 const autocomplete = document.querySelector('auto-complete');
