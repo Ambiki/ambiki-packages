@@ -68,7 +68,20 @@ whether the `auto-complete` is a single-select or a multi-select.
 In both the above cases, `id` is the `id` of an `option` and `value` is the `innerText` or `data-autocomplete-value`
 attribute of an `option` item.
 
-You can also use the `value` attribute to set the initially selected options.
+You can also use the `value` attribute to set the initially selected options either by inlining or via `JavaScript`.
+Here's how you can do it with `JavaScript`,
+
+```js
+const autocomplete = document.querySelector('auto-complete');
+
+if (autocomplete.multiple) {
+  autocomplete.value = [{ id: '1', value: 'Player' }];
+} else {
+  autocomplete.value = { id: '1', value: 'Player' };
+}
+```
+
+[See full list of API](./src/index.ts)
 
 #### `src`
 
