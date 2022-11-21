@@ -112,6 +112,29 @@
     </auto-complete>
     <button type="button" id="options-value-button">Set value</button>
 
+    <h3 style="margin-top: 40px">Multi select Ambiki</h3>
+    <ul id="ambiki-container" style="position: static; border: 0"></ul>
+    <auto-complete for="ambiki-options" multiple>
+      <div style="display: flex">
+        <input type="text" class="form-control" />
+      </div>
+
+      <ul id="ambiki-options" hidden>
+        <li id="1" role="option" data-autocomplete-value="Option 1">
+          Option 1
+          <span class="select-menu-icon-check">(checked)</span>
+        </li>
+        <li id="2" role="option" data-autocomplete-value="Option 2">
+          Option 2
+          <span class="select-menu-icon-check">(checked)</span>
+        </li>
+        <li id="4" role="option" data-autocomplete-value="Option 4">
+          Option 4
+          <span class="select-menu-icon-check">(checked)</span>
+        </li>
+      </ul>
+    </auto-complete>
+
     <h3 style="margin-top: 40px">Multi select with ajax</h3>
     <auto-complete for="multi-options-ajax" multiple src="http://localhost:3001/auto_complete/patients">
       <div style="display: flex">
@@ -192,27 +215,62 @@
       const usersAutocomplete = document.querySelector('auto-complete[for="users"]');
 
       usersValueButton.addEventListener('click', (event) => {
-        usersAutocomplete.value = JSON.stringify({ id: 3, value: 'Molly' });
+        usersAutocomplete.value = { id: 3, value: 'Molly' };
       });
 
       const optionsValueButton = document.getElementById('options-value-button');
       const optionsAutocomplete = document.querySelector('auto-complete[for="options"]');
 
       optionsValueButton.addEventListener('click', (event) => {
-        optionsAutocomplete.value = JSON.stringify([
+        optionsAutocomplete.value = [
           { id: 4, value: 'Option 4' },
           { id: 2, value: 'Option 2' },
-        ]);
+        ];
       });
 
       const multiOptionsAjaxButton = document.getElementById('multi-options-ajax-value-button');
       const optionsAjaxAutocomplete = document.querySelector('auto-complete[for="multi-options-ajax"]');
 
       multiOptionsAjaxButton.addEventListener('click', (event) => {
-        optionsAjaxAutocomplete.value = JSON.stringify([
+        optionsAjaxAutocomplete.value = [
           { id: '1065c291-2458-42b7-8de8-e5d1e64cf1e7', value: 'Burl S Abbott' },
           { id: '86539f99-2dde-4eef-a935-1429acda2513', value: 'Tracy L Altenwerth' },
-        ]);
+        ];
+      });
+
+      const ambikiAutocomplete = document.querySelector('auto-complete[for="ambiki-options"]');
+      const ambikiContainer = document.getElementById('ambiki-container');
+
+      ambikiAutocomplete.addEventListener('auto-complete:commit', (event) => {
+        const option = event.detail.relatedTarget;
+        const existingOption = ambikiContainer.querySelector(`[data-id="${option.id}"]`);
+        if (existingOption) {
+          existingOption.remove();
+        } else {
+          const li = document.createElement('li');
+          li.setAttribute('data-id', option.id.toString());
+          li.setAttribute('data-token', '');
+          li.innerText = option.dataset.autocompleteValue;
+          ambikiContainer.append(li);
+        }
+      });
+
+      const ambikiInput = ambikiAutocomplete.querySelector('input[type="text"]');
+      ambikiInput.addEventListener('keydown', (event) => {
+        if (event.key !== 'Backspace') return;
+        const tokens = Array.from(ambikiContainer.querySelectorAll('[data-token]'));
+        if (!tokens.length) return;
+
+        if (event.target.value) return;
+
+        const lastToken = tokens[tokens.length - 1];
+        const autocompleteValue = ambikiAutocomplete.value;
+        const index = autocompleteValue.findIndex((a) => a.id === lastToken.dataset.id);
+        if (index === -1) return;
+
+        lastToken.remove();
+        autocompleteValue.splice(index, 1);
+        ambikiAutocomplete.value = autocompleteValue;
       });
     </script>
   </body>

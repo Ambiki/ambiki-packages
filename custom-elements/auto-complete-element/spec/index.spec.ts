@@ -119,6 +119,122 @@ describe('AutoCompleteElement', () => {
     });
   });
 
+  describe('#value', () => {
+    describe('single select', () => {
+      it('returns an empty object if value is blank', async () => {
+        await fixture(html`
+          <auto-complete for="list">
+            <input type="text" />
+            <ul id="list">
+              <li role="option">Player</li>
+            </ul>
+          </auto-complete>
+        `);
+
+        const el = find<AutoCompleteElement>('auto-complete');
+        expect(el.value).to.eql({});
+      });
+
+      it('returns an object if value is selected', async () => {
+        await fixture(html`
+          <auto-complete for="list" value='{ "id": 1, "value": "Player" }'>
+            <input type="text" />
+            <ul id="list">
+              <li id="1" role="option">Player</li>
+            </ul>
+          </auto-complete>
+        `);
+
+        const el = find<AutoCompleteElement>('auto-complete');
+        expect(el.value).to.eql({ id: '1', value: 'Player' });
+      });
+    });
+
+    describe('multi select', () => {
+      it('returns an empty array if value is blank', async () => {
+        await fixture(html`
+          <auto-complete for="list" multiple>
+            <input type="text" />
+            <ul id="list">
+              <li role="option">Player</li>
+            </ul>
+          </auto-complete>
+        `);
+
+        const el = find<AutoCompleteElement>('auto-complete');
+        expect(el.value).to.eql([]);
+      });
+
+      it('returns an array of objects if value is selected', async () => {
+        await fixture(html`
+          <auto-complete
+            for="list"
+            multiple
+            value='[{ "id": 1, "value": "Player" }, { "id": 2, "value": "Manhattan" }]'
+          >
+            <input type="text" />
+            <ul id="list">
+              <li id="1" role="option">Player</li>
+              <li id="2" role="option">Manhattan</li>
+            </ul>
+          </auto-complete>
+        `);
+
+        const el = find<AutoCompleteElement>('auto-complete');
+        expect(el.value).to.eql([
+          { id: '1', value: 'Player' },
+          { id: '2', value: 'Manhattan' },
+        ]);
+      });
+    });
+  });
+
+  describe('#value=', () => {
+    describe('single select', () => {
+      it('sets the value', async () => {
+        await fixture(html`
+          <auto-complete for="list">
+            <input type="text" />
+            <ul id="list">
+              <li id="1" role="option">Player</li>
+              <li role="option">Taxi</li>
+            </ul>
+          </auto-complete>
+        `);
+
+        const el = find<AutoCompleteElement>('auto-complete');
+        el.value = { id: '1', value: 'Player' };
+
+        expect(el.value).to.eql({ id: '1', value: 'Player' });
+      });
+    });
+
+    describe('multi select', () => {
+      it('sets the value', async () => {
+        await fixture(html`
+          <auto-complete for="list" multiple>
+            <input type="text" />
+            <ul id="list">
+              <li id="1" role="option">Player</li>
+              <li id="2" role="option">Taxi</li>
+            </ul>
+          </auto-complete>
+        `);
+
+        const el = find<AutoCompleteElement>('auto-complete');
+        el.value = [
+          { id: '1', value: 'Player' },
+          { id: '2', value: 'Taxi' },
+        ];
+
+        expect(el.value).to.eql([
+          { id: '1', value: 'Player' },
+          { id: '2', value: 'Taxi' },
+        ]);
+      });
+    });
+  });
+
   describe('initial focus', () => {
     it('focuses on the first option when there are no selected option', async () => {
       await fixture(html`
@@ -244,7 +360,7 @@ describe('AutoCompleteElement', () => {
 
         await triggerKeyEvent(input, 'keydown', { key: 'Enter' });
 
-        expect(JSON.parse(el.value)).to.eql({ id: '1', value: 'Player' });
+        expect(el.value).to.eql({ id: '1', value: 'Player' });
         expect(list.hidden).to.be.true;
       });
     });
@@ -283,7 +399,7 @@ describe('AutoCompleteElement', () => {
 
         await triggerKeyEvent(input, 'keydown', { key: 'Tab' });
 
-        expect(JSON.parse(el.value)).to.eql({ id: '1', value: 'Player' });
+        expect(el.value).to.eql({ id: '1', value: 'Player' });
         expect(list.hidden).to.be.true;
       });
     });
@@ -320,7 +436,7 @@ describe('AutoCompleteElement', () => {
         expectOptionConnectedWithInput(options[0], input);
 
         options[0].click();
-        expect(el.value).to.equal('');
+        expect(el.value).to.eql({});
       });
     });
 
@@ -359,7 +475,7 @@ describe('AutoCompleteElement', () => {
 
         options[0].click();
 
-        expect(JSON.parse(el.value)).to.eql({ id: '1', value: 'Player' });
+        expect(el.value).to.eql({ id: '1', value: 'Player' });
         expect(list.hidden).to.be.true;
       });
     });
@@ -396,7 +512,7 @@ describe('AutoCompleteElement', () => {
         relatedTarget = null;
         await oneEvent(el, 'auto-complete:commit');
         expect(relatedTarget).to.equal(options[0]);
-        expect(JSON.parse(el.value)).to.eql([{ id: '1', value: 'Player' }]);
+        expect(el.value).to.eql([{ id: '1', value: 'Player' }]);
         expect(list.hidden).to.be.false;
         expect(document.activeElement).to.equal(input);
 
@@ -404,7 +520,7 @@ describe('AutoCompleteElement', () => {
         relatedTarget = null;
         await oneEvent(el, 'auto-complete:commit');
         expect(relatedTarget).to.equal(options[1]);
-        expect(JSON.parse(el.value)).to.eql([
+        expect(el.value).to.eql([
           { id: '1', value: 'Player' },
           { id: '2', value: 'Taxi' },
         ]);

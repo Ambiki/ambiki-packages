@@ -1,12 +1,10 @@
 import Combobox from '@ambiki/combobox';
-import { debounce, nextTick } from '@ambiki/utils';
+import { debounce, isEmpty, nextTick } from '@ambiki/utils';
 import type AutoCompleteElement from './index';
 import type { SelectedOption } from './index';
 
 const AUTOCOMPLETE_VALUE_ATTR = 'data-autocomplete-value';
 const DATA_EMPTY_ATTR = 'data-empty';
-
-export type ParsedValue = SelectedOption | SelectedOption[] | null;
 
 export default class Autocomplete {
   element: AutoCompleteElement;
@@ -29,7 +27,7 @@ export default class Autocomplete {
     this.combobox = new Combobox(this.input, this.list, { multiple: this.element.multiple, max: this.element.max });
     this.currentQuery = null;
 
-    // Reset button
+    // Clear button
     this.clearButton = this.element.querySelector('[data-autocomplete-clear]');
     if (this.clearButton && !this.clearButton.hasAttribute('aria-label')) {
       this.clearButton.setAttribute('aria-label', 'Clear autocomplete');
@@ -117,7 +115,7 @@ export default class Autocomplete {
   async onOpen() {
     this.combobox.start();
 
-    // Only fetch results with empty query when the input is blank or if it contains a value that has already been
+    // Only fetch results with an empty query when the input is blank or if it contains a value that has already been
     // selected. This is kind of dirty, but it works.
     const inputValue = this.input.value.trim();
     const selectedValues = this.value.map(({ value }) => value.trim());
@@ -189,7 +187,7 @@ export default class Autocomplete {
     event.preventDefault();
 
     // Clear state
-    this.element.value = '';
+    this.element.value = [];
     this.input.focus();
 
     // We don't want the list to open after focusing on the `input` field
@@ -234,12 +232,12 @@ export default class Autocomplete {
 
   addOrRemoveOption(object: SelectedOption): void {
     if (this.element.multiple) {
-      const optionIndex = this.selectedOptions.findIndex(({ id }) => id.toString() === object.id.toString());
+      const optionIndex = this.selectedOptions.findIndex(({ id }) => id === object.id);
 
-      if (optionIndex !== -1) {
-        this.selectedOptions.splice(optionIndex, 1);
-      } else {
+      if (optionIndex === -1) {
         this.selectedOptions.push(object);
+      } else {
+        this.selectedOptions.splice(optionIndex, 1);
       }
     } else {
       this.selectedOptions = [];
@@ -260,12 +258,12 @@ export default class Autocomplete {
   }
 
   updateValueWithSelectedOptions() {
-    const value = JSON.stringify(this.element.multiple ? this.selectedOptions : this.selectedOptions[0]);
+    const value = this.element.multiple ? this.selectedOptions : this.selectedOptions[0];
     this.element.value = value;
   }
 
   getFirstSelectedOption<T extends { id: string }>(options: T[]): T | undefined {
-    return options.find((o) => this.selectedOptionIds.includes(o.id.toString()));
+    return options.find((o) => this.selectedOptionIds.includes(o.id));
   }
 
   checkIfListIsEmpty() {
@@ -312,33 +310,22 @@ export default class Autocomplete {
   }
 
   get value(): SelectedOption[] {
-    try {
-      const parsedValue = JSON.parse(this.element.value) as ParsedValue;
-      if (!parsedValue) throw new Error();
-      if (Array.isArray(parsedValue)) return parsedValue;
-
-      return [parsedValue];
-    } catch {
-      return [];
-    }
+    if (Array.isArray(this.element.value)) return this.element.value;
+    if (isEmpty(this.element.value)) return [];
+    return [this.element.value];
   }
 
-  set value(value: string | SelectedOption[]) {
-    const _value = typeof value === 'string' ? value : JSON.stringify(value);
-
-    try {
-      const parsedValue = JSON.parse(_value) as ParsedValue;
-      if (!parsedValue) throw new Error();
-
-      if (Array.isArray(parsedValue)) {
-        this.setSelectedOptions(parsedValue);
-        return;
-      }
-
-      this.setSelectedOptions([parsedValue]);
-    } catch {
-      this.setSelectedOptions([]);
+  set value(value: SelectedOption | SelectedOption[]) {
+    if (Array.isArray(value)) {
+      this.setSelectedOptions(value);
+      // When the `value` of the `auto-complete` element is changed, we want to select or deselect the options too. But
+      // we only want to do it if the list is open. This is like mimicking reactivity of the `value` attribute.
+      if (!this.list.hidden) this.selectOptions(value);
+      return;
     }
+
+    this.setSelectedOptions([value]);
+    if (!this.list.hidden) this.selectOptions([value]);
   }
 
   setSelectedOptions(options: SelectedOption[]) {
@@ -346,8 +333,15 @@ export default class Autocomplete {
     this.setInputValueWithSelectedValue();
   }
 
+  selectOptions(array: SelectedOption[]) {
+    const ids = array.map(({ id }) => id);
+    for (const option of this.combobox.options) {
+      option.setAttribute('aria-selected', ids.includes(option.id).toString());
+    }
+  }
+
   get selectedOptionIds() {
-    return this.value.map(({ id }) => id.toString());
+    return this.value.map(({ id }) => id);
   }
 
   showList() {

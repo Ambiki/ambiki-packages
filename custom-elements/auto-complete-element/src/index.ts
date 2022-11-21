@@ -6,6 +6,8 @@ export type SelectedOption = {
   value: string;
 };
 
+export type ParsedValue = SelectedOption | SelectedOption[] | null;
+
 export default class AutoCompleteElement extends HTMLElement {
   autocomplete: Autocomplete | null = null;
 
@@ -32,7 +34,7 @@ export default class AutoCompleteElement extends HTMLElement {
     if (oldValue === newValue) return;
 
     if (this.autocomplete) {
-      this.autocomplete.value = newValue;
+      this.autocomplete.value = getParsedValue(newValue);
     }
   }
 
@@ -68,15 +70,19 @@ export default class AutoCompleteElement extends HTMLElement {
     this.setAttribute('src', value);
   }
 
-  get value(): string {
-    return this.getAttribute('value') || '';
+  get value(): SelectedOption | SelectedOption[] {
+    const value = this.getAttribute('value') || '';
+    if (this.multiple) return getParsedValue(value);
+    return getParsedValue(value)[0] ? getParsedValue(value)[0] : <SelectedOption>{};
   }
 
-  set value(value: string | undefined) {
-    if (typeof value === 'undefined' || value === '[]' || !value) {
+  set value(value: SelectedOption | SelectedOption[]) {
+    const _value = JSON.stringify(value);
+
+    if (typeof _value === 'undefined' || _value === '[]' || !_value) {
       this.removeAttribute('value');
     } else {
-      this.setAttribute('value', value);
+      this.setAttribute('value', _value);
     }
   }
 
@@ -86,6 +92,22 @@ export default class AutoCompleteElement extends HTMLElement {
 
   set param(value: string) {
     this.setAttribute('param', value);
+  }
+}
+
+function getParsedValue(value: string): SelectedOption[] {
+  try {
+    const parsedValue = JSON.parse(value) as ParsedValue;
+    if (!parsedValue) throw new Error();
+    // Since an element's id is of type string, we'll need to convert the user passed value's id into a string as well.
+    // This will allow us to use `===`
+    if (Array.isArray(parsedValue)) {
+      return parsedValue.map((v) => ({ ...v, id: v.id.toString() }));
+    }
+
+    return [{ ...parsedValue, id: parsedValue.id.toString() }];
+  } catch {
+    return [];
   }
 }
 
