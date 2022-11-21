@@ -60,6 +60,7 @@ export default class Combobox {
   stop() {
     this.isMouseMoving = false;
     this.clearActiveOption();
+    this.clearSelectedOptions();
     this.input.setAttribute('aria-expanded', 'false');
 
     this.input.removeEventListener('keydown', this.onKeydown);
@@ -158,7 +159,7 @@ export default class Combobox {
 
     // We want hidden options here because the end-user might toggle the `hidden` attribute to filter the options
     for (const el of this.options) {
-      if (el === option) {
+      if (el.id === option.id) {
         this.input.setAttribute('aria-activedescendant', el.id);
         el.setAttribute('data-tracking', '');
         if (scroll) el.scrollIntoView({ block: 'nearest' });
@@ -175,11 +176,21 @@ export default class Combobox {
     }
   }
 
-  setInitialAttributesOnOptions() {
+  clearSelectedOptions() {
+    for (const option of this.selectedOptions) {
+      option.setAttribute('aria-selected', 'false');
+    }
+  }
+
+  setInitialAttributesOnOptions(selectedIds: string[] = []) {
     for (const option of this.options) {
       option.setAttribute('tabindex', '-1');
       if (enabled(option) && !option.hasAttribute('aria-selected')) {
         option.setAttribute('aria-selected', 'false');
+      }
+
+      if (selectedIds.includes(option.id)) {
+        option.setAttribute('aria-selected', 'true');
       }
 
       if (!option.id) option.id = brandedId();

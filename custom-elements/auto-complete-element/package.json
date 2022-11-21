@@ -33,6 +33,7 @@
     "@ambiki/combobox": "workspace:^"
   },
   "devDependencies": {
+    "@ambiki/test-utils": "workspace:^",
     "@ambiki/utils": "workspace:^"
   }
 }

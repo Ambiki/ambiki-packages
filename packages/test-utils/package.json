@@ -1,0 +1,7 @@
+{
+  "name": "@ambiki/test-utils",
+  "version": "1.0.0",
+  "description": "A set of utilities/helpers used for testing.",
+  "main": "src/index.ts",
+  "license": "MIT"
+}

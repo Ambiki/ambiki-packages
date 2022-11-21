@@ -1,6 +1,7 @@
-import type AutoCompleteElement from './index';
 import Combobox from '@ambiki/combobox';
-import { debounce, nextTick } from '@ambiki/utils';
+import { debounce, isEmpty, nextTick } from '@ambiki/utils';
+import type AutoCompleteElement from './index';
+import type { SelectedOption } from './index';
 
 const AUTOCOMPLETE_VALUE_ATTR = 'data-autocomplete-value';
 const DATA_EMPTY_ATTR = 'data-empty';
@@ -9,108 +10,211 @@ export default class Autocomplete {
   element: AutoCompleteElement;
   input: HTMLInputElement;
   list: HTMLElement;
-  resetButton: HTMLElement | null;
+  selectedOptions: SelectedOption[];
   combobox: Combobox;
+  currentQuery: string | null;
+  clearButton: HTMLButtonElement | null;
   listObserver: MutationObserver;
 
   constructor(element: AutoCompleteElement, input: HTMLInputElement, list: HTMLElement) {
     this.element = element;
     this.input = input;
     this.list = list;
+    this.selectedOptions = [];
+    this.setSelectedOptions(this.value); // Fill the array with user passed value
 
-    this.list.hidden = true;
+    this.hideList();
     this.combobox = new Combobox(this.input, this.list, { multiple: this.element.multiple, max: this.element.max });
+    this.currentQuery = null;
+
+    // Clear button
+    this.clearButton = this.element.querySelector('[data-autocomplete-clear]');
+    if (this.clearButton && !this.clearButton.hasAttribute('aria-label')) {
+      this.clearButton.setAttribute('aria-label', 'Clear autocomplete');
+    }
 
     this.input.setAttribute('spellcheck', 'false');
     this.input.setAttribute('autocomplete', 'off');
     this.list.setAttribute('tabindex', '-1');
     this.list.setAttribute('aria-orientation', 'vertical');
 
-    // Reset button
-    this.resetButton = this.element.querySelector('[data-autocomplete-reset]');
-    if (this.resetButton && !this.resetButton.hasAttribute('aria-label')) {
-      this.resetButton.setAttribute('aria-label', 'reset autocomplete');
-    }
-
     this.onFocus = this.onFocus.bind(this);
-    this.onPointerDown = this.onPointerDown.bind(this);
-    this.onKeydown = this.onKeydown.bind(this);
+    this.onBlur = this.onBlur.bind(this);
     this.onCommit = this.onCommit.bind(this);
     this.onInput = debounce(this.onInput.bind(this), 300);
-    this.onBlur = this.onBlur.bind(this);
-    this.handleReset = this.handleReset.bind(this);
+    this.onKeydown = this.onKeydown.bind(this);
+    this.onPointerdown = this.onPointerdown.bind(this);
+    this.onClear = this.onClear.bind(this);
 
     this.input.addEventListener('focus', this.onFocus);
     this.input.addEventListener('blur', this.onBlur);
-    this.input.addEventListener('pointerdown', this.onPointerDown); // We use `pointerdown` instead of `click` to simulate the `focus` event
-    this.input.addEventListener('keydown', this.onKeydown);
     this.input.addEventListener('input', this.onInput);
+    this.input.addEventListener('pointerdown', this.onPointerdown);
+    this.input.addEventListener('keydown', this.onKeydown);
     this.list.addEventListener('combobox:commit', this.onCommit);
-    this.resetButton?.addEventListener('click', this.handleReset);
+    this.clearButton?.addEventListener('click', this.onClear);
 
     this.listObserver = new MutationObserver(this.onListToggle.bind(this));
     this.listObserver.observe(this.list, { attributes: true, attributeFilter: ['hidden'] });
   }
 
-  destroy() {
+  destroy(): void {
+    this.hideList();
+    this.combobox.stop();
+
     this.input.removeEventListener('focus', this.onFocus);
     this.input.removeEventListener('blur', this.onBlur);
-    this.input.removeEventListener('pointerdown', this.onPointerDown);
-    this.input.removeEventListener('keydown', this.onKeydown);
     this.input.removeEventListener('input', this.onInput);
+    this.input.removeEventListener('pointerdown', this.onPointerdown);
+    this.input.removeEventListener('keydown', this.onKeydown);
     this.list.removeEventListener('combobox:commit', this.onCommit);
-    this.resetButton?.removeEventListener('click', this.handleReset);
+    this.clearButton?.removeEventListener('click', this.onClear);
 
     this.listObserver.disconnect();
   }
 
-  onListToggle() {
+  onFocus(): void {
+    this.showList();
+  }
+
+  async onBlur(event: FocusEvent) {
+    const { relatedTarget } = event;
+    if (!(relatedTarget instanceof HTMLElement)) {
+      this.hideList();
+      return;
+    }
+
+    /**
+     * Trick to keep focus on the input field after clicking inside the list. We could've used `this.input.focus()`,
+     * but that blurs the input for a moment and then focuses back which causes a noticeable transition between
+     * the state
+     */
+    const list = relatedTarget.closest<HTMLElement>('[role="listbox"]');
+    if (list) {
+      // Wait for nextTick before focusing (Firefox edge case)
+      await nextTick();
+      this.input.focus();
+    } else {
+      this.hideList();
+    }
+  }
+
+  async onListToggle(): Promise<void> {
     if (this.list.hidden) {
       dispatchEvent(this.element, 'hide');
-      this.combobox.stop();
-      this.list.removeAttribute(DATA_EMPTY_ATTR);
-      syncSelection(this);
+      this.onClose();
       dispatchEvent(this.element, 'hidden');
     } else {
       dispatchEvent(this.element, 'show');
-      this.combobox.start();
-      this.list.toggleAttribute(DATA_EMPTY_ATTR, this.combobox.visibleOptions.length === 0);
+      await this.onOpen();
+      // Fire `shown` event after we fetch all the options
       dispatchEvent(this.element, 'shown');
     }
   }
 
-  onFocus() {
-    if (!this.list.hidden) return;
+  async onOpen() {
+    this.combobox.start();
 
-    this.openAndInitializeList();
+    // Only fetch results with an empty query when the input is blank or if it contains a value that has already been
+    // selected. This is kind of dirty, but it works.
+    const inputValue = this.input.value.trim();
+    const selectedValues = this.value.map(({ value }) => value.trim());
+    if (inputValue.length === 0 || selectedValues.includes(inputValue)) {
+      await this.fetchResults();
+    }
+
+    this.combobox.setInitialAttributesOnOptions(this.selectedOptionIds);
+    this.activateFirstOrSelectedOption();
+    this.checkIfListIsEmpty();
   }
 
-  onPointerDown() {
-    if (!this.list.hidden) return;
-    if (document.activeElement !== this.input) return; // If it's not already active, then `onFocus` logic will apply
+  onClose() {
+    this.combobox.stop();
+    this.list.removeAttribute(DATA_EMPTY_ATTR);
 
-    this.openAndInitializeList();
+    // Clear out input field after closing the list for multi-select element
+    if (this.element.multiple) {
+      this.input.value = '';
+      return;
+    }
+
+    this.setInputValueWithSelectedValue();
+  }
+
+  onPointerdown() {
+    if (!this.list.hidden) return;
+    // Return early so that `onFocus` logic can be called
+    if (document.activeElement !== this.input) return;
+
+    this.showList();
+  }
+
+  async onInput(event: Event) {
+    const query = (event.target as HTMLInputElement).value.trim();
+    await this.fetchResults(query);
+
+    this.combobox.setActive(this.combobox.visibleOptions[0]);
+    this.checkIfListIsEmpty();
+
+    this.showList();
+  }
+
+  async onCommit(event: Event): Promise<void> {
+    const option = event.target;
+    if (!(option instanceof HTMLElement)) return;
+
+    const value = option.getAttribute(AUTOCOMPLETE_VALUE_ATTR) || option.textContent || '';
+    this.addOrRemoveOption({ id: option.id, value });
+    this.updateValueWithSelectedOptions();
+
+    if (this.element.multiple) {
+      // Clear out the input field and activate the selected option or the first visible option
+      this.input.value = '';
+      await this.fetchResults();
+      const selectedOrFirstOption =
+        this.combobox.options.find((o) => o.id === option.id) || this.combobox.visibleOptions[0];
+      this.combobox.setActive(selectedOrFirstOption);
+      this.checkIfListIsEmpty();
+    } else {
+      // We want to hide the list after selecting an option for single-select auto-complete
+      this.hideList();
+    }
+
+    dispatchEvent(this.element, 'commit', { detail: { relatedTarget: option } });
+  }
+
+  onClear(event: MouseEvent) {
+    event.preventDefault();
+
+    // Clear state
+    this.element.value = [];
+    this.input.focus();
+
+    // We don't want the list to open after focusing on the `input` field
+    this.hideList();
+    // Should fire after closing the list
+    dispatchEvent(this.element, 'clear');
   }
 
   onKeydown(event: KeyboardEvent) {
     switch (event.key) {
       case 'Escape':
         if (!this.list.hidden) {
-          this.list.hidden = true;
+          this.hideList();
           event.preventDefault();
           event.stopPropagation();
         }
         break;
       case 'ArrowDown':
         if (event.altKey && this.list.hidden) {
-          this.openAndInitializeList();
+          this.showList();
           event.preventDefault();
           event.stopPropagation();
         }
         break;
       case 'ArrowUp':
         if (event.altKey && !this.list.hidden) {
-          this.list.hidden = true;
+          this.hideList();
           event.preventDefault();
           event.stopPropagation();
         }
@@ -120,90 +224,134 @@ export default class Autocomplete {
     }
   }
 
-  onInput() {
-    if (this.list.hidden) {
-      this.list.hidden = false;
-    }
-
-    const query = this.input.value.trim();
-    this.filterListWithQuery(query);
-    this.combobox.setActive(this.combobox.visibleOptions[0]);
-    this.list.toggleAttribute(DATA_EMPTY_ATTR, this.combobox.visibleOptions.length === 0);
-  }
-
-  onCommit(event: Event) {
-    const option = event.target;
-    if (!(option instanceof HTMLElement)) return;
-
-    const value = (option.getAttribute(AUTOCOMPLETE_VALUE_ATTR) || option.textContent) as string;
-    if (this.element.multiple) {
-      if (this.input.value) {
-        this.inputValue = '';
-        this.filterListWithQuery();
-        this.combobox.setActive(option);
-      }
-    } else {
-      this.inputValue = value;
-      this.list.hidden = true;
-    }
-
-    dispatchEvent(this.element, 'selected', { detail: { relatedTarget: option } });
-  }
-
-  async onBlur(event: FocusEvent) {
-    const { relatedTarget } = event;
-    if (!(relatedTarget instanceof HTMLElement)) {
-      this.list.hidden = true;
-      return;
-    }
-
-    const list = relatedTarget.closest<HTMLElement>('[role="listbox"]');
-    if (list) {
-      await nextTick(); // Wait for nextTick before focusing (Firefox edge case)
-      this.input.focus(); // Always keep focus on the input field when interacting with the list
-    } else {
-      this.list.hidden = true; // Hide the list for other elements that triggered the blur
-    }
-  }
-
-  async handleReset(event: Event) {
-    event.preventDefault();
-
-    for (const option of this.combobox.options.filter(selected)) {
-      option.setAttribute('aria-selected', 'false');
-    }
-    syncSelection(this);
-    this.input.focus();
-
-    await nextTick();
-    if (!this.list.hidden) {
-      this.list.hidden = true;
-    }
-
-    // Should fire after closing the list
-    dispatchEvent(this.element, 'reset');
-  }
-
-  openAndInitializeList() {
-    this.list.hidden = false;
-    this.filterListWithQuery();
-    this.activateFirstOption();
-  }
-
-  filterListWithQuery(query = '') {
-    this.combobox.options.forEach(filterOptions(query, { matching: AUTOCOMPLETE_VALUE_ATTR }));
-  }
-
-  async activateFirstOption() {
-    const selectedOption = this.combobox.options.filter(selected)[0];
+  activateFirstOrSelectedOption(): void {
+    const selectedOption = this.getFirstSelectedOption(this.combobox.options);
     const firstOption = selectedOption || this.combobox.visibleOptions[0];
-    await nextTick(); // `aria-activedescendant` on input field isn't always set, so we need to wait for the next tick
     this.combobox.setActive(firstOption);
   }
 
-  set inputValue(value: string) {
-    this.input.value = value;
-    this.input.dispatchEvent(new Event('change'));
+  addOrRemoveOption(object: SelectedOption): void {
+    if (this.element.multiple) {
+      const optionIndex = this.selectedOptions.findIndex(({ id }) => id === object.id);
+
+      if (optionIndex === -1) {
+        this.selectedOptions.push(object);
+      } else {
+        this.selectedOptions.splice(optionIndex, 1);
+      }
+    } else {
+      this.selectedOptions = [];
+      this.selectedOptions.push(object);
+    }
+  }
+
+  setInputValueWithSelectedValue() {
+    if (this.element.multiple) return;
+
+    const option = this.getFirstSelectedOption(this.selectedOptions);
+    if (!option) {
+      this.input.value = '';
+      return;
+    }
+
+    this.input.value = option.value;
+  }
+
+  updateValueWithSelectedOptions() {
+    const value = this.element.multiple ? this.selectedOptions : this.selectedOptions[0];
+    this.element.value = value;
+  }
+
+  getFirstSelectedOption<T extends { id: string }>(options: T[]): T | undefined {
+    return options.find((o) => this.selectedOptionIds.includes(o.id));
+  }
+
+  checkIfListIsEmpty() {
+    this.list.toggleAttribute(DATA_EMPTY_ATTR, this.combobox.visibleOptions.length === 0);
+  }
+
+  async fetchResults(query = '') {
+    // If there's no `src`, then we know that all the options are present inside the list
+    if (!this.element.src) {
+      this.combobox.options.forEach(filterOptions(query, { matching: AUTOCOMPLETE_VALUE_ATTR }));
+      // Select the option(s) which matches the value
+      this.combobox.setInitialAttributesOnOptions(this.selectedOptionIds);
+      return;
+    }
+
+    // Cache query so that we don't make network request for the same `query`
+    if (this.currentQuery === query) return;
+    this.currentQuery = query;
+
+    const url = new URL(this.element.src, window.location.href);
+    const params = new URLSearchParams(url.search.slice(1));
+    params.append(this.element.param, query);
+    url.search = params.toString();
+
+    dispatchEvent(this.element, 'loadstart');
+    try {
+      const response = await fetch(url.toString(), {
+        credentials: 'same-origin',
+        headers: {
+          accept: 'text/fragment+html',
+        },
+      });
+      const html = await response.text();
+      this.list.innerHTML = html;
+      // Select the option(s) which matches the value
+      this.combobox.setInitialAttributesOnOptions(this.selectedOptionIds);
+
+      dispatchEvent(this.element, 'success');
+      dispatchEvent(this.element, 'loadend');
+    } catch (error) {
+      dispatchEvent(this.element, 'error');
+      dispatchEvent(this.element, 'loadend');
+    }
+  }
+
+  get value(): SelectedOption[] {
+    if (Array.isArray(this.element.value)) return this.element.value;
+    if (isEmpty(this.element.value)) return [];
+    return [this.element.value];
+  }
+
+  set value(value: SelectedOption | SelectedOption[]) {
+    if (Array.isArray(value)) {
+      this.setSelectedOptions(value);
+      // When the `value` of the `auto-complete` element is changed, we want to select or deselect the options too. But
+      // we only want to do it if the list is open. This is like mimicking reactivity of the `value` attribute.
+      if (!this.list.hidden) this.selectOptions(value);
+      return;
+    }
+
+    this.setSelectedOptions([value]);
+    if (!this.list.hidden) this.selectOptions([value]);
+  }
+
+  setSelectedOptions(options: SelectedOption[]) {
+    this.selectedOptions = options;
+    this.setInputValueWithSelectedValue();
+  }
+
+  selectOptions(array: SelectedOption[]) {
+    const ids = array.map(({ id }) => id);
+    for (const option of this.combobox.options) {
+      option.setAttribute('aria-selected', ids.includes(option.id).toString());
+    }
+  }
+
+  get selectedOptionIds() {
+    return this.value.map(({ id }) => id);
+  }
+
+  showList() {
+    if (!this.list.hidden) return;
+    this.list.hidden = false;
+  }
+
+  hideList() {
+    if (this.list.hidden) return;
+    this.list.hidden = true;
   }
 }
 
@@ -217,22 +365,6 @@ function filterOptions(query: string, { matching }: { matching: string }) {
       target.hidden = false;
     }
   };
-}
-
-function syncSelection(autocomplete: Autocomplete) {
-  const { combobox, element } = autocomplete;
-  const selectedOption = combobox.options.filter(selected)[0];
-
-  if (element.multiple || !selectedOption) {
-    autocomplete.inputValue = '';
-  } else {
-    autocomplete.inputValue = (selectedOption.getAttribute(AUTOCOMPLETE_VALUE_ATTR) ||
-      selectedOption.textContent) as string;
-  }
-}
-
-function selected(option: HTMLElement) {
-  return option.getAttribute('aria-selected') === 'true';
 }
 
 function dispatchEvent(element: HTMLElement, name: string, options: CustomEventInit = {}) {
