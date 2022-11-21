@@ -4,7 +4,13 @@ import { esbuildPlugin } from '@web/dev-server-esbuild';
 const filteredDir = (workspace) =>
   fs.readdirSync(workspace).filter((dir) => fs.statSync(`${workspace}/${dir}`).isDirectory());
 
-const workspaces = [...filteredDir('custom-elements'), ...filteredDir('packages')];
+const packagesDir = filteredDir('packages');
+const index = packagesDir.findIndex((dir) => dir === 'test-utils');
+if (index !== -1) {
+  packagesDir.splice(index, 1);
+}
+
+const workspaces = [...filteredDir('custom-elements'), ...packagesDir];
 
 export default {
   concurrency: 10,
