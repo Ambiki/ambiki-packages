@@ -20,13 +20,16 @@ export function copyNode(target: HTMLElement): Promise<void> {
   return Promise.resolve();
 }
 
+// escape single quotes when copying text
 function fakeCopy(text: string) {
+  // convert text to a JSON string, which will escape single quotes and other special characters
+  const escapedText = JSON.stringify(text);
   const node = document.createElement('pre');
   node.style.width = '1px';
   node.style.height = '1px';
   node.style.position = 'fixed';
   node.style.top = '50%';
-  node.textContent = text;
+  node.textContent = escapedText;
 
   document.body.append(node);
   extractText(node);
