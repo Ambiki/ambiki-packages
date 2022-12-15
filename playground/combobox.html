@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Combobox</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 40px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="result"></div>
+
+    <div>
+      <input type="text" />
+      <div>
+        <ul>
+          <li role="option">Option 1</li>
+          <li role="option">Option 2</li>
+          <li role="option">Option 3</li>
+        </ul>
+      </div>
+    </div>
+
+    <script type="module">
+      import Combobox from '../packages/combobox/dist/index.js';
+
+      const result = document.getElementById('result');
+      document.addEventListener('combobox:commit', (event) => {
+        result.append(event.target.textContent);
+      });
+
+      const input = document.querySelector('input');
+      const list = document.querySelector('ul');
+      const combobox = new Combobox(input, list);
+
+      combobox.start();
+    </script>
+  </body>
+</html>
