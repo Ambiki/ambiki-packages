@@ -6,7 +6,8 @@
   ],
   "scripts": {
     "start": "web-dev-server",
-    "test": "web-test-runner --watch",
+    "test": "web-test-runner",
+    "test:watch": "web-test-runner --watch",
     "lint": "npx eslint \"**/*.{js,ts}\""
   },
   "license": "MIT",

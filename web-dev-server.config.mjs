@@ -1,8 +1,9 @@
 import { esbuildPlugin } from '@web/dev-server-esbuild';
 
 export default {
-  open: true,
-  appIndex: `custom-elements/${process.argv[3]}/examples/index.html`,
   nodeResolve: true,
+  open: true,
+  preserveSymlinks: true,
+  appIndex: './playground/index.html',
   plugins: [esbuildPlugin({ ts: true })],
 };
