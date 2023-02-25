@@ -17,9 +17,9 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "tsc && node esbuild.config.mjs --watch",
+    "build": "npx tsc && node esbuild.config.mjs --watch",
     "clean": "rm -rf ./dist",
-    "prepublishOnly": "tsc && node esbuild.config.mjs"
+    "prepublishOnly": "npx tsc && node esbuild.config.mjs"
   },
   "files": [
     "dist"
