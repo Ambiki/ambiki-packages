@@ -1,6 +1,6 @@
 import Combobox from '@ambiki/combobox';
 import type AutoCompleteElement from './index';
-import { enabled, nextTick } from '@ambiki/utils';
+import { enabled, nextTick, debounce } from '@ambiki/utils';
 import SingleSelection from './single_selection';
 import MultiSelection from './multi_selection';
 import { dispatchEvent } from './utils';
@@ -195,7 +195,13 @@ export default class AutoComplete {
     if (!(option instanceof HTMLElement) || !enabled(option)) return;
 
     await this.selectionVariant.onCommit(option);
-    dispatchEvent(this.container, 'commit', { detail: { option } });
+    dispatchEvent(this.container, 'commit', {
+      detail: {
+        option,
+        value: option.getAttribute('value'),
+        label: option.getAttribute('data-label') || option.innerText,
+      },
+    });
   }
 
   private onKeydown(event: KeyboardEvent) {
@@ -310,20 +316,6 @@ function filterOptions(query: string, { matching }: { matching: string }) {
     } else {
       target.hidden = false;
     }
-  };
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function debounce<T extends unknown[]>(callback: (...Rest: T) => unknown, wait = 0): (...Rest: T) => any {
-  let timeout: number;
-
-  return function (...Rest) {
-    clearTimeout(timeout);
-
-    timeout = window.setTimeout(() => {
-      clearTimeout(timeout);
-      callback(...Rest);
-    }, wait);
   };
 }
 
