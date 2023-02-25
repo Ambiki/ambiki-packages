@@ -24,3 +24,11 @@ export function triggerKeyEvent<T extends HTMLElement>(
     resolve(element);
   });
 }
+
+export function triggerMouseover<T extends Element>(element: T): Promise<T> {
+  return new Promise((resolve) => {
+    element.dispatchEvent(new CustomEvent('mousemove', { bubbles: true }));
+    element.dispatchEvent(new CustomEvent('mouseover', { bubbles: true }));
+    resolve(element);
+  });
+}

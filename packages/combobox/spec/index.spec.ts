@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { find, findAll, triggerKeyEvent } from '@ambiki/test-utils';
+import { find, findAll, triggerKeyEvent, triggerMouseover } from '@ambiki/test-utils';
 import * as sinon from 'sinon';
 import Combobox from '../src';
 
@@ -180,7 +180,7 @@ describe('Combobox', () => {
 
     expect(find('[data-active]')).not.to.exist;
 
-    mouseover(option);
+    await triggerMouseover(option);
     expectInputLinkedWithOption(input, option);
   });
 
@@ -314,11 +314,6 @@ describe('Combobox', () => {
     });
   });
 });
-
-function mouseover(element: Element) {
-  element.dispatchEvent(new CustomEvent('mousemove', { bubbles: true }));
-  element.dispatchEvent(new CustomEvent('mouseover', { bubbles: true }));
-}
 
 function expectInputLinkedWithOption(input: HTMLInputElement, option: HTMLElement) {
   expect(option).to.have.attribute('data-active');
