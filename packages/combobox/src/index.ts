@@ -128,10 +128,9 @@ export default class Combobox {
     if (this.multiple) {
       this.isSelected(option) ? this.deselect(option) : this.select(option);
     } else {
-      for (const el of this.options) {
-        el.id === option.id ? this.select(el) : this.deselect(el);
-      }
+      this.select(option);
     }
+
     option.dispatchEvent(new CustomEvent('combobox:commit', { bubbles: true }));
   }
 
@@ -156,10 +155,18 @@ export default class Combobox {
   }
 
   /**
-   * @description Sets `aria-selected="true"` on the option element
+   * @description Sets `aria-selected="true"` on the option element. If it's a single select, then it deselects all
+   * the options and selects only the provided option
    */
   select(option: HTMLElement) {
-    option.setAttribute('aria-selected', 'true');
+    if (this.multiple) {
+      option.setAttribute('aria-selected', 'true');
+      return;
+    }
+
+    for (const el of this.options) {
+      el.setAttribute('aria-selected', String(el === option));
+    }
   }
 
   /**
