@@ -42,6 +42,16 @@ describe('Combobox', () => {
     expect(option).not.to.have.attribute('data-active');
   });
 
+  it('deactivates the option with Escape key', async () => {
+    const { input, options, combobox } = await setupFixture({ options: [{ id: 1, active: true }] });
+    combobox.start();
+
+    expect(find('[data-active]')).to.exist;
+
+    await triggerKeyEvent(input, 'keydown', { key: 'Escape' });
+    expect(find('[data-active]')).not.to.exist;
+  });
+
   it('cycles downwards through the options with ArrowDown key', async () => {
     const { input, options, combobox } = await setupFixture({
       options: [{ id: 1 }, { id: 2, disabled: true }, { id: 3, hidden: true }],

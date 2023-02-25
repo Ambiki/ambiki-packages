@@ -14,6 +14,13 @@ export function fillIn<T extends HTMLInputElement>(input: T, value = '', options
   });
 }
 
+export function triggerEvent<T extends Element>(element: T, name: string, options: CustomEventInit = {}): Promise<T> {
+  return new Promise((resolve) => {
+    element.dispatchEvent(new CustomEvent(name, { bubbles: true, cancelable: true, ...options }));
+    resolve(element);
+  });
+}
+
 export function triggerKeyEvent<T extends HTMLElement>(
   element: T,
   type: string,
@@ -27,8 +34,8 @@ export function triggerKeyEvent<T extends HTMLElement>(
 
 export function triggerMouseover<T extends Element>(element: T): Promise<T> {
   return new Promise((resolve) => {
-    element.dispatchEvent(new CustomEvent('mousemove', { bubbles: true }));
-    element.dispatchEvent(new CustomEvent('mouseover', { bubbles: true }));
+    triggerEvent(element, 'mousemove');
+    triggerEvent(element, 'mouseover');
     resolve(element);
   });
 }

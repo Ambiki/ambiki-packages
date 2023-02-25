@@ -1,847 +1,464 @@
-// import { expect, fixture, html, oneEvent, triggerBlurFor, triggerFocusFor, waitUntil } from '@open-wc/testing';
-// import { nextTick } from '@ambiki/utils';
-// import { find, findAll, fillIn, triggerKeyEvent } from '@ambiki/test-utils';
-// import '../src';
-// import AutoCompleteElement from '../src';
-//
-// function expectOptionConnectedWithInput(option: HTMLElement, input: HTMLInputElement) {
-//   expect(option).to.have.attribute('data-tracking');
-//   expect(input).to.have.attribute('aria-activedescendant', option.id);
-// }
-//
-// describe('AutoCompleteElement', () => {
-//   describe('renders', () => {
-//     it('sets the attributes', async () => {
-//       await fixture(html`
-//         <auto-complete for="list">
-//           <input type="text" />
-//           <ul id="list">
-//             <li role="option">Player</li>
-//             <li role="option">Taxi</li>
-//           </ul>
-//         </auto-complete>
-//       `);
-//
-//       const input = find('input');
-//       const list = find('#list');
-//
-//       expect(input).to.have.attribute('spellcheck', 'false');
-//       expect(input).to.have.attribute('autocomplete', 'off');
-//       expect(list).to.have.attribute('tabindex', '-1');
-//       expect(list).to.have.attribute('aria-orientation', 'vertical');
-//
-//       await triggerFocusFor(input);
-//       await waitUntil(() => document.activeElement === input);
-//       expect(input).not.to.have.attribute('data-empty');
-//     });
-//
-//     it('sets data-empty attribute when list is empty', async () => {
-//       await fixture(html`
-//         <auto-complete for="list">
-//           <input type="text" />
-//           <ul id="list"></ul>
-//         </auto-complete>
-//       `);
-//
-//       const input = find('input');
-//       const list = find('#list');
-//
-//       await triggerFocusFor(input);
-//       await waitUntil(() => document.activeElement === input);
-//       expect(list).to.have.attribute('data-empty');
-//     });
-//
-//     it('sets aria-label on the clear button', async () => {
-//       await fixture(html`
-//         <auto-complete for="list">
-//           <button type="button" data-autocomplete-clear>Clear</button>
-//           <input type="text" />
-//           <ul id="list"></ul>
-//         </auto-complete>
-//       `);
-//
-//       const button = find('[data-autocomplete-clear]');
-//
-//       expect(button).to.have.attribute('aria-label', 'Clear autocomplete');
-//     });
-//
-//     describe('single select', () => {
-//       it('sets aria-selected as true when there is a selected option', async () => {
-//         await fixture(html`
-//           <auto-complete for="list" value='{ "id": 2, "value": "Taxi" }'>
-//             <input type="text" />
-//             <ul id="list">
-//               <li role="option">Player</li>
-//               <li id="2" role="option">Taxi</li>
-//             </ul>
-//           </auto-complete>
-//         `);
-//
-//         const input = find('input');
-//         const options = findAll('[role="option"]');
-//         expect(options[0]).not.to.have.attribute('aria-selected');
-//         expect(options[1]).not.to.have.attribute('aria-selected');
-//
-//         await triggerFocusFor(input);
-//         expect(options[0]).to.have.attribute('aria-selected', 'false');
-//         expect(options[1]).to.have.attribute('aria-selected', 'true');
-//       });
-//     });
-//
-//     describe('multi select', () => {
-//       it('sets aria-selected as true when there are selected options', async () => {
-//         await fixture(html`
-//           <auto-complete
-//             for="list"
-//             multiple
-//             value='[{ "id": 2, "value": "Taxi" }, { "id": "3", "value": "Manhattan" }]'
-//           >
-//             <input type="text" />
-//             <ul id="list">
-//               <li role="option">Player</li>
-//               <li id="2" role="option">Taxi</li>
-//               <li id="3" role="option">Manhattan</li>
-//             </ul>
-//           </auto-complete>
-//         `);
-//
-//         const input = find('input');
-//         const options = findAll('[role="option"]');
-//         expect(options[0]).not.to.have.attribute('aria-selected');
-//         expect(options[1]).not.to.have.attribute('aria-selected');
-//         expect(options[2]).not.to.have.attribute('aria-selected');
-//
-//         await triggerFocusFor(input);
-//         expect(options[0]).to.have.attribute('aria-selected', 'false');
-//         expect(options[1]).to.have.attribute('aria-selected', 'true');
-//         expect(options[2]).to.have.attribute('aria-selected', 'true');
-//       });
-//     });
-//   });
-//
-//   describe('#value', () => {
-//     describe('single select', () => {
-//       it('returns an empty object if value is blank', async () => {
-//         await fixture(html`
-//           <auto-complete for="list">
-//             <input type="text" />
-//             <ul id="list">
-//               <li role="option">Player</li>
-//             </ul>
-//           </auto-complete>
-//         `);
-//
-//         const el = find<AutoCompleteElement>('auto-complete');
-//         expect(el.value).to.eql({});
-//       });
-//
-//       it('returns an object if value is selected', async () => {
-//         await fixture(html`
-//           <auto-complete for="list" value='{ "id": 1, "value": "Player" }'>
-//             <input type="text" />
-//             <ul id="list">
-//               <li id="1" role="option">Player</li>
-//             </ul>
-//           </auto-complete>
-//         `);
-//
-//         const el = find<AutoCompleteElement>('auto-complete');
-//         expect(el.value).to.eql({ id: '1', value: 'Player' });
-//       });
-//     });
-//
-//     describe('multi select', () => {
-//       it('returns an empty array if value is blank', async () => {
-//         await fixture(html`
-//           <auto-complete for="list" multiple>
-//             <input type="text" />
-//             <ul id="list">
-//               <li role="option">Player</li>
-//             </ul>
-//           </auto-complete>
-//         `);
-//
-//         const el = find<AutoCompleteElement>('auto-complete');
-//         expect(el.value).to.eql([]);
-//       });
-//
-//       it('returns an array of objects if value is selected', async () => {
-//         await fixture(html`
-//           <auto-complete
-//             for="list"
-//             multiple
-//             value='[{ "id": 1, "value": "Player" }, { "id": 2, "value": "Manhattan" }]'
-//           >
-//             <input type="text" />
-//             <ul id="list">
-//               <li id="1" role="option">Player</li>
-//               <li id="2" role="option">Manhattan</li>
-//             </ul>
-//           </auto-complete>
-//         `);
-//
-//         const el = find<AutoCompleteElement>('auto-complete');
-//         expect(el.value).to.eql([
-//           { id: '1', value: 'Player' },
-//           { id: '2', value: 'Manhattan' },
-//         ]);
-//       });
-//     });
-//   });
-//
-//   describe('#value=', () => {
-//     describe('single select', () => {
-//       it('sets the value', async () => {
-//         await fixture(html`
-//           <auto-complete for="list">
-//             <input type="text" />
-//             <ul id="list">
-//               <li id="1" role="option">Player</li>
-//               <li role="option">Taxi</li>
-//             </ul>
-//           </auto-complete>
-//         `);
-//
-//         const el = find<AutoCompleteElement>('auto-complete');
-//         el.value = { id: '1', value: 'Player' };
-//
-//         expect(el.value).to.eql({ id: '1', value: 'Player' });
-//       });
-//     });
-//
-//     describe('multi select', () => {
-//       it('sets the value', async () => {
-//         await fixture(html`
-//           <auto-complete for="list" multiple>
-//             <input type="text" />
-//             <ul id="list">
-//               <li id="1" role="option">Player</li>
-//               <li id="2" role="option">Taxi</li>
-//             </ul>
-//           </auto-complete>
-//         `);
-//
-//         const el = find<AutoCompleteElement>('auto-complete');
-//         el.value = [
-//           { id: '1', value: 'Player' },
-//           { id: '2', value: 'Taxi' },
-//         ];
-//
-//         expect(el.value).to.eql([
-//           { id: '1', value: 'Player' },
-//           { id: '2', value: 'Taxi' },
-//         ]);
-//       });
-//     });
-//   });
-//
-//   describe('initial focus', () => {
-//     it('focuses on the first option when there are no selected option', async () => {
-//       await fixture(html`
-//         <auto-complete for="list">
-//           <input type="text" />
-//           <ul id="list">
-//             <li role="option">Player</li>
-//             <li role="option">Taxi</li>
-//           </ul>
-//         </auto-complete>
-//       `);
-//
-//       const input = find<HTMLInputElement>('input');
-//       const list = find('#list');
-//       const options = findAll('[role="option"]');
-//       expect(list.hidden).to.be.true;
-//
-//       await triggerFocusFor(input);
-//
-//       expect(list.hidden).to.be.false;
-//       expect(input).to.have.attribute('aria-expanded', 'true');
-//
-//       await nextTick();
-//       expectOptionConnectedWithInput(options[0], input);
-//       expect(options[1]).not.to.have.attribute('data-tracking');
-//     });
-//
-//     describe('single select', () => {
-//       it('focuses on the selected option', async () => {
-//         await fixture(html`
-//           <auto-complete for="list" value='{ "id": 2, "value": "Taxi" }'>
-//             <input type="text" />
-//             <ul id="list">
-//               <li role="option">Player</li>
-//               <li id="2" role="option">Taxi</li>
-//             </ul>
-//           </auto-complete>
-//         `);
-//
-//         const input = find<HTMLInputElement>('input');
-//         const list = find('#list');
-//         const options = findAll('[role="option"]');
-//         expect(list.hidden).to.be.true;
-//
-//         await triggerFocusFor(input);
-//
-//         expect(list.hidden).to.be.false;
-//         expect(input).to.have.attribute('aria-expanded', 'true');
-//
-//         await nextTick();
-//         expectOptionConnectedWithInput(options[1], input);
-//         expect(options[0]).not.to.have.attribute('data-tracking');
-//       });
-//     });
-//
-//     describe('multi select', () => {
-//       it('focuses on the first option from the list', async () => {
-//         await fixture(html`
-//           <auto-complete
-//             for="list"
-//             multiple
-//             value='[{ "id": 2, "value": "Taxi" }, { "id": "3", "value": "Manhattan" }]'
-//           >
-//             <input type="text" />
-//             <ul id="list">
-//               <li role="option">Player</li>
-//               <li id="2" role="option">Taxi</li>
-//               <li id="3" role="option">Manhattan</li>
-//             </ul>
-//           </auto-complete>
-//         `);
-//
-//         const input = find<HTMLInputElement>('input');
-//         const list = find('#list');
-//         const options = findAll('[role="option"]');
-//         expect(list.hidden).to.be.true;
-//
-//         await triggerFocusFor(input);
-//
-//         expect(list.hidden).to.be.false;
-//         expect(input).to.have.attribute('aria-expanded', 'true');
-//
-//         await nextTick();
-//         expectOptionConnectedWithInput(options[1], input);
-//         expect(options[0]).not.to.have.attribute('data-tracking');
-//         expect(options[2]).not.to.have.attribute('data-tracking');
-//       });
-//     });
-//   });
-//
-//   describe('selecting option(s)', () => {
-//     describe('Enter key', () => {
-//       it('selects the option', async () => {
-//         await fixture(html`
-//           <auto-complete for="list">
-//             <input type="text" />
-//             <ul id="list">
-//               <li id="1" role="option">Player</li>
-//             </ul>
-//           </auto-complete>
-//         `);
-//
-//         const el = find<AutoCompleteElement>('auto-complete');
-//         const input = find<HTMLInputElement>('input');
-//         const list = find('#list');
-//         const options = findAll('[role="option"]');
-//         let relatedTarget: HTMLElement;
-//
-//         el.addEventListener(
-//           'auto-complete:commit',
-//           (event) => {
-//             relatedTarget = (event as CustomEvent).detail.relatedTarget;
-//             expect(relatedTarget).to.equal(options[0]);
-//           },
-//           { once: true }
-//         );
-//
-//         await triggerFocusFor(input);
-//         await nextTick();
-//         expect(list.hidden).to.be.false;
-//         expectOptionConnectedWithInput(options[0], input);
-//         expect(el.multiple).to.be.false;
-//
-//         await triggerKeyEvent(input, 'keydown', { key: 'Enter' });
-//
-//         expect(el.value).to.eql({ id: '1', value: 'Player' });
-//         expect(list.hidden).to.be.true;
-//       });
-//     });
-//
-//     describe('Tab key', () => {
-//       it('selects the option', async () => {
-//         await fixture(html`
-//           <auto-complete for="list">
-//             <input type="text" />
-//             <ul id="list">
-//               <li id="1" role="option">Player</li>
-//             </ul>
-//           </auto-complete>
-//         `);
-//
-//         const el = find<AutoCompleteElement>('auto-complete');
-//         const input = find<HTMLInputElement>('input');
-//         const list = find('#list');
-//         const options = findAll('[role="option"]');
-//         let relatedTarget: HTMLElement;
-//
-//         el.addEventListener(
-//           'auto-complete:commit',
-//           (event) => {
-//             relatedTarget = (event as CustomEvent).detail.relatedTarget;
-//             expect(relatedTarget).to.equal(options[0]);
-//           },
-//           { once: true }
-//         );
-//
-//         await triggerFocusFor(input);
-//         await nextTick();
-//         expect(list.hidden).to.be.false;
-//         expectOptionConnectedWithInput(options[0], input);
-//         expect(el.multiple).to.be.false;
-//
-//         await triggerKeyEvent(input, 'keydown', { key: 'Tab' });
-//
-//         expect(el.value).to.eql({ id: '1', value: 'Player' });
-//         expect(list.hidden).to.be.true;
-//       });
-//     });
-//
-//     describe('disabled option', () => {
-//       it('cannot select disabled options', async () => {
-//         await fixture(html`
-//           <auto-complete for="list">
-//             <input type="text" />
-//             <ul id="list">
-//               <li role="option" disabled>Player</li>
-//             </ul>
-//           </auto-complete>
-//         `);
-//
-//         const el = find<AutoCompleteElement>('auto-complete');
-//         const input = find<HTMLInputElement>('input');
-//         const list = find('#list');
-//         const options = findAll('[role="option"]');
-//         let relatedTarget: HTMLElement;
-//
-//         el.addEventListener(
-//           'auto-complete:commit',
-//           (event) => {
-//             relatedTarget = (event as CustomEvent).detail.relatedTarget;
-//             expect(relatedTarget).to.equal(null);
-//           },
-//           { once: true }
-//         );
-//
-//         await triggerFocusFor(input);
-//         await nextTick();
-//         expect(list.hidden).to.be.false;
-//         expectOptionConnectedWithInput(options[0], input);
-//
-//         options[0].click();
-//         expect(el.value).to.eql({});
-//       });
-//     });
-//
-//     describe('single select', () => {
-//       it('selects an option and fires `auto-complete:commit` event', async () => {
-//         await fixture(html`
-//           <auto-complete for="list">
-//             <input type="text" />
-//             <ul id="list">
-//               <li id="1" role="option">Player</li>
-//               <li role="option">Taxi</li>
-//             </ul>
-//           </auto-complete>
-//         `);
-//
-//         const el = find<AutoCompleteElement>('auto-complete');
-//         const input = find<HTMLInputElement>('input');
-//         const list = find('#list');
-//         const options = findAll('[role="option"]');
-//         let relatedTarget: HTMLElement;
-//
-//         el.addEventListener(
-//           'auto-complete:commit',
-//           (event) => {
-//             relatedTarget = (event as CustomEvent).detail.relatedTarget;
-//             expect(relatedTarget).to.equal(options[0]);
-//           },
-//           { once: true }
-//         );
-//
-//         await triggerFocusFor(input);
-//         await nextTick();
-//         expect(list.hidden).to.be.false;
-//         expectOptionConnectedWithInput(options[0], input);
-//         expect(el.multiple).to.be.false;
-//
-//         options[0].click();
-//
-//         expect(el.value).to.eql({ id: '1', value: 'Player' });
-//         expect(list.hidden).to.be.true;
-//       });
-//     });
-//
-//     describe('multi select', () => {
-//       it('selects multiple options and fires `auto-complete:commit` event', async () => {
-//         await fixture(html`
-//           <auto-complete for="list" multiple>
-//             <input type="text" />
-//             <ul id="list">
-//               <li id="1" role="option">Player</li>
-//               <li id="2" role="option">Taxi</li>
-//             </ul>
-//           </auto-complete>
-//         `);
-//
-//         const el = find<AutoCompleteElement>('auto-complete');
-//         const input = find<HTMLInputElement>('input');
-//         const list = find('#list');
-//         const options = findAll('[role="option"]');
-//         let relatedTarget: HTMLElement | null;
-//
-//         el.addEventListener('auto-complete:commit', (event) => {
-//           relatedTarget = (event as CustomEvent).detail.relatedTarget;
-//         });
-//
-//         await triggerFocusFor(input);
-//         await nextTick();
-//         expect(list.hidden).to.be.false;
-//         expectOptionConnectedWithInput(options[0], input);
-//         expect(el.multiple).to.be.true;
-//
-//         options[0].click();
-//         relatedTarget = null;
-//         await oneEvent(el, 'auto-complete:commit');
-//         expect(relatedTarget).to.equal(options[0]);
-//         expect(el.value).to.eql([{ id: '1', value: 'Player' }]);
-//         expect(list.hidden).to.be.false;
-//         expect(document.activeElement).to.equal(input);
-//
-//         options[1].click();
-//         relatedTarget = null;
-//         await oneEvent(el, 'auto-complete:commit');
-//         expect(relatedTarget).to.equal(options[1]);
-//         expect(el.value).to.eql([
-//           { id: '1', value: 'Player' },
-//           { id: '2', value: 'Taxi' },
-//         ]);
-//         expect(list.hidden).to.be.false;
-//         expect(document.activeElement).to.equal(input);
-//       });
-//     });
-//   });
-//
-//   describe('keyboard interactions', () => {
-//     it('opens the list on alt+ArrowDown key', async () => {
-//       await fixture(html`
-//         <auto-complete for="list" value='{ "id": "1", "value": "Player" }'>
-//           <input type="text" />
-//           <ul id="list">
-//             <li id="1" role="option">Player</li>
-//             <li role="option">Taxi</li>
-//           </ul>
-//         </auto-complete>
-//       `);
-//
-//       const input = find('input');
-//       const list = find('#list');
-//
-//       await triggerFocusFor(input);
-//       await nextTick();
-//       expect(list.hidden).to.be.false;
-//
-//       await triggerKeyEvent(input, 'keydown', { key: 'Escape' });
-//       expect(list.hidden).to.be.true;
-//
-//       await triggerKeyEvent(input, 'keydown', { key: 'ArrowDown', altKey: true });
-//       expect(list.hidden).to.be.false;
-//     });
-//
-//     it('closes the list on Escape key', async () => {
-//       await fixture(html`
-//         <auto-complete for="list" value='{ "id": "1", "value": "Player" }'>
-//           <input type="text" />
-//           <ul id="list">
-//             <li id="1" role="option">Player</li>
-//             <li role="option">Taxi</li>
-//           </ul>
-//         </auto-complete>
-//       `);
-//
-//       const input = find('input');
-//       const list = find('#list');
-//
-//       await triggerFocusFor(input);
-//       await nextTick();
-//       expect(list.hidden).to.be.false;
-//
-//       await triggerKeyEvent(input, 'keydown', { key: 'Escape' });
-//       expect(list.hidden).to.be.true;
-//     });
-//
-//     it('closes the list on alt+ArrowUp key', async () => {
-//       await fixture(html`
-//         <auto-complete for="list" value='{ "id": "1", "value": "Player" }'>
-//           <input type="text" />
-//           <ul id="list">
-//             <li id="1" role="option">Player</li>
-//             <li role="option">Taxi</li>
-//           </ul>
-//         </auto-complete>
-//       `);
-//
-//       const input = find('input');
-//       const list = find('#list');
-//
-//       await triggerFocusFor(input);
-//       await nextTick();
-//       expect(list.hidden).to.be.false;
-//
-//       await triggerKeyEvent(input, 'keydown', { key: 'ArrowUp', altKey: true });
-//       expect(list.hidden).to.be.true;
-//     });
-//
-//     it('cycles through the options with arrow keys', async () => {
-//       await fixture(html`
-//         <auto-complete for="list">
-//           <input type="text" />
-//           <ul id="list">
-//             <li role="option">Player</li>
-//             <li role="option" disabled>Taxi</li>
-//             <li role="option">Manhattan</li>
-//           </ul>
-//         </auto-complete>
-//       `);
-//
-//       const input = find<HTMLInputElement>('input');
-//       const list = find('#list');
-//       const options = findAll('[role="option"]');
-//
-//       await triggerFocusFor(input);
-//       await nextTick();
-//       expect(list.hidden).to.be.false;
-//
-//       expectOptionConnectedWithInput(options[0], input);
-//       await triggerKeyEvent(input, 'keydown', { key: 'ArrowDown' });
-//       expectOptionConnectedWithInput(options[1], input);
-//       await triggerKeyEvent(input, 'keydown', { key: 'ArrowDown' });
-//       expectOptionConnectedWithInput(options[2], input);
-//       await triggerKeyEvent(input, 'keydown', { key: 'ArrowDown' });
-//       expectOptionConnectedWithInput(options[0], input);
-//       await triggerKeyEvent(input, 'keydown', { key: 'ArrowUp' });
-//       expectOptionConnectedWithInput(options[2], input);
-//     });
-//   });
-//
-//   describe('opening the list', () => {
-//     it('opens the list with pointer down when the input has focus', async () => {
-//       await fixture(html`
-//         <auto-complete for="list">
-//           <input type="text" />
-//           <ul id="list"></ul>
-//         </auto-complete>
-//       `);
-//
-//       const input = find('input');
-//       const list = find('#list');
-//
-//       await triggerFocusFor(input);
-//       await nextTick();
-//       expect(list.hidden).to.be.false;
-//       await triggerKeyEvent(input, 'keydown', { key: 'Escape' });
-//       expect(list.hidden).to.be.true;
-//       expect(document.activeElement).to.equal(input);
-//
-//       input.dispatchEvent(new MouseEvent('pointerdown'));
-//       expect(list.hidden).to.be.false;
-//     });
-//
-//     it('dispatches show and shown events in order', async () => {
-//       const el: AutoCompleteElement = await fixture(html`
-//         <auto-complete for="list">
-//           <input type="text" />
-//           <ul id="list"></ul>
-//         </auto-complete>
-//       `);
-//
-//       const input = find('input');
-//       const list = find('#list');
-//
-//       const events: string[] = [];
-//       const track = (event: Event) => events.push(event.type);
-//
-//       el.addEventListener('auto-complete:show', track);
-//       el.addEventListener('auto-complete:shown', track);
-//
-//       const completed = Promise.all([oneEvent(el, 'auto-complete:show'), oneEvent(el, 'auto-complete:shown')]);
-//       await triggerFocusFor(input);
-//       await nextTick();
-//       expect(list.hidden).to.be.false;
-//
-//       await completed;
-//
-//       expect(events).to.eql(['auto-complete:show', 'auto-complete:shown']);
-//     });
-//   });
-//
-//   describe('closing the list', () => {
-//     it('dispatches hide and hidden events in order', async () => {
-//       const el: AutoCompleteElement = await fixture(html`
-//         <auto-complete for="list">
-//           <input type="text" />
-//           <ul id="list"></ul>
-//         </auto-complete>
-//       `);
-//
-//       const input = find('input');
-//       const list = find('#list');
-//
-//       const events: string[] = [];
-//       const track = (event: Event) => events.push(event.type);
-//
-//       el.addEventListener('auto-complete:hide', track);
-//       el.addEventListener('auto-complete:hidden', track);
-//
-//       const completed = Promise.all([oneEvent(el, 'auto-complete:hide'), oneEvent(el, 'auto-complete:hidden')]);
-//       await triggerFocusFor(input);
-//       await nextTick();
-//       expect(list.hidden).to.be.false;
-//       await triggerBlurFor(input);
-//       expect(list.hidden).to.be.true;
-//
-//       await completed;
-//
-//       expect(events).to.eql(['auto-complete:hide', 'auto-complete:hidden']);
-//     });
-//
-//     it('removes data-empty attribute from the list', async () => {
-//       await fixture(html`
-//         <auto-complete for="list">
-//           <input type="text" />
-//           <ul id="list"></ul>
-//         </auto-complete>
-//       `);
-//
-//       const input = find('input');
-//       const list = find('#list');
-//       await triggerFocusFor(input);
-//       await waitUntil(() => document.activeElement === input);
-//       expect(list).to.have.attribute('data-empty');
-//
-//       await triggerBlurFor(input);
-//       await waitUntil(() => list.hidden === true);
-//       expect(list).not.to.have.attribute('data-empty');
-//     });
-//
-//     it('clears out the input field', async () => {
-//       await fixture(html`
-//         <auto-complete for="list">
-//           <input type="text" />
-//           <ul id="list">
-//             <li role="option">Player</li>
-//             <li role="option">Taxi</li>
-//           </ul>
-//         </auto-complete>
-//       `);
-//
-//       const input = find<HTMLInputElement>('input');
-//       await triggerFocusFor(input);
-//       await fillIn(input, 'Hello world');
-//       expect(input.value).to.equal('Hello world');
-//
-//       await triggerBlurFor(input);
-//       expect(input.value).to.equal('');
-//     });
-//
-//     describe('single select', () => {
-//       it('sets the input value to the selected value', async () => {
-//         await fixture(html`
-//           <auto-complete for="list" value='{ "id": "1", "value": "Player" }'>
-//             <input type="text" />
-//             <ul id="list">
-//               <li id="1" role="option">Player</li>
-//               <li role="option">Taxi</li>
-//             </ul>
-//           </auto-complete>
-//         `);
-//
-//         const input = find<HTMLInputElement>('input');
-//         await triggerFocusFor(input);
-//         expect(input.value).to.equal('Player');
-//
-//         await triggerFocusFor(input);
-//         await fillIn(input, 'Hello world');
-//         expect(input.value).to.equal('Hello world');
-//
-//         await triggerBlurFor(input);
-//         expect(input.value).to.equal('Player');
-//       });
-//     });
-//
-//     describe('multi select', () => {
-//       it('clears out the input field even if there is a selected option', async () => {
-//         await fixture(html`
-//           <auto-complete for="list" multiple value='[{ "id": "1", "value": "Player" }]'>
-//             <input type="text" />
-//             <ul id="list">
-//               <li id="1" role="option">Player</li>
-//               <li role="option">Taxi</li>
-//             </ul>
-//           </auto-complete>
-//         `);
-//
-//         const input = find<HTMLInputElement>('input');
-//         await triggerFocusFor(input);
-//         expect(input.value).to.equal('');
-//
-//         await triggerFocusFor(input);
-//         await fillIn(input, 'Hello world');
-//         expect(input.value).to.equal('Hello world');
-//
-//         await triggerBlurFor(input);
-//         expect(input.value).to.equal('');
-//       });
-//     });
-//   });
-//
-//   describe('clearing', () => {
-//     it('removes the value attribute and dispatches `auto-complete:clear` event', async () => {
-//       await fixture(html`
-//         <auto-complete for="list" value='{ "id": "1", "value": "Player" }'>
-//           <input type="text" />
-//           <button type="button" data-autocomplete-clear>Clear</button>
-//           <ul id="list">
-//             <li id="1" role="option">Player</li>
-//             <li role="option">Taxi</li>
-//           </ul>
-//         </auto-complete>
-//       `);
-//
-//       const el = find<AutoCompleteElement>('auto-complete');
-//       const input = find<HTMLInputElement>('input');
-//       const list = find('#list');
-//       const button = find<HTMLButtonElement>('[data-autocomplete-clear]');
-//       let cleared = false;
-//
-//       el.addEventListener(
-//         'auto-complete:clear',
-//         () => {
-//           cleared = true;
-//         },
-//         { once: true }
-//       );
-//
-//       expect(el).to.have.attribute('value');
-//       expect(input.value).to.equal('Player');
-//       await triggerFocusFor(input);
-//       await nextTick();
-//       expect(list.hidden).to.be.false;
-//
-//       button.click();
-//       expect(cleared).to.be.true;
-//       expect(document.activeElement).to.equal(input);
-//       expect(list.hidden).to.be.true;
-//       expect(el).not.to.have.attribute('value');
-//       expect(input.value).to.equal('');
-//     });
-//   });
-// });
+import { expect, fixture, html, waitUntil } from '@open-wc/testing';
+import { fillIn, find, findAll, triggerEvent, triggerKeyEvent } from '@ambiki/test-utils';
+import { nextTick } from '@ambiki/utils';
+import * as sinon from 'sinon';
+import '../src';
+import AutoCompleteElement from '../src';
+
+describe('AutoCompleteElement', () => {
+  it('adds attributes after initializing', async () => {
+    const { input, list, clearBtn } = await setupFixture({ options: [{ id: 1 }], clearable: true });
+
+    expect(input).to.have.attribute('spellcheck', 'false');
+    expect(input).to.have.attribute('autocomplete', 'off');
+    expect(list).to.have.attribute('tabindex', '-1');
+    expect(list).to.have.attribute('aria-orientation', 'vertical');
+    expect(clearBtn).to.have.attribute('aria-label');
+  });
+
+  it('adds attributes after opening the list', async () => {
+    const { input, list } = await setupFixture({ options: [{ id: 1 }] });
+    await triggerEvent(input, 'pointerdown');
+
+    expect(input).not.to.have.attribute('data-empty');
+    expect(list.hidden).to.be.false;
+  });
+
+  it('activates the first option after opening the list', async () => {
+    const { input, list, options } = await setupFixture({ options: [{ id: 1 }] });
+    await triggerEvent(input, 'pointerdown');
+
+    expect(list.hidden).to.be.false;
+    expectInputLinkedWithOption(input, options[0]);
+  });
+
+  it('activates the selected option after opening the list', async () => {
+    const { input, list, options } = await setupFixture({ options: [{ id: 1 }, { id: 2 }], value: 2 });
+    await triggerEvent(input, 'pointerdown');
+
+    expect(list.hidden).to.be.false;
+    expectInputLinkedWithOption(input, options[1]);
+  });
+
+  it('adds data-empty attribute if there are no options', async () => {
+    const { input, list } = await setupFixture({ options: [] });
+    await triggerEvent(input, 'pointerdown');
+
+    expect(list.hidden).to.be.false;
+    expect(list).to.have.attribute('data-empty');
+  });
+
+  it('destroys the options after closing the list', async () => {
+    const { input, list, options } = await setupFixture({ options: [{ id: 1 }, { id: 2 }], value: 2 });
+    await triggerEvent(input, 'pointerdown');
+
+    expect(options[1]).to.have.attribute('aria-selected', 'true');
+    expect(options[1]).to.have.attribute('data-active');
+    await triggerEvent(input, 'blur');
+
+    expect(list.hidden).to.be.true;
+    expect(options[1]).to.have.attribute('aria-selected', 'false');
+    expect(options[1]).not.to.have.attribute('data-active');
+  });
+
+  it('does not select if the option is disabled', async () => {
+    const { input, list, options, container } = await setupFixture({ options: [{ id: 1, disabled: true }] });
+    const commitHandler = sinon.spy();
+    const selectHandler = sinon.spy();
+    container.addEventListener('auto-complete:commit', commitHandler);
+    container.addEventListener('auto-complete:select', selectHandler);
+
+    await triggerEvent(input, 'pointerdown');
+    expect(list.hidden).to.be.false;
+
+    options[0].click();
+    expect(container).not.to.have.attribute('value');
+    expect(commitHandler.called).to.be.false;
+    expect(selectHandler.called).to.be.false;
+  });
+
+  it('selects the option on Enter/Tab key', async () => {
+    const { input, list, options, container } = await setupFixture({
+      options: [
+        { id: 1, value: 'foo', label: 'Foo' },
+        { id: 2, value: 'bar', label: 'Bar' },
+      ],
+    });
+    const commitHandler = sinon.spy();
+    const selectHandler = sinon.spy();
+    container.addEventListener('auto-complete:commit', commitHandler);
+    container.addEventListener('auto-complete:select', selectHandler);
+
+    await triggerEvent(input, 'pointerdown');
+    expect(list.hidden).to.be.false;
+    await triggerKeyEvent(input, 'keydown', { key: 'Enter' });
+
+    expect(container.value).to.eq(options[0].getAttribute('value'));
+    expect(commitHandler.calledOnce).to.be.true;
+    expectEventArgs(commitHandler, { option: options[0], value: 'foo', label: 'Foo' });
+    expect(selectHandler.calledOnce).to.be.true;
+    expectEventArgs(selectHandler, { option: options[0], value: 'foo', label: 'Foo' });
+    expect(commitHandler.calledAfter(selectHandler)).to.be.true;
+
+    await triggerEvent(input, 'pointerdown');
+    expect(list.hidden).to.be.false;
+    await triggerKeyEvent(input, 'keydown', { key: 'ArrowDown' });
+    expectInputLinkedWithOption(input, options[1]);
+    await triggerKeyEvent(input, 'keydown', { key: 'Tab' });
+
+    expect(container.value).to.eq(options[1].getAttribute('value'));
+    expect(commitHandler.called).to.be.true;
+    expect(selectHandler.called).to.be.true;
+    expect(commitHandler.calledAfter(selectHandler)).to.be.true;
+  });
+
+  it('closes the list on Escape key', async () => {
+    const { input, list } = await setupFixture({ options: [{ id: 1 }] });
+
+    await triggerEvent(input, 'pointerdown');
+    expect(list.hidden).to.be.false;
+
+    await triggerKeyEvent(input, 'keydown', { key: 'Escape' });
+    expect(list.hidden).to.be.true;
+  });
+
+  it('opens the list on Alt+ArrowDown', async () => {
+    const { input, list } = await setupFixture({ options: [{ id: 1 }] });
+
+    await triggerKeyEvent(input, 'keydown', { key: 'ArrowDown', altKey: true });
+    expect(list.hidden).to.be.false;
+  });
+
+  it('closes the list on Alt+ArrowUp', async () => {
+    const { input, list } = await setupFixture({ options: [{ id: 1 }] });
+
+    await triggerEvent(input, 'pointerdown');
+    expect(list.hidden).to.be.false;
+
+    await triggerKeyEvent(input, 'keydown', { key: 'ArrowUp', altKey: true });
+    expect(list.hidden).to.be.true;
+  });
+
+  it('dispatches events when showing the list', async () => {
+    const { input, list, container } = await setupFixture({ options: [{ id: 1 }] });
+    const showHandler = sinon.spy();
+    const shownHandler = sinon.spy();
+    container.addEventListener('auto-complete:show', showHandler);
+    container.addEventListener('auto-complete:shown', shownHandler);
+
+    await triggerEvent(input, 'pointerdown');
+    expect(list.hidden).to.be.false;
+
+    expect(showHandler.calledOnce).to.be.true;
+    expect(shownHandler.calledOnce).to.be.true;
+    expect(shownHandler.calledAfter(showHandler)).to.be.true;
+  });
+
+  it('dispatches events when hiding the list', async () => {
+    const { input, list, container } = await setupFixture({ options: [{ id: 1 }] });
+    const hideHandler = sinon.spy();
+    const hiddenHandler = sinon.spy();
+    container.addEventListener('auto-complete:hide', hideHandler);
+    container.addEventListener('auto-complete:hidden', hiddenHandler);
+
+    await triggerEvent(input, 'pointerdown');
+    expect(list.hidden).to.be.false;
+
+    await triggerEvent(input, 'blur');
+    expect(list.hidden).to.be.true;
+
+    expect(hideHandler.calledOnce).to.be.true;
+    expect(hiddenHandler.calledOnce).to.be.true;
+    expect(hiddenHandler.calledAfter(hideHandler)).to.be.true;
+  });
+
+  it('filters the options', async () => {
+    const { input, list, options } = await setupFixture({
+      options: [
+        { id: 1, label: 'Hero' },
+        { id: 2, label: 'Mauri' },
+      ],
+    });
+    await triggerEvent(input, 'pointerdown');
+    expect(list.hidden).to.be.false;
+
+    await fillIn(input, 'hero');
+    await waitUntil(() => options[1].hidden); // search is debounced
+    expect(options[1].hidden).to.be.true;
+    expect(options[0].hidden).to.be.false;
+  });
+
+  describe('when single-select', () => {
+    it('sets aria-selected="true" on the option that matches the value', async () => {
+      const { input, list, options } = await setupFixture({ options: [{ id: 1 }, { id: 2 }], value: 2 });
+      await triggerEvent(input, 'pointerdown');
+
+      expect(list.hidden).to.be.false;
+      expect(options[1]).to.have.attribute('aria-selected', 'true');
+    });
+
+    it('selects an option', async () => {
+      const { input, list, options, container } = await setupFixture({
+        options: [{ id: 1, label: 'Hero' }, { id: 2 }],
+      });
+
+      await triggerEvent(input, 'pointerdown');
+      expect(list.hidden).to.be.false;
+
+      options[0].click();
+      expect(container.value).to.eq(options[0].getAttribute('value'));
+      expect(container.label).to.eq(options[0].getAttribute('data-label'));
+      expect(input.value).to.eq('Hero');
+      expect(list.hidden).to.be.true;
+
+      await triggerEvent(input, 'pointerdown');
+      expect(list.hidden).to.be.false;
+      expect(options[0]).to.have.attribute('aria-selected', 'true');
+    });
+
+    it('sets input value if label is present', async () => {
+      const { input } = await setupFixture({
+        options: [{ id: 1, value: 100, label: 'My option' }, { id: 2 }],
+        value: 100,
+      });
+
+      expect(input.value).to.eq('My option');
+    });
+
+    it('clears the selected value when clearBtn is clicked', async () => {
+      const { input, list, container, clearBtn } = await setupFixture({
+        options: [{ id: 1, value: 1, label: 'Hero' }, { id: 2 }],
+        value: 1,
+        clearable: true,
+      });
+
+      const clearHandler = sinon.spy();
+      container.addEventListener('auto-complete:clear', clearHandler);
+
+      expect(container).to.have.attribute('value');
+      expect(input.value).to.eq('Hero');
+      await triggerEvent(input, 'pointerdown');
+      expect(list.hidden).to.be.false;
+
+      clearBtn.click();
+      expect(list.hidden).to.be.true;
+      expect(document.activeElement === input).to.be.true;
+      expect(container).not.to.have.attribute('value');
+      expect(input.value).to.eq('');
+      expect(clearHandler.calledOnce).to.be.true;
+    });
+  });
+
+  describe('when multi-select', () => {
+    it('sets aria-selected="true" on all the options that matches the value', async () => {
+      const { input, list, options } = await setupFixture({
+        options: [{ id: 1 }, { id: 2 }, { id: 3 }],
+        value: [1, 2],
+        multiple: true,
+      });
+      await triggerEvent(input, 'pointerdown');
+
+      expect(list.hidden).to.be.false;
+      expect(options[0]).to.have.attribute('aria-selected', 'true');
+      expect(options[1]).to.have.attribute('aria-selected', 'true');
+      expect(options[2]).to.have.attribute('aria-selected', 'false');
+    });
+
+    it('selects options', async () => {
+      const { input, list, options, container } = await setupFixture({
+        options: [{ id: 1 }, { id: 2 }],
+        multiple: true,
+      });
+      await triggerEvent(input, 'pointerdown');
+      expect(list.hidden).to.be.false;
+
+      options[0].click();
+      expect(JSON.parse(container.value)).to.eql([options[0].getAttribute('value')]);
+      expect(list.hidden).to.be.false;
+
+      options[1].click();
+      expect(JSON.parse(container.value)).to.eql([options[0].getAttribute('value'), options[1].getAttribute('value')]);
+
+      await triggerEvent(input, 'blur');
+      expect(list.hidden).to.be.true;
+      await triggerEvent(input, 'pointerdown');
+      expect(options[0]).to.have.attribute('aria-selected', 'true');
+      expect(options[1]).to.have.attribute('aria-selected', 'true');
+
+      options[0].click();
+      expect(JSON.parse(container.value)).to.eql([options[1].getAttribute('value')]);
+
+      options[1].click();
+      expect(container).not.to.have.attribute('value');
+    });
+
+    it('deselects the option on Enter key', async () => {
+      const { input, list, container, options } = await setupFixture({
+        options: [{ id: 1, value: 'foo', label: 'Foo' }],
+        value: ['foo'],
+        multiple: true,
+      });
+      const commitHandler = sinon.spy();
+      const deselectHandler = sinon.spy();
+      container.addEventListener('auto-complete:commit', commitHandler);
+      container.addEventListener('auto-complete:deselect', deselectHandler);
+
+      await triggerEvent(input, 'pointerdown');
+      expect(list.hidden).to.be.false;
+      await triggerKeyEvent(input, 'keydown', { key: 'Enter' });
+
+      expect(container).not.to.have.attribute('value');
+      await nextTick();
+      expect(commitHandler.calledOnce).to.be.true;
+      expectEventArgs(commitHandler, { option: options[0], value: 'foo', label: 'Foo' });
+      expect(deselectHandler.calledOnce).to.be.true;
+      expectEventArgs(deselectHandler, { option: options[0], value: 'foo', label: 'Foo' });
+      expect(commitHandler.calledAfter(deselectHandler)).to.be.true;
+    });
+
+    it('deselects the option on Tab key', async () => {
+      const { input, list, container, options } = await setupFixture({
+        options: [{ id: 1, value: 'foo', label: 'Foo' }],
+        value: ['foo'],
+        multiple: true,
+      });
+      const commitHandler = sinon.spy();
+      const deselectHandler = sinon.spy();
+      container.addEventListener('auto-complete:commit', commitHandler);
+      container.addEventListener('auto-complete:deselect', deselectHandler);
+
+      await triggerEvent(input, 'pointerdown');
+      expect(list.hidden).to.be.false;
+      await triggerKeyEvent(input, 'keydown', { key: 'Tab' });
+
+      expect(container).not.to.have.attribute('value');
+      await nextTick();
+      expect(commitHandler.calledOnce).to.be.true;
+      expectEventArgs(commitHandler, { option: options[0], value: 'foo', label: 'Foo' });
+      expect(deselectHandler.calledOnce).to.be.true;
+      expectEventArgs(deselectHandler, { option: options[0], value: 'foo', label: 'Foo' });
+      expect(commitHandler.calledAfter(deselectHandler)).to.be.true;
+    });
+
+    it('clears the input field after committing', async () => {
+      const { input, options } = await setupFixture({ options: [{ id: 1 }], multiple: true });
+      await fillIn(input, 'search text');
+      expect(input.value).to.eq('search text');
+
+      await triggerEvent(input, 'pointerdown');
+      options[0].click();
+      expect(input.value).to.eq('');
+    });
+
+    it('sets data-active after committing an option', async () => {
+      const { input, list, options } = await setupFixture({
+        options: [{ id: 1 }, { id: 2 }],
+        value: [1],
+        multiple: true,
+      });
+
+      await triggerEvent(input, 'pointerdown');
+      expect(list.hidden).to.be.false;
+      options[1].click();
+      await waitUntil(() => options[1].hasAttribute('data-active'));
+      expect(options[0]).not.to.have.attribute('data-active');
+      expect(options[1]).to.have.attribute('data-active');
+
+      options[0].click();
+      await waitUntil(() => options[0].hasAttribute('data-active'));
+      expect(options[0]).to.have.attribute('data-active');
+      expect(options[1]).not.to.have.attribute('data-active');
+    });
+
+    it('clears the selected values when clearBtn is clicked', async () => {
+      const { input, list, container, clearBtn } = await setupFixture({
+        options: [{ id: 1 }, { id: 2 }],
+        value: [1, 2],
+        clearable: true,
+      });
+
+      const clearHandler = sinon.spy();
+      container.addEventListener('auto-complete:clear', clearHandler);
+
+      expect(container).to.have.attribute('value');
+      await triggerEvent(input, 'pointerdown');
+      expect(list.hidden).to.be.false;
+
+      clearBtn.click();
+      expect(list.hidden).to.be.true;
+      expect(document.activeElement === input).to.be.true;
+      expect(container).not.to.have.attribute('value');
+      expect(clearHandler.calledOnce).to.be.true;
+    });
+  });
+});
+
+function expectInputLinkedWithOption(input: HTMLInputElement, option: HTMLElement) {
+  expect(option).to.have.attribute('data-active');
+  expect(input).to.have.attribute('aria-activedescendant', option.id);
+}
+
+function expectEventArgs(
+  eventHandler: sinon.SinonSpy,
+  { option, value, label }: { option: HTMLElement; value: string | number; label: string }
+) {
+  expect(eventHandler.args[0][0].detail.option).to.eq(option);
+  expect(eventHandler.args[0][0].detail.value).to.eq(value);
+  expect(eventHandler.args[0][0].detail.label).to.eq(label);
+}
+
+type SetupFixtureProps = {
+  options: Array<{
+    id: number;
+    value?: number | string;
+    label?: string;
+    text?: string;
+    disabled?: boolean;
+    hidden?: boolean;
+  }>;
+  value?: string | string[] | number | number[];
+  multiple?: boolean;
+  clearable?: boolean;
+};
+
+async function setupFixture({ options, value, multiple = false, clearable = false }: SetupFixtureProps) {
+  const _value = Array.isArray(value) ? JSON.stringify(value) : value;
+  const selectedOption = options.find((o) => o.value === value);
+  const _label = multiple ? undefined : selectedOption?.label;
+
+  await fixture(html`
+    <auto-complete
+      for="list"
+      ?multiple="${multiple}"
+      .value="${typeof _value === 'undefined' ? undefined : _value}"
+      data-label="${typeof _label === 'undefined' ? undefined : _label}"
+    >
+      <input type="text" />
+      ${clearable && html`<button type="button" data-clear>X</button>`}
+      <ul id="list" hidden>
+        ${options.map(
+          (option) =>
+            html`<li
+              value="${option.value || option.id}"
+              data-label="${option.label || 'Option'}"
+              role="option"
+              id="${option.id}"
+              aria-disabled="${option.disabled ? 'true' : 'false'}"
+              ?disabled="${option.disabled}"
+              ?hidden="${option.hidden}"
+            >
+              ${option.text || 'Option'}
+            </li>`
+        )}
+      </ul>
+    </auto-complete>
+  `);
+
+  return {
+    container: find<AutoCompleteElement>('auto-complete'),
+    input: find<HTMLInputElement>('input'),
+    list: find('ul'),
+    options: findAll('li[role="option"]'),
+    clearBtn: find('button[data-clear]'),
+  };
+}
