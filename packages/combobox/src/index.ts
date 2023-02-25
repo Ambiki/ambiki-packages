@@ -13,7 +13,7 @@ export default class Combobox {
   multiple: boolean;
   private isMouseMoving = false;
 
-  constructor(input: HTMLInputElement, list: HTMLElement, { multiple = false }: Options) {
+  constructor(input: HTMLInputElement, list: HTMLElement, { multiple = false }: Options = {}) {
     this.input = input;
     this.list = list;
     this.multiple = multiple;
