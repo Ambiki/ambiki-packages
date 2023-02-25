@@ -1,18 +1,21 @@
-import { MAX_SAFE_INTEGER } from '@ambiki/utils';
-import Autocomplete from './autocomplete';
-
-export type SelectedOption = {
-  id: string;
-  value: string;
-};
-
-export type Value = SelectedOption | SelectedOption[];
-export type ParsedValue = Value | null;
+import AutoComplete from './auto_complete';
 
 export default class AutoCompleteElement extends HTMLElement {
-  autocomplete: Autocomplete | null = null;
+  /**
+   * @description Handles all the core logic of the component. To access functions see the example below:
+   * @example
+   * <auto-complete>
+   *   <!-- More -->
+   * </auto-complete>
+   *
+   * const element = document.querySelector('auto-complete');
+   * const options = element.autocomplete.options;
+   * element.autocomplete.select(myOption);
+   * // etc
+   */
+  autocomplete?: AutoComplete;
 
-  connectedCallback(): void {
+  connectedCallback() {
     const input = this.querySelector<HTMLInputElement>('input:not([type="hidden"])');
     const id = this.getAttribute('for');
     if (!id) return;
@@ -20,29 +23,92 @@ export default class AutoCompleteElement extends HTMLElement {
     const list = document.getElementById(id);
     if (!(input instanceof HTMLElement) || !list) return;
 
-    this.autocomplete = new Autocomplete(this, input, list);
-  }
-
-  disconnectedCallback(): void {
-    this.autocomplete?.destroy();
+    this.autocomplete = new AutoComplete(this, input, list);
   }
 
   static get observedAttributes(): string[] {
-    return ['value'];
+    return ['open'];
   }
 
-  attributeChangedCallback(_name: string, oldValue: string, newValue: string): void {
+  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
     if (oldValue === newValue) return;
+    if (!this.autocomplete) return;
 
-    if (this.autocomplete) {
-      this.autocomplete.value = getParsedValue(newValue);
+    switch (name) {
+      case 'open':
+        newValue === null ? this.autocomplete.hideList() : this.autocomplete.showList();
+        break;
     }
   }
 
+  disconnectedCallback() {
+    this.autocomplete?.destroy();
+  }
+
+  /**
+   * @description Selected option's value
+   */
+  get value(): string {
+    return this.getAttribute('value') || '';
+  }
+
+  /**
+   * @description Sets the value of the `auto-complete` element with the selected option's value
+   */
+  set value(value: string | null | undefined) {
+    if (!value || value === '[]') {
+      this.removeAttribute('value');
+      return;
+    }
+    this.setAttribute('value', value);
+  }
+
+  /**
+   * @description Selected option's label or `innerText`
+   */
+  get label(): string {
+    return this.getAttribute('data-label') || '';
+  }
+
+  /**
+   * @description Sets the label of the `auto-complete` element with the selected option's label or `innerText`
+   */
+  set label(value: string) {
+    if (!value) {
+      this.removeAttribute('data-label');
+      return;
+    }
+    this.setAttribute('data-label', value);
+  }
+
+  /**
+   * @description Whether the element is open or not
+   */
+  get open(): boolean {
+    return this.hasAttribute('open');
+  }
+
+  /**
+   * @description Shows/hides the list
+   */
+  set open(value: boolean) {
+    if (value) {
+      this.setAttribute('open', '');
+    } else {
+      this.removeAttribute('open');
+    }
+  }
+
+  /**
+   * @description Whether multiple options can be selected or not
+   */
   get multiple(): boolean {
     return this.hasAttribute('multiple');
   }
 
+  /**
+   * @description Updates the multiple state
+   */
   set multiple(value: boolean) {
     if (value) {
       this.setAttribute('multiple', '');
@@ -51,64 +117,32 @@ export default class AutoCompleteElement extends HTMLElement {
     }
   }
 
-  get max(): number {
-    if (this.hasAttribute('max') && !Number.isNaN(this.getAttribute('max'))) {
-      return Number(this.getAttribute('max'));
-    }
-
-    return MAX_SAFE_INTEGER;
-  }
-
-  set max(value: number) {
-    this.setAttribute('max', value.toString());
-  }
-
+  /**
+   * @description Returns the `src` attribute of the element
+   */
   get src(): string {
     return this.getAttribute('src') || '';
   }
 
+  /**
+   * @description Sets the `src` attribute of the element
+   */
   set src(value: string) {
     this.setAttribute('src', value);
   }
 
-  get value(): Value {
-    const value = this.getAttribute('value') || '';
-    if (this.multiple) return getParsedValue(value);
-    return getParsedValue(value)[0] ? getParsedValue(value)[0] : <SelectedOption>{};
-  }
-
-  set value(value: Value) {
-    const _value = JSON.stringify(value);
-
-    if (typeof _value === 'undefined' || _value === '[]' || !_value) {
-      this.removeAttribute('value');
-    } else {
-      this.setAttribute('value', _value);
-    }
-  }
-
+  /**
+   * @description Returns the query param name
+   */
   get param(): string {
     return this.getAttribute('param') || 'q';
   }
 
+  /**
+   * @description Sets the `param` attribute of the element
+   */
   set param(value: string) {
     this.setAttribute('param', value);
-  }
-}
-
-function getParsedValue(value: string): SelectedOption[] {
-  try {
-    const parsedValue = JSON.parse(value) as ParsedValue;
-    if (!parsedValue) throw new Error();
-    // Since an element's id is of type string, we'll need to convert the user passed value's id into a string as well.
-    // This will allow us to use `===`
-    if (Array.isArray(parsedValue)) {
-      return parsedValue.map((v) => ({ ...v, id: v.id.toString() }));
-    }
-
-    return [{ ...parsedValue, id: parsedValue.id.toString() }];
-  } catch {
-    return [];
   }
 }
 

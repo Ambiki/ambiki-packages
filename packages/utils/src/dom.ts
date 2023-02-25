@@ -17,3 +17,7 @@ export function move(elements: HTMLElement[], activeElement: HTMLElement, index:
 
   return elements[indexOfElement];
 }
+
+export function enabled(element: HTMLElement) {
+  return !element.hasAttribute('disabled') && element.getAttribute('aria-disabled') !== 'true';
+}
