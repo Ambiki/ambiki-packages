@@ -3,6 +3,7 @@ import type AutoCompleteElement from './index';
 import { enabled, nextTick } from '@ambiki/utils';
 import SingleSelection from './single_selection';
 import MultiSelection from './multi_selection';
+import { dispatchEvent } from './utils';
 
 const DATA_EMPTY_ATTR = 'data-empty';
 
@@ -333,8 +334,4 @@ function makeAbortController() {
 
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   return { signal: null, abort() {} };
-}
-
-export function dispatchEvent(element: HTMLElement, name: string, options: CustomEventInit = {}) {
-  return element.dispatchEvent(new CustomEvent(`auto-complete:${name}`, { bubbles: true, ...options }));
 }
