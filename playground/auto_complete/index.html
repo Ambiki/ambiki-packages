@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Auto Complete Element</title>
+    <link rel="stylesheet" href="../reset.css" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+
+  <body>
+    <div id="app">
+      <div>
+        <h3>Single</h3>
+        <auto-complete for="ambiki-options" value="2" data-label="Option 2">
+          <div class="input-wrapper">
+            <input type="text" class="form-control" />
+            <div class="clear-btn-wrapper">
+              <button type="button" data-clear>X</button>
+            </div>
+          </div>
+          <ul id="ambiki-options" class="options" hidden>
+            <li role="option" class="option" data-label="Option 1" value="1">Option 1 <span>(checked)</span></li>
+            <li role="option" class="option" data-label="Option 2" value="2" aria-disabled="true">
+              Option 2 <span>(checked)</span>
+            </li>
+            <li role="option" class="option" data-label="Option 3" value="3">Option 3 <span>(checked)</span></li>
+            <li role="option" class="option" data-label="Option 4" value="4">Option 4 <span>(checked)</span></li>
+            <li role="option" class="option" data-label="Option 5" value="5">Option 5 <span>(checked)</span></li>
+            <li role="option" class="option" data-label="Option 6" value="6">Option 6 <span>(checked)</span></li>
+            <li role="option" class="option" data-label="Option 7" value="7">Option 7 <span>(checked)</span></li>
+            <li role="option" class="option" data-label="Option 8" value="8">Option 8 <span>(checked)</span></li>
+            <li class="blankslate">We couldn't find that!</li>
+          </ul>
+        </auto-complete>
+      </div>
+
+      <div>
+        <h3>Single Ajax</h3>
+        <auto-complete for="ambiki-options-ajax" src="http://localhost:3000/auto_complete/users">
+          <div class="input-wrapper">
+            <input type="text" class="form-control" />
+            <div class="clear-btn-wrapper">
+              <button type="button" data-clear>X</button>
+            </div>
+          </div>
+          <ul id="ambiki-options-ajax" class="options" hidden></ul>
+        </auto-complete>
+      </div>
+
+      <div>
+        <h3>Multi</h3>
+        <auto-complete
+          for="ambiki-options-multiple"
+          multiple
+          data-controller="token"
+          data-action="auto-complete:select->token#select auto-complete:deselect->token#deselect auto-complete:clear->token#clear"
+        >
+          <div data-token-target="output" class="token-container"></div>
+          <div class="input-wrapper">
+            <input
+              type="text"
+              class="form-control"
+              data-action="keydown->token#removeLastToken"
+              data-token-target="input"
+            />
+            <div class="clear-btn-wrapper">
+              <button type="button" data-clear>X</button>
+            </div>
+          </div>
+          <ul id="ambiki-options-multiple" class="options" hidden>
+            <li role="option" class="option" data-label="Option 1" value="1">Option 1 <span>(checked)</span></li>
+            <li role="option" class="option" data-label="Option 2" value="2">Option 2 <span>(checked)</span></li>
+            <li role="option" class="option" data-label="Option 3" value="3">Option 3 <span>(checked)</span></li>
+            <li role="option" class="option" data-label="Option 4" value="4">Option 4 <span>(checked)</span></li>
+            <li role="option" class="option" data-label="Option 5" value="5">Option 5 <span>(checked)</span></li>
+            <li role="option" class="option" data-label="Option 6" value="6">Option 6 <span>(checked)</span></li>
+            <li role="option" class="option" data-label="Option 7" value="7">Option 7 <span>(checked)</span></li>
+            <li role="option" class="option" data-label="Option 8" value="8">Option 8 <span>(checked)</span></li>
+            <li class="blankslate">We couldn't find that!</li>
+          </ul>
+        </auto-complete>
+      </div>
+
+      <div>
+        <h3>Multi Ajax</h3>
+        <auto-complete for="ambiki-options-multiple-ajax" multiple src="http://localhost:3000/auto_complete/users">
+          <div class="input-wrapper">
+            <input type="text" class="form-control" />
+            <div class="clear-btn-wrapper">
+              <button type="button" data-clear>X</button>
+            </div>
+          </div>
+          <ul id="ambiki-options-multiple-ajax" class="options" hidden></ul>
+        </auto-complete>
+      </div>
+    </div>
+
+    <script type="module" src="../../custom-elements/auto-complete-element/dist/index.js"></script>
+    <script type="module">
+      import { Application, Controller } from 'https://unpkg.com/@hotwired/stimulus/dist/stimulus.js';
+      window.Stimulus = Application.start();
+
+      Stimulus.register(
+        'token',
+        class extends Controller {
+          static targets = ['output', 'token', 'input'];
+
+          select(event) {
+            const { option, value, label } = event.detail;
+            if (!option) return;
+
+            const tokenItem = document.createElement('button');
+            tokenItem.type = 'button';
+            tokenItem.setAttribute('data-value', value);
+            tokenItem.classList.add('token');
+            tokenItem.setAttribute('data-token-target', 'token');
+            tokenItem.setAttribute('data-action', 'token#remove');
+            tokenItem.innerText = label;
+            this.outputTarget.append(tokenItem);
+          }
+
+          deselect(event) {
+            const { option, value } = event.detail;
+            if (!option) return;
+
+            const selectedToken = this.tokenTargets.find((token) => token.getAttribute('data-value') === value);
+            selectedToken?.remove();
+          }
+
+          remove(event) {
+            event.preventDefault();
+            const token = event.target.closest('button');
+            this.removeToken(token);
+          }
+
+          removeLastToken(event) {
+            if (!this.hasTokenTarget) return;
+            if (event.key === 'Backspace') {
+              if (this.inputTarget.value.length) return;
+              const lastToken = this.tokenTargets[this.tokenTargets.length - 1];
+              this.removeToken(lastToken);
+            }
+          }
+
+          clear() {
+            this.tokenTargets.forEach((token) => token.remove());
+          }
+
+          removeToken(token) {
+            this.autocomplete.removeValue(token.getAttribute('data-value'));
+            token.remove();
+          }
+
+          get autocomplete() {
+            return this.element.autocomplete;
+          }
+        }
+      );
+    </script>
+  </body>
+</html>
