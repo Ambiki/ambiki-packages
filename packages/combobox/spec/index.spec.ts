@@ -1,406 +1,375 @@
-// import { expect, fixture, html } from '@open-wc/testing';
-// import Combobox from '../src';
-//
-// function press(element: Element, key: string) {
-//   element.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
-// }
-//
-// function mouseover(element: Element) {
-//   element.dispatchEvent(new CustomEvent('mousemove', { bubbles: true }));
-//   element.dispatchEvent(new CustomEvent('mouseover', { bubbles: true }));
-// }
-//
-// function expectInputLinkedWithOption(input: HTMLInputElement, option: HTMLElement) {
-//   expect(option).to.have.attribute('data-tracking');
-//   expect(input).to.have.attribute('aria-activedescendant', option.id);
-// }
-//
-// describe('Combobox', () => {
-//   describe('starting and stopping', () => {
-//     let el: HTMLElement;
-//     let input: HTMLInputElement;
-//     let list: HTMLElement;
-//     let options: NodeListOf<HTMLElement>;
-//     let combobox: Combobox;
-//
-//     beforeEach(async () => {
-//       el = await fixture(html`
-//         <div>
-//           <input type="text" aria-activedescendant="list-id" />
-//           <ul>
-//             <li role="option" data-tracking>Player</li>
-//             <li role="option">Taxi</li>
-//           </ul>
-//         </div>
-//       `);
-//
-//       input = el.querySelector('input');
-//       list = el.querySelector('ul');
-//       options = list.querySelectorAll<HTMLElement>('[role="option"]');
-//       combobox = new Combobox(input, list);
-//     });
-//
-//     afterEach(() => {
-//       combobox.stop();
-//     });
-//
-//     it('adds default attributes', () => {
-//       expect(input).to.have.attribute('aria-expanded', 'false');
-//       expect(input).to.have.attribute('role', 'combobox');
-//       expect(input).to.have.attribute('aria-haspopup', 'listbox');
-//       expect(input).to.have.attribute('aria-controls', list.id);
-//       expect(input).to.have.attribute('aria-autocomplete', 'list');
-//       expect(input).not.to.have.attribute('aria-multiselectable');
-//       expect(list).to.have.attribute('role', 'listbox');
-//     });
-//
-//     it('on starting combobox', () => {
-//       combobox.start();
-//
-//       expect(input).to.have.attribute('aria-expanded', 'true');
-//       expect(input).to.have.attribute('aria-activedescendant');
-//       expect(options[0]).to.have.attribute('data-tracking');
-//
-//       options.forEach((option) => {
-//         expect(option).to.have.attribute('tabindex', '-1');
-//         expect(option).to.have.attribute('id');
-//       });
-//     });
-//
-//     it('on stopping combobox', () => {
-//       combobox.start();
-//       options[0].click();
-//       expect(options[0]).to.have.attribute('aria-selected', 'true');
-//       combobox.stop();
-//
-//       expect(input).to.have.attribute('aria-expanded', 'false');
-//       expect(options[0]).to.have.attribute('aria-selected', 'false');
-//       expect(input).not.to.have.attribute('aria-activedescendant');
-//       expect(options[0]).not.to.have.attribute('data-tracking');
-//     });
-//   });
-//
-//   describe('keyboard interaction', () => {
-//     let el: HTMLElement;
-//     let input: HTMLInputElement;
-//     let list: HTMLElement;
-//     let options: NodeListOf<HTMLElement>;
-//     let combobox: Combobox;
-//
-//     beforeEach(async () => {
-//       el = await fixture(html`
-//         <div>
-//           <input type="text" />
-//           <ul>
-//             <li role="option">Player</li>
-//             <li role="option">Taxi</li>
-//             <li role="option" aria-disabled="true">Taxi</li>
-//             <li role="option" hidden>Taxi</li>
-//           </ul>
-//         </div>
-//       `);
-//
-//       input = el.querySelector('input');
-//       list = el.querySelector('ul');
-//       options = list.querySelectorAll<HTMLElement>('[role="option"]');
-//       combobox = new Combobox(input, list);
-//     });
-//
-//     afterEach(() => {
-//       combobox.stop();
-//     });
-//
-//     it('cycles through the options with ArrowDown key', () => {
-//       combobox.start();
-//
-//       press(input, 'ArrowDown');
-//       expectInputLinkedWithOption(input, options[0]);
-//
-//       press(input, 'ArrowDown');
-//       expectInputLinkedWithOption(input, options[1]);
-//
-//       press(input, 'ArrowDown');
-//       expectInputLinkedWithOption(input, options[2]);
-//
-//       // Skips hidden option
-//       press(input, 'ArrowDown');
-//       expectInputLinkedWithOption(input, options[0]);
-//     });
-//
-//     it('cycles through the options with ArrowUp key', () => {
-//       combobox.start();
-//
-//       // Skips hidden option
-//       press(input, 'ArrowUp');
-//       expectInputLinkedWithOption(input, options[options.length - 2]);
-//
-//       press(input, 'ArrowUp');
-//       expectInputLinkedWithOption(input, options[options.length - 3]);
-//
-//       press(input, 'ArrowUp');
-//       expectInputLinkedWithOption(input, options[options.length - 4]);
-//
-//       press(input, 'ArrowUp');
-//       expectInputLinkedWithOption(input, options[options.length - 2]);
-//     });
-//
-//     it('commits the option on Enter and Tab key', () => {
-//       combobox.start();
-//       let expectedOption: string | null = null;
-//
-//       list.addEventListener('combobox:commit', (event) => {
-//         expectedOption = (event.target as HTMLElement).id;
-//       });
-//
-//       expectedOption = null;
-//       press(input, 'ArrowDown');
-//       press(input, 'Enter');
-//       expect(expectedOption).to.equal(options[0].id);
-//
-//       expectedOption = null;
-//       press(input, 'Tab');
-//       expect(expectedOption).to.equal(options[0].id);
-//
-//       expectedOption = null;
-//       press(input, 'ArrowDown');
-//       press(input, 'Enter');
-//       expect(expectedOption).to.equal(options[1].id);
-//
-//       expectedOption = null;
-//       press(input, 'Tab');
-//       expect(expectedOption).to.equal(options[1].id);
-//
-//       // No events emitted for aria-disabled options
-//       expectedOption = null;
-//       press(input, 'ArrowDown');
-//       press(input, 'Enter');
-//       expect(expectedOption).to.equal(null);
-//
-//       press(input, 'Tab');
-//       expect(expectedOption).to.equal(null);
-//     });
-//
-//     it('selects the option', () => {
-//       combobox.start();
-//
-//       expect(options[0]).to.have.attribute('aria-selected', 'false');
-//
-//       press(input, 'ArrowDown');
-//       press(input, 'Enter');
-//       expect(options[0]).to.have.attribute('aria-selected', 'true');
-//
-//       // Other options are not selected
-//       expect(options[1]).to.have.attribute('aria-selected', 'false');
-//     });
-//   });
-//
-//   describe('mouse interaction', () => {
-//     let el: HTMLElement;
-//     let input: HTMLInputElement;
-//     let list: HTMLElement;
-//     let options: NodeListOf<HTMLElement>;
-//     let combobox: Combobox;
-//
-//     beforeEach(async () => {
-//       el = await fixture(html`
-//         <div>
-//           <input type="text" />
-//           <ul>
-//             <li role="option">Player</li>
-//             <li role="option">Taxi</li>
-//             <li role="option" aria-disabled="true">Taxi</li>
-//             <li role="option" hidden>Taxi</li>
-//           </ul>
-//         </div>
-//       `);
-//
-//       input = el.querySelector('input');
-//       list = el.querySelector('ul');
-//       options = list.querySelectorAll('[role="option"]');
-//       combobox = new Combobox(input, list);
-//     });
-//
-//     afterEach(() => {
-//       combobox.stop();
-//     });
-//
-//     it('commits the option on click', () => {
-//       combobox.start();
-//       let expectedOption: string | null = null;
-//
-//       list.addEventListener('combobox:commit', (event) => {
-//         expectedOption = (event.target as HTMLElement).id;
-//       });
-//
-//       expectedOption = null;
-//       options[0].click();
-//       expect(expectedOption).to.equal(options[0].id);
-//
-//       expectedOption = null;
-//       options[1].click();
-//       expect(expectedOption).to.equal(options[1].id);
-//
-//       // No events emitted for aria-disabled options
-//       expectedOption = null;
-//       options[2].click();
-//       expect(expectedOption).to.equal(null);
-//     });
-//
-//     it('selects the option', () => {
-//       combobox.start();
-//
-//       expect(options[0]).to.have.attribute('aria-selected', 'false');
-//
-//       options[0].click();
-//       expect(options[0]).to.have.attribute('aria-selected', 'true');
-//
-//       // Other options are not selected
-//       expect(options[1]).to.have.attribute('aria-selected', 'false');
-//     });
-//
-//     it('updates aria-activedescendant on mouseover', () => {
-//       combobox.start();
-//
-//       mouseover(options[0]);
-//       expectInputLinkedWithOption(input, options[0]);
-//
-//       mouseover(options[1]);
-//       expectInputLinkedWithOption(input, options[1]);
-//
-//       mouseover(options[2]);
-//       expectInputLinkedWithOption(input, options[2]);
-//     });
-//   });
-//
-//   describe('single selection', () => {
-//     let el: HTMLElement;
-//     let input: HTMLInputElement;
-//     let list: HTMLElement;
-//     let options: NodeListOf<HTMLElement>;
-//     let combobox: Combobox;
-//
-//     beforeEach(async () => {
-//       el = await fixture(html`
-//         <div>
-//           <input type="text" />
-//           <ul>
-//             <li role="option">Player</li>
-//             <li role="option">Taxi</li>
-//           </ul>
-//         </div>
-//       `);
-//
-//       input = el.querySelector('input');
-//       list = el.querySelector('ul');
-//       options = list.querySelectorAll<HTMLElement>('[role="option"]');
-//       combobox = new Combobox(input, list);
-//     });
-//
-//     afterEach(() => {
-//       combobox.stop();
-//     });
-//
-//     // Does not make sense to have max constraint on single select combobox. Instead if we want to restrict any option
-//     // from being selected, we can set 'aria-disabled' to 'true' on all of the options.
-//     it('can select more than the max count', () => {
-//       combobox = new Combobox(input, list, { max: 0 });
-//       combobox.start();
-//
-//       let expectedOption: string | null = null;
-//
-//       list.addEventListener('combobox:commit', (event) => {
-//         expectedOption = (event.target as HTMLElement).id;
-//       });
-//
-//       options[0].click();
-//       expect(options[0]).to.have.attribute('aria-selected', 'true');
-//       expect(expectedOption).to.equal(options[0].id);
-//       expect(options[1]).to.have.attribute('aria-selected', 'false');
-//
-//       expectedOption = null;
-//       options[1].click();
-//       expect(options[1]).to.have.attribute('aria-selected', 'true');
-//       expect(expectedOption).to.equal(options[1].id);
-//       expect(options[0]).to.have.attribute('aria-selected', 'false');
-//     });
-//   });
-//
-//   describe('multiple selections', () => {
-//     let el: HTMLElement;
-//     let input: HTMLInputElement;
-//     let list: HTMLElement;
-//     let options: NodeListOf<HTMLElement>;
-//     let combobox: Combobox;
-//
-//     beforeEach(async () => {
-//       el = await fixture(html`
-//         <div>
-//           <input type="text" />
-//           <ul>
-//             <li role="option">Player</li>
-//             <li role="option">Taxi</li>
-//           </ul>
-//         </div>
-//       `);
-//
-//       input = el.querySelector('input');
-//       list = el.querySelector('ul');
-//       options = list.querySelectorAll<HTMLElement>('[role="option"]');
-//       combobox = new Combobox(input, list, { multiple: true });
-//     });
-//
-//     afterEach(() => {
-//       combobox.stop();
-//     });
-//
-//     it('adds aria-multiselectable', () => {
-//       expect(input).to.have.attribute('aria-multiselectable', 'true');
-//     });
-//
-//     it('selecting options', () => {
-//       combobox.start();
-//
-//       expect(options[0]).to.have.attribute('aria-selected', 'false');
-//       expect(options[1]).to.have.attribute('aria-selected', 'false');
-//
-//       options[0].click();
-//       expect(options[0]).to.have.attribute('aria-selected', 'true');
-//
-//       options[1].click();
-//       expect(options[1]).to.have.attribute('aria-selected', 'true');
-//     });
-//
-//     it('cannot select more than the max count', () => {
-//       combobox = new Combobox(input, list, { multiple: true, max: 1 });
-//       combobox.start();
-//
-//       let expectedOption: string | null = null;
-//
-//       list.addEventListener('combobox:commit', (event) => {
-//         expectedOption = (event.target as HTMLElement).id;
-//       });
-//
-//       options[0].click();
-//       expect(options[0]).to.have.attribute('aria-selected', 'true');
-//       expect(expectedOption).to.equal(options[0].id);
-//
-//       // Cannot select the second option
-//       expectedOption = null;
-//       options[1].click();
-//       expect(options[1]).not.to.have.attribute('aria-selected', 'true');
-//       expect(expectedOption).to.equal(null);
-//
-//       // Deselect the first option
-//       expectedOption = null;
-//       options[0].click();
-//       expect(options[0]).to.have.attribute('aria-selected', 'false');
-//       expect(expectedOption).to.equal(options[0].id);
-//
-//       // Select the desired option
-//       expectedOption = null;
-//       options[1].click();
-//       expect(options[1]).to.have.attribute('aria-selected', 'true');
-//       expect(expectedOption).to.equal(options[1].id);
-//     });
-//   });
-// });
+import { expect, fixture, html } from '@open-wc/testing';
+import { find, findAll, triggerKeyEvent } from '@ambiki/test-utils';
+import * as sinon from 'sinon';
+import Combobox from '../src';
+
+describe('Combobox', () => {
+  it('adds attributes after initializing', async () => {
+    const { input, list } = await setupFixture({ options: [{ id: 1 }] });
+
+    expect(input).to.have.attribute('aria-expanded', 'false');
+    expect(input).to.have.attribute('role', 'combobox');
+    expect(input).to.have.attribute('aria-haspopup', 'listbox');
+    expect(input).to.have.attribute('aria-autocomplete', 'list');
+    expect(list).to.have.attribute('id');
+    expect(list).to.have.attribute('role', 'listbox');
+    expect(list).not.to.have.attribute('aria-multiselectable');
+  });
+
+  it('updates attributes when starting a combobox', async () => {
+    const { input, list, options, combobox } = await setupFixture({ options: [{ id: 1 }] });
+    const option = options[0];
+    combobox.start();
+
+    expect(input).to.have.attribute('aria-expanded', 'true');
+    expect(input).to.have.attribute('aria-controls', list.id);
+    expect(option).to.have.attribute('tabindex', '-1');
+    expect(option).to.have.attribute('id');
+    expect(option).to.have.attribute('aria-selected', 'false');
+  });
+
+  it('updates attributes when stopping a combobox', async () => {
+    const { input, options, combobox } = await setupFixture({
+      options: [{ id: 1, selected: true, active: true }],
+    });
+    const option = options[0];
+    combobox.start();
+    combobox.stop();
+
+    expect(input).to.have.attribute('aria-expanded', 'false');
+    expect(input).not.to.have.attribute('aria-controls');
+    expect(option).to.have.attribute('aria-selected', 'false');
+    expect(option).not.to.have.attribute('data-active');
+  });
+
+  it('cycles downwards through the options with ArrowDown key', async () => {
+    const { input, options, combobox } = await setupFixture({
+      options: [{ id: 1 }, { id: 2, disabled: true }, { id: 3, hidden: true }],
+    });
+    combobox.start();
+
+    // Assert there is no active option
+    expect(find('[data-active]')).not.to.exist;
+
+    await triggerKeyEvent(input, 'keydown', { key: 'ArrowDown' });
+    expectInputLinkedWithOption(input, options[0]);
+
+    await triggerKeyEvent(input, 'keydown', { key: 'ArrowDown' });
+    expectInputLinkedWithOption(input, options[1]);
+
+    // Skips hidden option and cycles to the top
+    await triggerKeyEvent(input, 'keydown', { key: 'ArrowDown' });
+    expectInputLinkedWithOption(input, options[0]);
+  });
+
+  it('cycles upwards through the options with ArrowDown key', async () => {
+    const { input, options, combobox } = await setupFixture({
+      options: [{ id: 1 }, { id: 2, disabled: true }, { id: 3, hidden: true }],
+    });
+    combobox.start();
+
+    // Assert there is no active option
+    expect(find('[data-active]')).not.to.exist;
+
+    // Skips the hidden option
+    await triggerKeyEvent(input, 'keydown', { key: 'ArrowUp' });
+    expectInputLinkedWithOption(input, options[1]);
+
+    await triggerKeyEvent(input, 'keydown', { key: 'ArrowUp' });
+    expectInputLinkedWithOption(input, options[0]);
+
+    // Cycles to the bottom skipping the hidden option
+    await triggerKeyEvent(input, 'keydown', { key: 'ArrowUp' });
+    expectInputLinkedWithOption(input, options[1]);
+  });
+
+  it('activates the first option with Home key', async () => {
+    const { input, options, combobox } = await setupFixture({
+      options: [{ id: 1 }, { id: 2, disabled: true }, { id: 3, hidden: true }],
+    });
+    combobox.start();
+
+    // Assert there is no active option
+    expect(find('[data-active]')).not.to.exist;
+
+    // Skips the hidden option
+    await triggerKeyEvent(input, 'keydown', { key: 'Home' });
+    expectInputLinkedWithOption(input, options[0]);
+  });
+
+  it('activates the last option with End key', async () => {
+    const { input, options, combobox } = await setupFixture({
+      options: [{ id: 1 }, { id: 2 }, { id: 3, hidden: true }],
+    });
+    combobox.start();
+
+    // Assert there is no active option
+    expect(find('[data-active]')).not.to.exist;
+
+    // Skips the hidden option
+    await triggerKeyEvent(input, 'keydown', { key: 'End' });
+    expectInputLinkedWithOption(input, options[1]);
+  });
+
+  it('commits the option with Enter and Tab key', async () => {
+    const { container, input, options, combobox } = await setupFixture({ options: [{ id: 1 }] });
+    combobox.start();
+
+    await triggerKeyEvent(input, 'keydown', { key: 'ArrowDown' });
+    expectInputLinkedWithOption(input, options[0]);
+
+    const commitHandler = sinon.spy();
+    container.addEventListener('combobox:commit', commitHandler);
+
+    await triggerKeyEvent(input, 'keydown', { key: 'Enter' });
+    expect(commitHandler.called).to.be.true;
+
+    await triggerKeyEvent(input, 'keydown', { key: 'Tab' });
+    expect(commitHandler.called).to.be.true;
+  });
+
+  it('does not commit the disabled option', async () => {
+    const { container, input, options, combobox } = await setupFixture({ options: [{ id: 1, disabled: true }] });
+    combobox.start();
+
+    await triggerKeyEvent(input, 'keydown', { key: 'ArrowDown' });
+    expectInputLinkedWithOption(input, options[0]);
+
+    const commitHandler = sinon.spy();
+    container.addEventListener('combobox:commit', commitHandler);
+
+    await triggerKeyEvent(input, 'keydown', { key: 'Enter' });
+    expect(commitHandler.called).to.be.false;
+
+    await triggerKeyEvent(input, 'keydown', { key: 'Tab' });
+    expect(commitHandler.called).to.be.false;
+  });
+
+  it('selects the option on mouse click', async () => {
+    const { container, options, combobox } = await setupFixture({ options: [{ id: 1 }] });
+    const option = options[0];
+    combobox.start();
+
+    const commitHandler = sinon.spy();
+    container.addEventListener('combobox:commit', commitHandler);
+
+    expect(find('[aria-selected="true"]')).not.to.exist;
+
+    option.click();
+    expect(option).to.have.attribute('aria-selected', 'true');
+    expect(commitHandler.calledOnce).to.be.true;
+  });
+
+  it('does not select a disabled option', async () => {
+    const { container, options, combobox } = await setupFixture({ options: [{ id: 1, disabled: true }] });
+    const option = options[0];
+    combobox.start();
+
+    const commitHandler = sinon.spy();
+    container.addEventListener('combobox:commit', commitHandler);
+
+    option.click();
+    expect(option).not.to.have.attribute('aria-selected', 'true');
+    expect(commitHandler.called).to.be.false;
+  });
+
+  it('activates option on mouseover', async () => {
+    const { input, options, combobox } = await setupFixture({ options: [{ id: 1 }] });
+    const option = options[0];
+    combobox.start();
+
+    expect(find('[data-active]')).not.to.exist;
+
+    mouseover(option);
+    expectInputLinkedWithOption(input, option);
+  });
+
+  describe('#deselect', () => {
+    describe('when single-select', () => {
+      it('only selects one option at a time', async () => {
+        const { options, combobox } = await setupFixture({ options: [{ id: 1 }, { id: 2 }] });
+        combobox.start();
+
+        combobox.select(options[0]);
+        expect(options[0]).to.have.attribute('aria-selected', 'true');
+        expect(options[1]).to.have.attribute('aria-selected', 'false');
+
+        combobox.select(options[1]);
+        expect(options[0]).to.have.attribute('aria-selected', 'false');
+        expect(options[1]).to.have.attribute('aria-selected', 'true');
+      });
+    });
+
+    describe('when multi-select', () => {
+      it('selects multiple options', async () => {
+        const { options, combobox } = await setupFixture({
+          options: [{ id: 1 }, { id: 2 }],
+          multiple: true,
+        });
+        combobox.start();
+
+        combobox.select(options[0]);
+        expect(options[0]).to.have.attribute('aria-selected', 'true');
+        expect(options[1]).to.have.attribute('aria-selected', 'false');
+
+        combobox.select(options[1]);
+        expect(options[0]).to.have.attribute('aria-selected', 'true');
+        expect(options[1]).to.have.attribute('aria-selected', 'true');
+      });
+    });
+  });
+
+  describe('#deselect', () => {
+    it('sets aria-selected="false" on the option', async () => {
+      const { options, combobox } = await setupFixture({ options: [{ id: 1, selected: true }] });
+      const option = options[0];
+      combobox.start();
+
+      expect(option).to.have.attribute('aria-selected', 'true');
+
+      combobox.deselect(option);
+      expect(option).to.have.attribute('aria-selected', 'false');
+    });
+  });
+
+  describe('#deselectAll', () => {
+    it('sets aria-selected="false" on all the options', async () => {
+      const { options, combobox } = await setupFixture({
+        options: [
+          { id: 1, selected: true },
+          { id: 2, selected: true },
+        ],
+        multiple: true,
+      });
+      combobox.start();
+
+      expect(options[0]).to.have.attribute('aria-selected', 'true');
+      expect(options[1]).to.have.attribute('aria-selected', 'true');
+
+      combobox.deselectAll();
+
+      expect(options[0]).to.have.attribute('aria-selected', 'false');
+      expect(options[1]).to.have.attribute('aria-selected', 'false');
+    });
+  });
+
+  describe('#activate', () => {
+    it('sets data-active on the option', async () => {
+      const { input, options, combobox } = await setupFixture({ options: [{ id: 1 }, { id: 2, active: true }] });
+      combobox.start();
+
+      combobox.activate(options[0]);
+      expect(options[0]).to.have.attribute('data-active');
+      expect(options[1]).not.to.have.attribute('data-active');
+      expectInputLinkedWithOption(input, options[0]);
+    });
+  });
+
+  describe('#deactivate', () => {
+    it('removes data-active from the options', async () => {
+      const { input, combobox } = await setupFixture({ options: [{ id: 1, active: true }] });
+      combobox.start();
+
+      combobox.deactivate();
+      expect(find('[data-active]')).not.to.exist;
+      expect(input).not.to.have.attribute('aria-activedescendant');
+    });
+  });
+
+  describe('single selection', () => {
+    it('only selects one option at a time', async () => {
+      const { options, combobox } = await setupFixture({ options: [{ id: 1 }, { id: 2 }] });
+      combobox.start();
+
+      options[0].click();
+      expect(options[0]).to.have.attribute('aria-selected', 'true');
+      expect(options[1]).not.to.have.attribute('aria-selected', 'true');
+
+      options[1].click();
+      expect(options[0]).not.to.have.attribute('aria-selected', 'true');
+      expect(options[1]).to.have.attribute('aria-selected', 'true');
+    });
+  });
+
+  describe('multi selection', () => {
+    it('adds attributes after initializing', async () => {
+      const { input } = await setupFixture({ options: [{ id: 1 }], multiple: true });
+      expect(input).to.have.attribute('aria-multiselectable', 'true');
+    });
+
+    it('selects multiple options', async () => {
+      const { options, combobox } = await setupFixture({
+        options: [{ id: 1 }, { id: 3 }],
+        multiple: true,
+      });
+      combobox.start();
+
+      options[0].click();
+      expect(options[0]).to.have.attribute('aria-selected', 'true');
+      expect(options[1]).not.to.have.attribute('aria-selected', 'true');
+
+      options[1].click();
+      expect(options[0]).to.have.attribute('aria-selected', 'true');
+      expect(options[1]).to.have.attribute('aria-selected', 'true');
+    });
+  });
+});
+
+function mouseover(element: Element) {
+  element.dispatchEvent(new CustomEvent('mousemove', { bubbles: true }));
+  element.dispatchEvent(new CustomEvent('mouseover', { bubbles: true }));
+}
+
+function expectInputLinkedWithOption(input: HTMLInputElement, option: HTMLElement) {
+  expect(option).to.have.attribute('data-active');
+  expect(input).to.have.attribute('aria-activedescendant', option.id);
+}
+
+type SetupFixtureProps = {
+  options: Array<{
+    id: number;
+    text?: string;
+    selected?: boolean;
+    active?: boolean;
+    disabled?: boolean;
+    hidden?: boolean;
+  }>;
+  multiple?: boolean;
+};
+
+async function setupFixture({ options, multiple = false }: SetupFixtureProps) {
+  const activeOption = options.find((o) => o.active);
+
+  await fixture(html`
+    <div>
+      <input type="text" ?aria-activedescendant="${activeOption?.id}" />
+      <ul>
+        ${options.map(
+          (option) =>
+            html`<li
+              role="option"
+              id="${option.id}"
+              aria-selected="${typeof option.selected === 'undefined' ? false : option.selected ? 'true' : 'false'}"
+              ?data-active="${option.active}"
+              aria-disabled="${option.disabled ? 'true' : 'false'}"
+              ?disabled="${option.disabled}"
+              ?hidden="${option.hidden}"
+            >
+              ${option.text || 'Option'}
+            </li>`
+        )}
+      </ul>
+    </div>
+  `);
+
+  const input = find<HTMLInputElement>('input');
+  const list = find('ul');
+
+  return {
+    container: find('div'),
+    input,
+    list,
+    options: findAll('li[role="option"]'),
+    combobox: new Combobox(input, list, { multiple }),
+  };
+}
