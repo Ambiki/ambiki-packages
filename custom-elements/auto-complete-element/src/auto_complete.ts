@@ -3,7 +3,8 @@ import type AutoCompleteElement from './index';
 import { enabled, nextTick, debounce } from '@ambiki/utils';
 import SingleSelection from './single_selection';
 import MultiSelection from './multi_selection';
-import { dispatchEvent } from './utils';
+import { dispatchEvent, getValue, getLabel, makeAbortController } from './utils';
+import type { MakeAbortControllerType } from './utils';
 
 const DATA_EMPTY_ATTR = 'data-empty';
 
@@ -14,7 +15,7 @@ export default class AutoComplete {
   combobox: Combobox;
   clearButton: HTMLButtonElement | null;
   private selectionVariant: SingleSelection | MultiSelection;
-  private controller?: AbortController | { signal: null; abort: () => void };
+  private controller?: MakeAbortControllerType;
   private currentQuery?: string;
   private shouldFetch = true;
 
@@ -74,7 +75,7 @@ export default class AutoComplete {
    */
   setValue(value: string) {
     this.selectionVariant.setValue(value);
-    const option = this.options.find((o) => o.getAttribute('value') === value);
+    const option = this.options.find((o) => getValue(o) === value);
     if (!this.container.open || !option) return;
 
     this.combobox.select(option);
@@ -85,7 +86,7 @@ export default class AutoComplete {
    */
   removeValue(value: string) {
     this.selectionVariant.removeValue(value);
-    const option = this.options.find((o) => o.getAttribute('value') === value);
+    const option = this.options.find((o) => getValue(o) === value);
     if (!option) return;
 
     this.combobox.deselect(option);
@@ -198,8 +199,8 @@ export default class AutoComplete {
     dispatchEvent(this.container, 'commit', {
       detail: {
         option,
-        value: option.getAttribute('value'),
-        label: option.getAttribute('data-label') || option.innerText,
+        value: getValue(option),
+        label: getLabel(option),
       },
     });
   }
@@ -317,13 +318,4 @@ function filterOptions(query: string, { matching }: { matching: string }) {
       target.hidden = false;
     }
   };
-}
-
-function makeAbortController() {
-  if ('AbortController' in window) {
-    return new AbortController();
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  return { signal: null, abort() {} };
 }

@@ -1,5 +1,6 @@
 import type AutoCompleteElement from './index';
 import type AutoComplete from './auto_complete';
+import { getLabel, getValue } from './utils';
 
 export default class BaseSelection {
   protected container: AutoCompleteElement;
@@ -40,13 +41,13 @@ export default class BaseSelection {
    * @description Get `value` attribute
    */
   protected getValue(option: HTMLElement): string {
-    return option.getAttribute('value') || '';
+    return getValue(option);
   }
 
   /**
    * @description Get `data-label` attribute
    */
   protected getLabel(option: HTMLElement): string {
-    return option.getAttribute('data-label') || option.innerText.trim();
+    return getLabel(option);
   }
 }
