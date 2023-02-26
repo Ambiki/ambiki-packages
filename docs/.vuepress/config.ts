@@ -1,6 +1,7 @@
 import { defineConfig } from 'vuepress/config';
 
 export default defineConfig({
+  base: '/ambiki-packages/',
   title: 'Ambiki packages',
   description: 'A collection of everyday web-components and libraries.',
   themeConfig: {
