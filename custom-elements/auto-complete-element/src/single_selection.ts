@@ -55,13 +55,9 @@ export default class SingleSelection extends BaseSelection {
   }
 
   private identifySelectionState() {
-    for (const option of this.autocomplete.options) {
-      if (this.maySelect(option)) {
-        this.autocomplete.combobox.select(option);
-      } else {
-        this.autocomplete.combobox.deselect(option);
-      }
-    }
+    const option = this.autocomplete.options.find((o) => this.maySelect(o));
+    if (!option) return;
+    this.autocomplete.combobox.select(option);
   }
 
   /**
