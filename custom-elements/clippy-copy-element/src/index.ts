@@ -70,7 +70,7 @@ async function copy(button: HTMLElement) {
 }
 
 function dispatchEvent(element: HTMLElement) {
-  element.dispatchEvent(new CustomEvent('clippy-copy-element:copied', { bubbles: true }));
+  element.dispatchEvent(new CustomEvent('clippy-copy:copied', { bubbles: true }));
 }
 
 declare global {

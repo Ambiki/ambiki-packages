@@ -5,13 +5,13 @@ A clipboard element to copy text content, input values, and more.
 ## Installation
 
 ```bash
-npm install @ambiki/clippy-copy-element-element
+npm install @ambiki/clippy-copy-element
 ```
 
 ## Usage
 
 ```js
-import '@ambiki/clippy-copy-element-element';
+import '@ambiki/clippy-copy-element';
 ```
 
 ### Copying an input's value
@@ -39,7 +39,7 @@ import '@ambiki/clippy-copy-element-element';
 `clippy-copy:copied` event will be dispatched from the `<clippy-copy>` element after copying to the clipboard.
 
 ```js
-document.addEventListener('clippy-copy-element:copied', (event) => {
+document.addEventListener('clippy-copy:copied', (event) => {
   const button = event.target;
   button.setAttribute('aria-label', 'Copied!');
 })
