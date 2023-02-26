@@ -21,7 +21,7 @@ describe('ClippyCopyElement', () => {
     });
 
     whenCopied = new Promise((resolve) => {
-      document.addEventListener('clippy-copy:copied', () => resolve(copiedText), { once: true });
+      document.addEventListener('clippy-copy-element:copied', () => resolve(copiedText), { once: true });
     });
   });
 
@@ -51,7 +51,7 @@ describe('ClippyCopyElement', () => {
         <clippy-copy for="input"></clippy-copy>
       </div>
     `);
-    const button = el.querySelector('clippy-copy');
+    const button = el.querySelector('clippy-copy-element');
     button.click();
 
     const text = await whenCopied;
@@ -65,7 +65,7 @@ describe('ClippyCopyElement', () => {
         <clippy-copy for="textarea"></clippy-copy>
       </div>
     `);
-    const button = el.querySelector('clippy-copy');
+    const button = el.querySelector('clippy-copy-element');
     button.click();
 
     const text = await whenCopied;
@@ -79,7 +79,7 @@ describe('ClippyCopyElement', () => {
         <clippy-copy for="inner"></clippy-copy>
       </div>
     `);
-    const button = el.querySelector('clippy-copy');
+    const button = el.querySelector('clippy-copy-element');
     button.click();
 
     const text = await whenCopied;
@@ -98,7 +98,7 @@ describe('ClippyCopyElement', () => {
         </div>
       `);
 
-      button = el.querySelector('clippy-copy');
+      button = el.querySelector('clippy-copy-element');
       button.focus();
     });
 
