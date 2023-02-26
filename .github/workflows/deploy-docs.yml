@@ -12,5 +12,5 @@ jobs:
           ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
           TARGET_REPO: Ambiki/ambiki-packages
           TARGET_BRANCH: main
-          BUILD_SCRIPT: yarn && yarn docs:build
+          BUILD_SCRIPT: yarn && yarn docs:build-safe
           BUILD_DIR: docs/.vuepress/dist

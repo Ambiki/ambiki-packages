@@ -8,6 +8,7 @@
     "start": "web-dev-server",
     "docs:dev": "NODE_OPTIONS=--openssl-legacy-provider && vuepress dev docs",
     "docs:build": "NODE_OPTIONS=--openssl-legacy-provider && vuepress build docs",
+    "docs:build-safe": "vuepress build docs",
     "test": "web-test-runner",
     "test:watch": "web-test-runner --watch",
     "lint": "npx eslint \"**/*.{js,ts}\""
