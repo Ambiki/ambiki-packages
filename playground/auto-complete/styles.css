@@ -1,0 +1,114 @@
+#app {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#app > div {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#app > * + * {
+  margin-top: 16px;
+}
+
+auto-complete {
+  position: relative;
+  display: block;
+  width: 320px;
+}
+
+.input-wrapper {
+  position: relative;
+}
+
+.clear-btn-wrapper {
+  display: none;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 4px;
+  align-items: center;
+}
+
+auto-complete[value] .clear-btn-wrapper {
+  display: flex;
+}
+
+.form-control {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  padding: 6px 16px;
+  border-radius: var(--border-radius);
+  font-size: 16px;
+  line-height: 24px;
+}
+
+.options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  list-style: none;
+  padding: 4px 0;
+  box-shadow: var(--shadow);
+  margin: 4px 0 0 0;
+  border-radius: var(--border-radius);
+  background-color: var(--color-bg);
+  z-index: 10;
+  overflow-y: auto;
+  max-height: 200px;
+}
+
+.option {
+  cursor: pointer;
+  padding: 6px 16px;
+}
+
+.option[disabled],
+.option[aria-disabled='true'] {
+  color: #6e7781;
+}
+
+.option > span {
+  display: none;
+}
+
+.option[data-active] {
+  background-color: var(--color-bg-subtle);
+}
+
+.option[aria-selected='true'] > span {
+  display: inline;
+}
+
+.blankslate {
+  display: none;
+  padding: 8px 16px;
+  text-align: center;
+}
+
+.options[data-empty] .blankslate {
+  display: block;
+}
+
+.token-container {
+  display: grid;
+  gap: 4px;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  margin-bottom: 4px;
+}
+
+.token {
+  background-color: var(--color-bg-subtle);
+  padding: 4px 6px;
+  border-radius: 2px;
+  display: inline-block;
+  font-size: 14px;
+  text-align: center;
+}
