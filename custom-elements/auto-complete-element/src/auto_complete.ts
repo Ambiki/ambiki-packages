@@ -3,8 +3,8 @@ import type AutoCompleteElement from './index';
 import { enabled, nextTick, debounce } from '@ambiki/utils';
 import SingleSelection from './single_selection';
 import MultiSelection from './multi_selection';
-import { dispatchEvent, getValue, getLabel, makeAbortController } from './utils';
-import type { MakeAbortControllerType } from './utils';
+import { dispatchEvent, getValue, getLabel, makeAbortController, toArray } from './utils';
+import type { MakeAbortControllerType, SetValueType } from './utils';
 
 const DATA_EMPTY_ATTR = 'data-empty';
 
@@ -71,18 +71,25 @@ export default class AutoComplete {
   }
 
   /**
-   * @description Updates the state of the `auto-complete` element and selects the option based on the value provided
+   * @description Resets the selected options to the given value
    */
-  setValue(value: string) {
+  setValue(value: SetValueType) {
     this.selectionVariant.setValue(value);
-    const option = this.options.find((o) => getValue(o) === value);
-    if (!this.container.open || !option) return;
+    if (!this.container.open) return;
 
-    this.combobox.select(option);
+    if (value.length === 0) {
+      this.combobox.deselectAll();
+      return;
+    }
+
+    const transformedValue = toArray(value).map((v) => v.value.toString());
+    for (const option of this.options.filter((o) => transformedValue.includes(getValue(o)))) {
+      this.combobox.select(option);
+    }
   }
 
   /**
-   * @description Updates the state of the `auto-complete` element and deselects the option based on the value provided
+   * @description Removes the selected option matching the provided value
    */
   removeValue(value: string) {
     this.selectionVariant.removeValue(value);

@@ -165,7 +165,7 @@ export default class Combobox {
     }
 
     for (const el of this.options) {
-      el.setAttribute('aria-selected', String(el === option));
+      el.setAttribute('aria-selected', (el === option).toString());
     }
   }
 

@@ -1,5 +1,6 @@
 import BaseSelection from './base_selection';
 import { dispatchEvent } from './utils';
+import type { SetValueType } from './utils';
 
 export default class SingleSelection extends BaseSelection {
   override initialize() {
@@ -17,7 +18,6 @@ export default class SingleSelection extends BaseSelection {
   }
 
   override destroy() {
-    this.input.value = '';
     this.removeValue();
   }
 
@@ -36,22 +36,32 @@ export default class SingleSelection extends BaseSelection {
   }
 
   /**
-   * @description Sets the value attribute on the `auto-complete` element. Additionally, it also tries to find the
-   * option based on the provided value. If an option is found, `data-label` attribute is set on the `auto-complete`
-   * element, else removed
+   * @description Sets the value attribute on the `auto-complete` element. Additionally, it also tries to set the
+   * value of the input field
    */
-  setValue(value: string) {
-    this.container.value = value;
-    const option = this.autocomplete.options.find((o) => this.getValue(o) === value);
-    this.container.label = option ? this.getLabel(option) : '';
+  setValue(value: SetValueType) {
+    const _value = value[0];
+    if (!_value) {
+      this.removeValue();
+      return;
+    }
+
+    this.container.value = _value.value.toString();
+    const option = this.autocomplete.options.find((o) => this.maySelect(o));
+
+    const label = _value.label || (option ? this.getLabel(option) : '');
+    this.container.label = label;
+    this.input.value = label;
   }
 
   /**
-   * @description Removes the value and label attribute from the `auto-complete` element
+   * @description Removes the value and label attribute from the `auto-complete` element, and it also clears the
+   * value of the input field
    */
   removeValue() {
     this.container.value = '';
     this.container.label = '';
+    this.input.value = '';
   }
 
   private identifySelectionState() {

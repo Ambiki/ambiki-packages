@@ -32,3 +32,13 @@ export function makeAbortController(): MakeAbortControllerType {
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   return { signal: null, abort() {} };
 }
+
+export type SetValueType = Array<{ value: string | number; label?: string }>;
+
+/**
+ * @description Transforms a given value to an array
+ */
+export function toArray<T>(value: T | T[]): T[] {
+  if (Array.isArray(value)) return value;
+  return [value];
+}

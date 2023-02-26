@@ -188,6 +188,18 @@ describe('AutoCompleteElement', () => {
     expect(options[0].hidden).to.be.false;
   });
 
+  describe('#deactivate', () => {
+    it('removes the data-active attribute from the option element', async () => {
+      const { input, list, options, container } = await setupFixture({ options: [{ id: 1 }, { id: 2 }] });
+
+      await triggerEvent(input, 'pointerdown');
+      expect(options[0]).to.have.attribute('data-active');
+
+      container.autocomplete?.deactivate();
+      expect(find('[data-active]')).not.to.exist;
+    });
+  });
+
   describe('when single-select', () => {
     it('sets aria-selected="true" on the option that matches the value', async () => {
       const { input, list, options } = await setupFixture({ options: [{ id: 1 }, { id: 2 }], value: 2 });
@@ -246,6 +258,91 @@ describe('AutoCompleteElement', () => {
       expect(container).not.to.have.attribute('value');
       expect(input.value).to.eq('');
       expect(clearHandler.calledOnce).to.be.true;
+    });
+
+    describe('#setValue', () => {
+      it('sets the value but does not select the option if the list is hidden', async () => {
+        const { container, input, options } = await setupFixture({ options: [{ id: 1, value: 'foo', label: 'Foo' }] });
+        container.autocomplete?.setValue([{ value: 'foo' }]);
+
+        expect(container.value).to.eq('foo');
+        expect(container.label).to.eq('Foo');
+        expect(input.value).to.eq('Foo');
+        expect(options[0]).not.to.have.attribute('aria-selected', 'true');
+      });
+
+      it('sets the value and selects the option if list is open', async () => {
+        const { input, container, list, options } = await setupFixture({
+          options: [{ id: 1, value: 'foo', label: 'Foo' }],
+        });
+
+        await triggerEvent(input, 'pointerdown');
+        expect(list.hidden).to.be.false;
+        expect(options[0]).to.have.attribute('aria-selected', 'false');
+
+        container.autocomplete?.setValue([{ value: 'foo' }]);
+        expect(container.value).to.eq('foo');
+        expect(container.label).to.eq('Foo');
+        expect(input.value).to.eq('Foo');
+        expect(options[0]).to.have.attribute('aria-selected', 'true');
+      });
+
+      it('sets the value and the label from the params', async () => {
+        const { input, container } = await setupFixture({ options: [] });
+        // Only selects the first object because it's a single-select
+        container.autocomplete?.setValue([
+          { value: 'foo', label: 'Foo' },
+          { value: 'bar', label: 'Baz' },
+        ]);
+
+        expect(container.value).to.eq('foo');
+        expect(container.label).to.eq('Foo');
+        expect(input.value).to.eq('Foo');
+      });
+
+      it('removes the `data-label` attribute if label cannot be determined', async () => {
+        const { input, container } = await setupFixture({ options: [] });
+        container.autocomplete?.setValue([{ value: 'foo' }]);
+
+        expect(container.value).to.eq('foo');
+        expect(container).not.to.have.attribute('data-label');
+        expect(input.value).to.eq('');
+      });
+
+      it('clears the value', async () => {
+        const { input, container, options } = await setupFixture({
+          options: [{ id: 1, value: 'foo', label: 'Foo' }],
+          value: 'foo',
+        });
+        await triggerEvent(input, 'pointerdown');
+        container.autocomplete?.setValue([]);
+
+        expect(container.value).to.eq('');
+        expect(container.label).to.eq('');
+        expect(input.value).to.eq('');
+        expect(options[0]).not.to.have.attribute('aria-selected', 'true');
+      });
+    });
+
+    describe('#removeValue', () => {
+      it('removes a value and updates the selected state', async () => {
+        const { input, container, options } = await setupFixture({
+          options: [{ id: 1, value: 'foo', label: 'Foo' }],
+          value: 'foo',
+        });
+        expect(container.value).to.eq('foo');
+        expect(container.label).to.eq('Foo');
+        expect(input.value).to.eq('Foo');
+
+        await triggerEvent(input, 'pointerdown');
+        expect(options[0]).to.have.attribute('aria-selected', 'true');
+
+        container.autocomplete?.removeValue('foo');
+        expect(container).not.to.have.attribute('value');
+        expect(container).not.to.have.attribute('data-label');
+        expect(input.value).to.eq('');
+        expect(options[0]).to.have.attribute('aria-selected', 'false');
+      });
     });
   });
 
@@ -389,6 +486,82 @@ describe('AutoCompleteElement', () => {
       expect(document.activeElement === input).to.be.true;
       expect(container).not.to.have.attribute('value');
       expect(clearHandler.calledOnce).to.be.true;
+    });
+
+    describe('#setValue', () => {
+      it('sets the value but does not select the option if the list is hidden', async () => {
+        const { container, options } = await setupFixture({
+          options: [{ id: 1, value: 'foo' }],
+          multiple: true,
+        });
+        container.autocomplete?.setValue([{ value: 'foo' }]);
+
+        expect(JSON.parse(container.value)).to.eql(['foo']);
+        expect(container.label).to.eq('');
+        expect(options[0]).not.to.have.attribute('aria-selected', 'true');
+      });
+
+      it('sets the value and selects the option if list is open', async () => {
+        const { input, container, list, options } = await setupFixture({
+          options: [{ id: 1, value: 'foo' }],
+          multiple: true,
+        });
+
+        await triggerEvent(input, 'pointerdown');
+        expect(list.hidden).to.be.false;
+        expect(options[0]).to.have.attribute('aria-selected', 'false');
+
+        container.autocomplete?.setValue([{ value: 'foo' }]);
+        expect(JSON.parse(container.value)).to.eql(['foo']);
+        expect(options[0]).to.have.attribute('aria-selected', 'true');
+      });
+
+      it('does not set duplicate values', async () => {
+        const { container } = await setupFixture({
+          options: [{ id: 1, value: 'foo' }],
+          multiple: true,
+        });
+        container.autocomplete?.setValue([{ value: 'foo' }, { value: 'foo' }]);
+
+        expect(JSON.parse(container.value)).to.eql(['foo']);
+      });
+
+      it('clears the value', async () => {
+        const { input, container, options } = await setupFixture({
+          options: [{ id: 1, value: 'foo', label: 'Foo' }],
+          value: ['foo'],
+          multiple: true,
+        });
+        await triggerEvent(input, 'pointerdown');
+        container.autocomplete?.setValue([]);
+
+        expect(container).not.to.have.attribute('value');
+        expect(input.value).to.eq('');
+        expect(options[0]).not.to.have.attribute('aria-selected', 'true');
+      });
+    });
+
+    describe('#removeValue', () => {
+      it('removes a value and updates the selected state', async () => {
+        const { input, container, options } = await setupFixture({
+          options: [
+            { id: 1, value: 'foo', label: 'Foo' },
+            { id: 2, value: 'bar', label: 'Baz' },
+          ],
+          value: ['foo', 'bar'],
+          multiple: true,
+        });
+        expect(JSON.parse(container.value)).to.eql(['foo', 'bar']);
+
+        await triggerEvent(input, 'pointerdown');
+        expect(options[0]).to.have.attribute('aria-selected', 'true');
+        expect(options[1]).to.have.attribute('aria-selected', 'true');
+
+        container.autocomplete?.removeValue('foo');
+        expect(JSON.parse(container.value)).to.eql(['bar']);
+        expect(options[0]).to.have.attribute('aria-selected', 'false');
+        expect(options[1]).to.have.attribute('aria-selected', 'true');
+      });
     });
   });
 });

@@ -1,6 +1,7 @@
 import BaseSelection from './base_selection';
 import { nextTick } from '@ambiki/utils';
 import { dispatchEvent } from './utils';
+import type { SetValueType } from './utils';
 
 export default class MultiSelection extends BaseSelection {
   /**
@@ -38,7 +39,7 @@ export default class MultiSelection extends BaseSelection {
       this.removeValue(value);
       dispatchEvent(this.container, 'deselect', { detail: { option, value, label } });
     } else {
-      this.setValue(value);
+      this.setValue([{ value }]);
       dispatchEvent(this.container, 'select', { detail: { option, value, label } });
     }
 
@@ -53,10 +54,16 @@ export default class MultiSelection extends BaseSelection {
   /**
    * @description Adds the value to the state and updates the `value` attribute on the `auto-complete` element
    */
-  setValue(value: string) {
-    if (this.selectedValues.has(value)) return;
+  setValue(value: SetValueType) {
+    if (value.length === 0) {
+      this.destroy();
+      return;
+    }
 
-    this.selectedValues.add(value);
+    for (const _value of value) {
+      this.selectedValues.add(_value.value.toString());
+    }
+
     this.updateContainerWithSelectedValues();
   }
 
@@ -103,7 +110,7 @@ export default class MultiSelection extends BaseSelection {
 function parseJSON(value: string): string[] {
   try {
     const parsedValue = JSON.parse(value) as string[];
-    return parsedValue.map((e) => String(e));
+    return parsedValue.map((e) => e.toString());
   } catch {
     return [];
   }
