@@ -1,5 +1,5 @@
 import type AutoCompleteElement from './index';
-import type AutoComplete from './auto_complete';
+import type AutoComplete from './auto-complete';
 import { getLabel, getValue } from './utils';
 
 export default class BaseSelection {

@@ -1,4 +1,4 @@
-import BaseSelection from './base_selection';
+import BaseSelection from './base-selection';
 import { nextTick } from '@ambiki/utils';
 import { dispatchEvent } from './utils';
 import type { SetValueType } from './utils';

@@ -1,8 +1,8 @@
 import Combobox from '@ambiki/combobox';
 import type AutoCompleteElement from './index';
 import { enabled, nextTick, debounce } from '@ambiki/utils';
-import SingleSelection from './single_selection';
-import MultiSelection from './multi_selection';
+import SingleSelection from './single-selection';
+import MultiSelection from './multi-selection';
 import { dispatchEvent, getValue, getLabel, makeAbortController, toArray } from './utils';
 import type { MakeAbortControllerType, SetValueType } from './utils';
 

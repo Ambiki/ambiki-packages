@@ -1,4 +1,4 @@
-import AutoComplete from './auto_complete';
+import AutoComplete from './auto-complete';
 
 export default class AutoCompleteElement extends HTMLElement {
   /**
