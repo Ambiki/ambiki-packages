@@ -10,14 +10,16 @@ export default defineConfig({
     editLinks: true,
     editLinkText: 'Edit this page on GitHub',
     lastUpdated: 'Last Updated',
+    smoothScroll: true,
     sidebar: [
       '/',
       {
         title: 'Custom elements',
         children: ['/custom-elements/auto-complete-element/', '/custom-elements/clippy-copy-element/'],
         collapsable: false,
+        sidebarDepth: 3,
       },
-      { title: 'Packages', children: ['/packages/combobox/'], collapsable: false },
+      { title: 'Packages', children: ['/packages/combobox/'], collapsable: false, sidebarDepth: 3 },
     ],
   },
 });

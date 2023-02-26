@@ -187,7 +187,7 @@ export default class Combobox {
 
   /**
    * @description Sets `data-active` attribute on the option element. It also sets `aria-activedescendant` as the
-   * `id` of the option on the input element
+   * `id` of the option on the input field
    */
   activate(option: HTMLElement, { scroll = false } = {}) {
     for (const el of this.options) {
@@ -202,7 +202,7 @@ export default class Combobox {
   }
 
   /**
-   * @description Removes `data-active` and `aria-activedescendant` attribute from the option and input element
+   * @description Removes `data-active` and `aria-activedescendant` attribute from the option and input field
    * respectively
    */
   deactivate() {

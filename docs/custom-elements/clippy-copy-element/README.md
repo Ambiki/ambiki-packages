@@ -10,20 +10,35 @@ Copy text content, input values, and more to your clipboard.
 
 ## Installation
 
-```bash
-npm install @ambiki/clippy-copy-element
-```
+<code-group>
+  <code-block title="YARN">
+  ```bash
+  yarn add @ambiki/clippy-copy-element
+  ```
+  </code-block>
 
-## Usage
+  <code-block title="NPM">
+  ```bash
+  npm install @ambiki/clippy-copy-element
+  ```
+  </code-block>
+</code-group>
+
+After installing,
 
 ```bash
 import '@ambiki/clippy-copy-element';
 ```
 
+## Examples
+
 ### Copying an input's value
 
 ```html
-<input id="input" type="text" value="Some value" /> <clippy-copy for="input">Copy</clippy-copy>
+<div>
+  <input id="input" type="text" value="Some value" />
+</div>
+<clippy-copy for="input">Copy</clippy-copy>
 ```
 
 > Similarly, we also support `textarea` and `select` tags.
