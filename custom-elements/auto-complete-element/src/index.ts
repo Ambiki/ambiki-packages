@@ -10,7 +10,7 @@ export default class AutoCompleteElement extends HTMLElement {
    *
    * const element = document.querySelector('auto-complete');
    * const options = element.autocomplete.options;
-   * element.autocomplete.select(myOption);
+   * element.autocomplete.setValue([{ value: 1 }]);
    * // etc
    */
   autocomplete?: AutoComplete;
