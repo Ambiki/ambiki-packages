@@ -274,3 +274,178 @@ component.
 | `auto-complete:success`   | Fired when the network request has completed successfully.                                                                                                |
 | `auto-complete:error`     | Fired when the network request has failed.                                                                                                                |
 | `auto-complete:loadend`   | Fired when the network request has finished.                                                                                                              |
+
+## API
+
+Given the following markup:
+
+```html
+<auto-complete for="list">
+  <input type="text" />
+  <ul id="list" hidden>
+    <li role="option" value="player">Player</li>
+  </ul>
+</auto-complete>
+```
+
+```js
+const container = document.querySelector('auto-complete');
+const autocomplete = container.autocomplete;
+```
+
+### `open`
+
+Whether the list is open or not.
+
+```js
+container.open;
+// => false
+```
+
+### `open=`
+
+Shows/hides the list.
+
+```js
+container.open = true;
+```
+
+### `multiple`
+
+Whether multiple options can be selected or not.
+
+```js
+container.multiple;
+// => false
+```
+
+### `multiple=`
+
+Set where multiple options can be selected or not.
+
+```js
+container.multiple = true;
+```
+
+### `src`
+
+Returns the `src` attribute of the `auto-complete` element.
+
+```js
+container.src;
+// => /users
+```
+
+### `src=`
+
+Set the `src` attribute of the `auto-complete` element.
+
+```js
+container.src = '/people';
+```
+
+### `param`
+
+Returns the query param name.
+
+```js
+container.param;
+// => 'q'
+```
+
+### `param=`
+
+Sets the `param` attribute of the `auto-complete` element.
+
+```js
+container.param = 'query';
+```
+
+### `value`
+
+Returns all the selected options' value.
+
+```js
+container.value;
+// => ['1', '2']
+```
+
+### `setValue`
+
+Resets the selected options to the given value.
+
+```js
+autocomplete.setValue([{ value: 1 }, { value: 2 }]);
+```
+
+In case of single-select where options are fetched over a [network request](#asynchronous-requests), you can pass
+`label` to set the input field's value.
+
+```js
+autocomplete.setValue([{ value: 1, label: 'Selected option' }]);
+```
+
+### `removeValue`
+
+Removes the selected option that matches the provided value.
+
+```js
+autocomplete.removeValue('foo');
+```
+
+### `activate`
+
+Adds `data-active` attribute on the option element and sets `aria-activedescendant` attribute on the input element.
+
+```js
+autocomplete.activate(option);
+```
+
+::: tip
+You can also scroll to the activated option by setting `scroll: true`. By default, it's `false`.
+
+```js
+autocomplete.activate(option, { scroll: true });
+```
+:::
+
+### `deactivate`
+
+Removes `data-active` attribute from the option element and removes `aria-activedescendant` attribute from the input
+element.
+
+```js
+autocomplete.deactivate();
+```
+
+### `clear`
+
+Deselects all the selected options and closes the list.
+
+```js
+autocomplete.clear();
+```
+
+### `options`
+
+Returns all the options of the `auto-complete` element.
+
+```js
+autocomplete.options;
+```
+
+### `visibleOptions`
+
+Returns all the options of the `auto-complete` element that are visible within the list.
+
+```js
+autocomplete.visibleOptions;
+```
+
+### `activeOption`
+
+Returns the option that has the `data-active` attribute.
+
+```js
+autocomplete.activeOption;
+```
