@@ -615,8 +615,6 @@ type SetupFixtureProps = {
 
 async function setupFixture({ options, value, label = '', multiple = false, clearable = false }: SetupFixtureProps) {
   const _value = Array.isArray(value) ? JSON.stringify(value) : value;
-  // const selectedOption = options.find((o) => o.value === value);
-  // const _label = multiple ? undefined : selectedOption?.label;
 
   await fixture(html`
     <auto-complete
