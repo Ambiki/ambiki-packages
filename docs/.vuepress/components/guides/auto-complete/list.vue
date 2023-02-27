@@ -4,6 +4,12 @@
   </ul>
 </template>
 
+<script>
+export default {
+  name: 'AutoCompleteList',
+};
+</script>
+
 <style>
 .options {
   position: absolute;

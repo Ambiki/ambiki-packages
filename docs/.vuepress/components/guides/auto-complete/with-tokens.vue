@@ -43,6 +43,7 @@ import AutoCompleteBlankslate from './blankslate.vue';
 import TokenItem from './token-item.vue';
 
 export default {
+  name: 'GuidesAutoCompleteWithTokens',
   components: { AutoCompleteList, AutoCompleteOption, AutoCompleteBlankslate, TokenItem },
   data() {
     return {

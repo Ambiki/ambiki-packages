@@ -39,6 +39,7 @@ import AutoCompleteOption from './auto-complete/option.vue';
 import AutoCompleteBlankSlate from './auto-complete/blankslate.vue';
 
 export default {
+  name: 'GuidesAutoComplete',
   components: { AutoCompleteList, AutoCompleteOption, AutoCompleteBlankSlate },
   props: {
     value: {

@@ -2,6 +2,12 @@
   <div class="box"><slot /></div>
 </template>
 
+<script>
+export default {
+  name: 'ComponentBox',
+};
+</script>
+
 <style scoped>
 .box {
   display: flex;

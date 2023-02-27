@@ -13,6 +13,7 @@ import AutoComplete from '../auto-complete.vue';
 import AutoCompleteOption from './option.vue';
 
 export default {
+  name: 'GuidesAutoCompleteWithAsync',
   components: { AutoComplete, AutoCompleteOption },
 };
 </script>

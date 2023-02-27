@@ -13,6 +13,7 @@
 
 <script>
 export default {
+  name: 'TokenItem',
   props: {
     label: {
       type: String,

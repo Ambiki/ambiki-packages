@@ -18,6 +18,7 @@
 
 <script>
 export default {
+  name: 'AutoCompleteOption',
   props: {
     value: {
       type: String,

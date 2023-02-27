@@ -1,6 +1,12 @@
 <template>
-  <li class="blankslate"><slot>We couldn't find that!</slot></li>
+  <li class="blankslate">We couldn't find that!</li>
 </template>
+
+<script>
+export default {
+  name: 'AutoCompleteBlankslate',
+};
+</script>
 
 <style>
 .blankslate {
