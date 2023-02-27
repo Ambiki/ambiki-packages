@@ -4,6 +4,11 @@ import type { SetValueType } from './utils';
 
 export default class SingleSelection extends BaseSelection {
   override initialize() {
+    // If `data-label` attribute is not passed and we find a selected option, use its label
+    if (!this.container.label && this.selectedOption) {
+      this.container.label = this.getLabel(this.selectedOption);
+    }
+
     this.input.value = this.container.label;
   }
 
@@ -47,7 +52,7 @@ export default class SingleSelection extends BaseSelection {
     }
 
     this.container.value = _value.value.toString();
-    const option = this.autocomplete.options.find((o) => this.maySelect(o));
+    const option = this.selectedOption;
 
     const label = _value.label || (option ? this.getLabel(option) : '');
     this.container.label = label;
@@ -65,9 +70,8 @@ export default class SingleSelection extends BaseSelection {
   }
 
   private identifySelectionState() {
-    const option = this.autocomplete.options.find((o) => this.maySelect(o));
-    if (!option) return;
-    this.autocomplete.combobox.select(option);
+    if (!this.selectedOption) return;
+    this.autocomplete.combobox.select(this.selectedOption);
   }
 
   /**
@@ -88,5 +92,9 @@ export default class SingleSelection extends BaseSelection {
    */
   get selectedValue(): string {
     return this.container.value;
+  }
+
+  private get selectedOption(): HTMLElement | undefined {
+    return this.autocomplete.options.find((o) => this.maySelect(o));
   }
 }

@@ -190,7 +190,7 @@ describe('AutoCompleteElement', () => {
 
   describe('#deactivate', () => {
     it('removes the data-active attribute from the option element', async () => {
-      const { input, list, options, container } = await setupFixture({ options: [{ id: 1 }, { id: 2 }] });
+      const { input, options, container } = await setupFixture({ options: [{ id: 1 }, { id: 2 }] });
 
       await triggerEvent(input, 'pointerdown');
       expect(options[0]).to.have.attribute('data-active');
@@ -201,8 +201,35 @@ describe('AutoCompleteElement', () => {
   });
 
   describe('when single-select', () => {
+    it('sets the input value and the data-label attribute from the value', async () => {
+      const { input, options, container } = await setupFixture({
+        options: [{ id: 1 }, { id: 2, label: 'Foo', value: 'foo' }],
+        value: 'foo',
+      });
+
+      expect(container.label).to.eq('Foo');
+      expect(input.value).to.eq('Foo');
+      expect(container.value).to.eq('foo');
+      expect(options[0]).not.to.have.attribute('aria-selected', 'true'); // We only want a checked state after opening the list
+    });
+
+    it('sets the input value and the data-label attribute from the data-label attribute', async () => {
+      const { input, container } = await setupFixture({
+        options: [{ id: 1 }, { id: 2, label: 'Foo', value: 'foo' }],
+        value: 'foo',
+        label: 'Foobar', // This is different than the `value` of the selected option. Testing if it can override it.
+      });
+
+      expect(container.label).to.eq('Foobar');
+      expect(input.value).to.eq('Foobar');
+      expect(container.value).to.eq('foo');
+    });
+
     it('sets aria-selected="true" on the option that matches the value', async () => {
-      const { input, list, options } = await setupFixture({ options: [{ id: 1 }, { id: 2 }], value: 2 });
+      const { input, list, options } = await setupFixture({
+        options: [{ id: 1 }, { id: 2, value: 'foo' }],
+        value: 'foo',
+      });
       await triggerEvent(input, 'pointerdown');
 
       expect(list.hidden).to.be.false;
@@ -226,15 +253,6 @@ describe('AutoCompleteElement', () => {
       await triggerEvent(input, 'pointerdown');
       expect(list.hidden).to.be.false;
       expect(options[0]).to.have.attribute('aria-selected', 'true');
-    });
-
-    it('sets input value if label is present', async () => {
-      const { input } = await setupFixture({
-        options: [{ id: 1, value: 100, label: 'My option' }, { id: 2 }],
-        value: 100,
-      });
-
-      expect(input.value).to.eq('My option');
     });
 
     it('clears the selected value when clearBtn is clicked', async () => {
@@ -590,22 +608,24 @@ type SetupFixtureProps = {
     hidden?: boolean;
   }>;
   value?: string | string[] | number | number[];
+  label?: string;
   multiple?: boolean;
   clearable?: boolean;
 };
 
-async function setupFixture({ options, value, multiple = false, clearable = false }: SetupFixtureProps) {
+async function setupFixture({ options, value, label = '', multiple = false, clearable = false }: SetupFixtureProps) {
   const _value = Array.isArray(value) ? JSON.stringify(value) : value;
-  const selectedOption = options.find((o) => o.value === value);
-  const _label = multiple ? undefined : selectedOption?.label;
+  // const selectedOption = options.find((o) => o.value === value);
+  // const _label = multiple ? undefined : selectedOption?.label;
 
   await fixture(html`
     <auto-complete
       for="list"
       ?multiple="${multiple}"
       .value="${typeof _value === 'undefined' ? undefined : _value}"
-      data-label="${typeof _label === 'undefined' ? undefined : _label}"
+      data-label="${typeof label === 'undefined' ? undefined : label}"
     >
+      >
       <input type="text" />
       ${clearable && html`<button type="button" data-clear>X</button>`}
       <ul id="list" hidden>
