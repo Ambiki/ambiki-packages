@@ -8,7 +8,7 @@
     "playground": "web-dev-server",
     "docs:dev": "yarn workspace @ambiki/combobox build && yarn workspace @ambiki/auto-complete-element build && yarn workspace @ambiki/clippy-copy-element build && NODE_OPTIONS=--openssl-legacy-provider && vuepress dev docs",
     "docs:build": "yarn workspace @ambiki/combobox build && yarn workspace @ambiki/auto-complete-element build && yarn workspace @ambiki/clippy-copy-element build && NODE_OPTIONS=--openssl-legacy-provider && vuepress build docs",
-    "docs:build-safe": "yarn workspace @ambiki/combobox build && yarn workspace @ambiki/auto-complete-element build && yarn workspace @ambiki/clippy-copy-element && vuepress build docs",
+    "docs:build-safe": "yarn workspace @ambiki/combobox build && yarn workspace @ambiki/auto-complete-element build && yarn workspace @ambiki/clippy-copy-element build && vuepress build docs",
     "test": "web-test-runner",
     "test:watch": "web-test-runner --watch",
     "lint": "npx eslint \"**/*.{js,ts}\""
