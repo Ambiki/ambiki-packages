@@ -130,16 +130,6 @@ auto-complete[value] .clear-btn-wrapper {
   display: flex;
 }
 
-.form-control {
-  width: 100%;
-  border: 1px solid #24292f;
-  padding: 6px 16px;
-  border-radius: var(--border-radius);
-  font-size: 16px;
-  line-height: 24px;
-  box-sizing: border-box;
-}
-
 .loading {
   padding: 8px 16px;
   text-align: center;
