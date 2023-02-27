@@ -12,6 +12,10 @@ export default defineConfig({
     editLinkText: 'Edit this page on GitHub',
     lastUpdated: 'Last Updated',
     smoothScroll: true,
+    nav: [
+      { text: 'Guide', link: '/' },
+      { text: 'Changelog', link: 'https://github.com/Ambiki/ambiki-packages/blob/main/CHANGELOG.md' },
+    ],
     sidebar: [
       '/',
       {
