@@ -68,6 +68,10 @@ export default {
       isLoading: false,
     };
   },
+  mounted() {
+    import('../../../../packages/combobox/dist/index.js');
+    import('../../../../custom-elements/auto-complete-element/dist/index.js');
+  },
   destroy() {
     if (this.timeout) clearTimeout(this.timeout);
   },

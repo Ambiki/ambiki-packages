@@ -15,6 +15,9 @@ export default {
       hasCopied: false,
     };
   },
+  mounted() {
+    import('../../../../../custom-elements/clippy-copy-element/dist/index.js');
+  },
   destroy() {
     this.clearTimeout();
   },

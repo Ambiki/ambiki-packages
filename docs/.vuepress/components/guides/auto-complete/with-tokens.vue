@@ -51,6 +51,10 @@ export default {
       listId: `ambiki-${Math.random().toString().slice(2, 6)}`,
     };
   },
+  mounted() {
+    import('../../../../../packages/combobox/dist/index.js');
+    import('../../../../../custom-elements/auto-complete-element/dist/index.js');
+  },
   computed: {
     autocomplete() {
       return this.$refs.container.autocomplete;
