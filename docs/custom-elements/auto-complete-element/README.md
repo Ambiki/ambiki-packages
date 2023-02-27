@@ -267,8 +267,8 @@ component.
 | `auto-complete:hide`      | Fired before the list is hidden.                                                                                                                          |
 | `auto-complete:hidden`    | Fired after the list is hidden.                                                                                                                           |
 | `auto-complete:select`    | Fired after the option has been selected. You can access the selected `option`, `label`, and `value` from the `detail` property of the event.             |
-| `auto-complete:deselect`  | Fired after the option has been deselected. You can access the selected `option`, `label`, and `value` from the `detail` property of the event.           |
-| `auto-complete:commit`    | Fired after the option has been selected/deselected. You can access the selected `option`, `label`, and `value` from the `detail` property of the event.  |
+| `auto-complete:deselect`  | Fired after the option has been deselected. You can access the deselected `option`, `label`, and `value` from the `detail` property of the event.         |
+| `auto-complete:commit`    | Fired after the option has been selected/deselected. You can access the committed `option`, `label`, and `value` from the `detail` property of the event. |
 | `auto-complete:clear`     | Fired after the [clear button](#clear-button) has been clicked.                                                                                           |
 | `auto-complete:loadstart` | Fired when the network request has started.                                                                                                               |
 | `auto-complete:success`   | Fired when the network request has completed successfully.                                                                                                |
