@@ -82,7 +82,7 @@ export default class AutoCompleteElement extends HTMLElement {
   }
 
   /**
-   * @description Whether the element is open or not
+   * @description Whether the list is open or not
    */
   get open(): boolean {
     return this.hasAttribute('open');

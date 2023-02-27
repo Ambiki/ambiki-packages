@@ -108,11 +108,13 @@ const option = list.querySelector('li[role="option"]');
 combobox.activate(option);
 ```
 
+::: tip
 You can also scroll to the activated option by setting `scroll: true`. By default, it's `false`.
 
 ```js
 combobox.activate(option, { scroll: true });
 ```
+:::
 
 ### `deactivate`
 
@@ -161,6 +163,6 @@ combobox.initializeOptions();
 
 ## Events
 
-| Event             |                                                              Description                                                               |
-| ----------------- | :------------------------------------------------------------------------------------------------------------------------------------: |
+| Name              | Description                                                                                                                            |
+|-------------------|----------------------------------------------------------------------------------------------------------------------------------------|
 | `combobox:commit` | This event is fired after selecting/deselecting an option. The option element will be available as the `target` property of the event. |

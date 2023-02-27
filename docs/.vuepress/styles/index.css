@@ -1,0 +1,17 @@
+:root {
+  --color-bg: #ffffff;
+  --color-bg-primary: #2948a0;
+  --color-bg-primary-dark: #213a82;
+  --color-fg: #24292f;
+  --color-fg-success: #1a7f37;
+  --color-bg-subtle: #eaeef2;
+  --color-border: #ddd;
+  --color-border-primary: #2948a0;
+  --font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  --shadow: rgb(0 0 0 / 20%) 0px 5px 5px -3px, rgb(0 0 0 / 14%) 0px 8px 10px 1px, rgb(0 0 0 / 12%) 0px 3px 14px 2px;
+  --border-radius: 4px;
+}
+
+[hidden][hidden] {
+  display: none !important;
+}

@@ -89,7 +89,7 @@ export default class AutoComplete {
   }
 
   /**
-   * @description Removes the selected option matching the provided value
+   * @description Removes the selected option that matches the provided value
    */
   removeValue(value: string) {
     this.selectionVariant.removeValue(value);

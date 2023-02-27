@@ -13,7 +13,7 @@
     <div id="app">
       <div>
         <h3>Single</h3>
-        <auto-complete for="ambiki-options" value="2" data-label="Option 2">
+        <auto-complete for="ambiki-options" value="3">
           <div class="input-wrapper">
             <input type="text" class="form-control" />
             <div class="clear-btn-wrapper">
@@ -31,6 +31,23 @@
             <li role="option" class="option" data-label="Option 6" value="6">Option 6 <span>(checked)</span></li>
             <li role="option" class="option" data-label="Option 7" value="7">Option 7 <span>(checked)</span></li>
             <li role="option" class="option" data-label="Option 8" value="8">Option 8 <span>(checked)</span></li>
+            <li class="blankslate">We couldn't find that!</li>
+          </ul>
+        </auto-complete>
+      </div>
+
+      <div>
+        <h3>Single persisted</h3>
+        <auto-complete for="ambiki-options-single-persisted" value="2">
+          <div class="input-wrapper">
+            <input type="text" class="form-control" />
+            <div class="clear-btn-wrapper">
+              <button type="button" data-clear>X</button>
+            </div>
+          </div>
+          <ul id="ambiki-options-single-persisted" class="options" hidden>
+            <li role="option" class="option" data-label="Darjeeling" value="1">Darjeeling <span>(checked)</span></li>
+            <li role="option" class="option" data-label="Kalimpong" value="2">Kalimpong <span>(checked)</span></li>
             <li class="blankslate">We couldn't find that!</li>
           </ul>
         </auto-complete>
