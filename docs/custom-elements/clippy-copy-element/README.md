@@ -58,6 +58,6 @@ import '@ambiki/clippy-copy-element';
 
 ## Events
 
-| Event                |                              Description                              |
-| -------------------- | :-------------------------------------------------------------------: |
+| Name                 | Description                                                           |
+|----------------------|-----------------------------------------------------------------------|
 | `clippy-copy:copied` | This event is fired immediately after successfully copying the value. |
