@@ -1,4 +1,4 @@
-import { brandedId } from '@ambiki/utils/src/random-id';
+import randomId from '@ambiki/utils/src/random-id';
 import { move, MoveDirection, enabled } from '@ambiki/utils';
 
 const ctrlBindings = !!navigator.userAgent.match(/Macintosh/);
@@ -19,7 +19,7 @@ export default class Combobox {
     this.multiple = multiple;
 
     // Set `id` if it's missing
-    if (!this.list.id) this.list.id = brandedId();
+    if (!this.list.id) this.list.id = randomId();
 
     // Set a11y attributes
     if (!this.input.getAttribute('aria-expanded')) {
@@ -249,7 +249,7 @@ export default class Combobox {
   initializeOptions() {
     for (const option of this.options) {
       option.setAttribute('tabindex', '-1');
-      if (!option.id) option.id = brandedId();
+      if (!option.id) option.id = randomId();
       if (!option.hasAttribute('aria-selected')) this.deselect(option);
     }
   }
