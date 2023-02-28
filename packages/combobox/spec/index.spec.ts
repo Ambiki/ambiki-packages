@@ -43,7 +43,7 @@ describe('Combobox', () => {
   });
 
   it('deactivates the option with Escape key', async () => {
-    const { input, options, combobox } = await setupFixture({ options: [{ id: 1, active: true }] });
+    const { input, combobox } = await setupFixture({ options: [{ id: 1, active: true }] });
     combobox.start();
 
     expect(find('[data-active]')).to.exist;

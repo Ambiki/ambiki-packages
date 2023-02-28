@@ -2,7 +2,7 @@
   "name": "@ambiki/combobox",
   "version": "1.1.0",
   "description": "Extend your autocomplete and command palette using the Combobox, which provides robust keyboard navigation and accessibility out of the box.",
-  "homepage": "https://github.com/Ambiki/ambiki-packages/tree/main/packages/combobox",
+  "homepage": "https://ambiki.github.io/ambiki-packages/packages/combobox",
   "bugs": "https://github.com/Ambiki/ambiki-packages/issues?q=is%3Aopen+is%3Aissue+label%3Acombobox",
   "repository": {
     "type": "git",

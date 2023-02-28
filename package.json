@@ -11,7 +11,7 @@
     "docs:build-safe": "yarn workspace @ambiki/combobox build && yarn workspace @ambiki/auto-complete-element build && yarn workspace @ambiki/clippy-copy-element build && vuepress build docs",
     "test": "web-test-runner",
     "test:watch": "web-test-runner --watch",
-    "lint": "npx eslint \"**/*.{js,ts}\""
+    "lint": "npx eslint \"**/*.{js,ts,vue}\""
   },
   "license": "MIT",
   "devDependencies": {
