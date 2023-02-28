@@ -1,8 +1,8 @@
 {
   "name": "@ambiki/clippy-copy-element",
   "version": "0.1.0",
-  "description": "A clipboard element to copy text content, input values, and more.",
-  "homepage": "https://github.com/Ambiki/ambiki-packages/tree/main/custom-elements/clippy-copy-element",
+  "description": "Copy text content, input values, and more to your clipboard.",
+  "homepage": "https://ambiki.github.io/ambiki-packages/custom-elements/clippy-copy-element",
   "bugs": "https://github.com/Ambiki/ambiki-packages/issues?q=is%3Aopen+is%3Aissue+label%3Aclippy-copy",
   "repository": {
     "type": "git",
