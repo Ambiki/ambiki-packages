@@ -18,7 +18,7 @@ describe('AutoCompleteElement', () => {
 
   it('adds attributes after opening the list', async () => {
     const { input, list } = await setupFixture({ options: [{ id: 1 }] });
-    await triggerEvent(input, 'mousedown');
+    await openList(input);
 
     expect(input).not.to.have.attribute('data-empty');
     expect(list.hidden).to.be.false;
