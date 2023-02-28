@@ -249,6 +249,9 @@ component.
   <guides-auto-complete-with-tokens />
 </component-box>
 
+> See [source code](https://github.com/Ambiki/ambiki-packages/blob/main/docs/.vuepress/components/guides/auto-complete/with-tokens.vue)
+> on GitHub.
+
 ## Attributes
 
 | Name         | Description                                                                        |
