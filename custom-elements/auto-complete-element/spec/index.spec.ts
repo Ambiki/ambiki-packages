@@ -18,7 +18,7 @@ describe('AutoCompleteElement', () => {
 
   it('adds attributes after opening the list', async () => {
     const { input, list } = await setupFixture({ options: [{ id: 1 }] });
-    await triggerEvent(input, 'pointerdown');
+    await triggerEvent(input, 'mousedown');
 
     expect(input).not.to.have.attribute('data-empty');
     expect(list.hidden).to.be.false;
@@ -26,7 +26,7 @@ describe('AutoCompleteElement', () => {
 
   it('activates the first option after opening the list', async () => {
     const { input, list, options } = await setupFixture({ options: [{ id: 1 }] });
-    await triggerEvent(input, 'pointerdown');
+    await openList(input);
 
     expect(list.hidden).to.be.false;
     expectInputLinkedWithOption(input, options[0]);
@@ -34,7 +34,7 @@ describe('AutoCompleteElement', () => {
 
   it('activates the selected option after opening the list', async () => {
     const { input, list, options } = await setupFixture({ options: [{ id: 1 }, { id: 2 }], value: 2 });
-    await triggerEvent(input, 'pointerdown');
+    await openList(input);
 
     expect(list.hidden).to.be.false;
     expectInputLinkedWithOption(input, options[1]);
@@ -42,7 +42,7 @@ describe('AutoCompleteElement', () => {
 
   it('adds data-empty attribute if there are no options', async () => {
     const { input, list } = await setupFixture({ options: [] });
-    await triggerEvent(input, 'pointerdown');
+    await openList(input);
 
     expect(list.hidden).to.be.false;
     expect(list).to.have.attribute('data-empty');
@@ -50,7 +50,7 @@ describe('AutoCompleteElement', () => {
 
   it('destroys the options after closing the list', async () => {
     const { input, list, options } = await setupFixture({ options: [{ id: 1 }, { id: 2 }], value: 2 });
-    await triggerEvent(input, 'pointerdown');
+    await openList(input);
 
     expect(options[1]).to.have.attribute('aria-selected', 'true');
     expect(options[1]).to.have.attribute('data-active');
@@ -68,7 +68,7 @@ describe('AutoCompleteElement', () => {
     container.addEventListener('auto-complete:commit', commitHandler);
     container.addEventListener('auto-complete:select', selectHandler);
 
-    await triggerEvent(input, 'pointerdown');
+    await openList(input);
     expect(list.hidden).to.be.false;
 
     options[0].click();
@@ -89,7 +89,7 @@ describe('AutoCompleteElement', () => {
     container.addEventListener('auto-complete:commit', commitHandler);
     container.addEventListener('auto-complete:select', selectHandler);
 
-    await triggerEvent(input, 'pointerdown');
+    await openList(input);
     expect(list.hidden).to.be.false;
     await triggerKeyEvent(input, 'keydown', { key: 'Enter' });
 
@@ -100,7 +100,7 @@ describe('AutoCompleteElement', () => {
     expectEventArgs(selectHandler, { option: options[0], value: 'foo', label: 'Foo' });
     expect(commitHandler.calledAfter(selectHandler)).to.be.true;
 
-    await triggerEvent(input, 'pointerdown');
+    await openList(input);
     expect(list.hidden).to.be.false;
     await triggerKeyEvent(input, 'keydown', { key: 'ArrowDown' });
     expectInputLinkedWithOption(input, options[1]);
@@ -115,7 +115,7 @@ describe('AutoCompleteElement', () => {
   it('closes the list on Escape key', async () => {
     const { input, list } = await setupFixture({ options: [{ id: 1 }] });
 
-    await triggerEvent(input, 'pointerdown');
+    await openList(input);
     expect(list.hidden).to.be.false;
 
     await triggerKeyEvent(input, 'keydown', { key: 'Escape' });
@@ -132,7 +132,7 @@ describe('AutoCompleteElement', () => {
   it('closes the list on Alt+ArrowUp', async () => {
     const { input, list } = await setupFixture({ options: [{ id: 1 }] });
 
-    await triggerEvent(input, 'pointerdown');
+    await openList(input);
     expect(list.hidden).to.be.false;
 
     await triggerKeyEvent(input, 'keydown', { key: 'ArrowUp', altKey: true });
@@ -146,7 +146,7 @@ describe('AutoCompleteElement', () => {
     container.addEventListener('auto-complete:show', showHandler);
     container.addEventListener('auto-complete:shown', shownHandler);
 
-    await triggerEvent(input, 'pointerdown');
+    await openList(input);
     expect(list.hidden).to.be.false;
 
     expect(showHandler.calledOnce).to.be.true;
@@ -161,7 +161,7 @@ describe('AutoCompleteElement', () => {
     container.addEventListener('auto-complete:hide', hideHandler);
     container.addEventListener('auto-complete:hidden', hiddenHandler);
 
-    await triggerEvent(input, 'pointerdown');
+    await openList(input);
     expect(list.hidden).to.be.false;
 
     await triggerEvent(input, 'blur');
@@ -179,7 +179,7 @@ describe('AutoCompleteElement', () => {
         { id: 2, label: 'Mauri' },
       ],
     });
-    await triggerEvent(input, 'pointerdown');
+    await openList(input);
     expect(list.hidden).to.be.false;
 
     await fillIn(input, 'hero');
@@ -192,7 +192,7 @@ describe('AutoCompleteElement', () => {
     it('removes the data-active attribute from the option element', async () => {
       const { input, options, container } = await setupFixture({ options: [{ id: 1 }, { id: 2 }] });
 
-      await triggerEvent(input, 'pointerdown');
+      await openList(input);
       expect(options[0]).to.have.attribute('data-active');
 
       container.autocomplete?.deactivate();
@@ -230,7 +230,7 @@ describe('AutoCompleteElement', () => {
         options: [{ id: 1 }, { id: 2, value: 'foo' }],
         value: 'foo',
       });
-      await triggerEvent(input, 'pointerdown');
+      await openList(input);
 
       expect(list.hidden).to.be.false;
       expect(options[1]).to.have.attribute('aria-selected', 'true');
@@ -241,7 +241,7 @@ describe('AutoCompleteElement', () => {
         options: [{ id: 1, label: 'Hero' }, { id: 2 }],
       });
 
-      await triggerEvent(input, 'pointerdown');
+      await openList(input);
       expect(list.hidden).to.be.false;
 
       options[0].click();
@@ -250,7 +250,7 @@ describe('AutoCompleteElement', () => {
       expect(input.value).to.eq('Hero');
       expect(list.hidden).to.be.true;
 
-      await triggerEvent(input, 'pointerdown');
+      await openList(input);
       expect(list.hidden).to.be.false;
       expect(options[0]).to.have.attribute('aria-selected', 'true');
     });
@@ -267,7 +267,7 @@ describe('AutoCompleteElement', () => {
 
       expect(container).to.have.attribute('value');
       expect(input.value).to.eq('Hero');
-      await triggerEvent(input, 'pointerdown');
+      await openList(input);
       expect(list.hidden).to.be.false;
 
       clearBtn.click();
@@ -294,7 +294,7 @@ describe('AutoCompleteElement', () => {
           options: [{ id: 1, value: 'foo', label: 'Foo' }],
         });
 
-        await triggerEvent(input, 'pointerdown');
+        await openList(input);
         expect(list.hidden).to.be.false;
         expect(options[0]).to.have.attribute('aria-selected', 'false');
 
@@ -332,7 +332,7 @@ describe('AutoCompleteElement', () => {
           options: [{ id: 1, value: 'foo', label: 'Foo' }],
           value: 'foo',
         });
-        await triggerEvent(input, 'pointerdown');
+        await openList(input);
         container.autocomplete?.setValue([]);
 
         expect(container.value).to.eq('');
@@ -352,7 +352,7 @@ describe('AutoCompleteElement', () => {
         expect(container.label).to.eq('Foo');
         expect(input.value).to.eq('Foo');
 
-        await triggerEvent(input, 'pointerdown');
+        await openList(input);
         expect(options[0]).to.have.attribute('aria-selected', 'true');
 
         container.autocomplete?.removeValue('foo');
@@ -371,7 +371,7 @@ describe('AutoCompleteElement', () => {
         value: [1, 2],
         multiple: true,
       });
-      await triggerEvent(input, 'pointerdown');
+      await openList(input);
 
       expect(list.hidden).to.be.false;
       expect(options[0]).to.have.attribute('aria-selected', 'true');
@@ -384,7 +384,7 @@ describe('AutoCompleteElement', () => {
         options: [{ id: 1 }, { id: 2 }],
         multiple: true,
       });
-      await triggerEvent(input, 'pointerdown');
+      await openList(input);
       expect(list.hidden).to.be.false;
 
       options[0].click();
@@ -396,7 +396,7 @@ describe('AutoCompleteElement', () => {
 
       await triggerEvent(input, 'blur');
       expect(list.hidden).to.be.true;
-      await triggerEvent(input, 'pointerdown');
+      await openList(input);
       expect(options[0]).to.have.attribute('aria-selected', 'true');
       expect(options[1]).to.have.attribute('aria-selected', 'true');
 
@@ -418,7 +418,7 @@ describe('AutoCompleteElement', () => {
       container.addEventListener('auto-complete:commit', commitHandler);
       container.addEventListener('auto-complete:deselect', deselectHandler);
 
-      await triggerEvent(input, 'pointerdown');
+      await openList(input);
       expect(list.hidden).to.be.false;
       await triggerKeyEvent(input, 'keydown', { key: 'Enter' });
 
@@ -442,7 +442,7 @@ describe('AutoCompleteElement', () => {
       container.addEventListener('auto-complete:commit', commitHandler);
       container.addEventListener('auto-complete:deselect', deselectHandler);
 
-      await triggerEvent(input, 'pointerdown');
+      await openList(input);
       expect(list.hidden).to.be.false;
       await triggerKeyEvent(input, 'keydown', { key: 'Tab' });
 
@@ -460,7 +460,7 @@ describe('AutoCompleteElement', () => {
       await fillIn(input, 'search text');
       expect(input.value).to.eq('search text');
 
-      await triggerEvent(input, 'pointerdown');
+      await openList(input);
       options[0].click();
       expect(input.value).to.eq('');
     });
@@ -472,7 +472,7 @@ describe('AutoCompleteElement', () => {
         multiple: true,
       });
 
-      await triggerEvent(input, 'pointerdown');
+      await openList(input);
       expect(list.hidden).to.be.false;
       options[1].click();
       await waitUntil(() => options[1].hasAttribute('data-active'));
@@ -496,7 +496,7 @@ describe('AutoCompleteElement', () => {
       container.addEventListener('auto-complete:clear', clearHandler);
 
       expect(container).to.have.attribute('value');
-      await triggerEvent(input, 'pointerdown');
+      await openList(input);
       expect(list.hidden).to.be.false;
 
       clearBtn.click();
@@ -525,7 +525,7 @@ describe('AutoCompleteElement', () => {
           multiple: true,
         });
 
-        await triggerEvent(input, 'pointerdown');
+        await openList(input);
         expect(list.hidden).to.be.false;
         expect(options[0]).to.have.attribute('aria-selected', 'false');
 
@@ -550,7 +550,7 @@ describe('AutoCompleteElement', () => {
           value: ['foo'],
           multiple: true,
         });
-        await triggerEvent(input, 'pointerdown');
+        await openList(input);
         container.autocomplete?.setValue([]);
 
         expect(container).not.to.have.attribute('value');
@@ -571,7 +571,7 @@ describe('AutoCompleteElement', () => {
         });
         expect(JSON.parse(container.value)).to.eql(['foo', 'bar']);
 
-        await triggerEvent(input, 'pointerdown');
+        await openList(input);
         expect(options[0]).to.have.attribute('aria-selected', 'true');
         expect(options[1]).to.have.attribute('aria-selected', 'true');
 
@@ -583,6 +583,10 @@ describe('AutoCompleteElement', () => {
     });
   });
 });
+
+async function openList(input: HTMLInputElement) {
+  await triggerEvent(input, 'mousedown');
+}
 
 function expectInputLinkedWithOption(input: HTMLInputElement, option: HTMLElement) {
   expect(option).to.have.attribute('data-active');

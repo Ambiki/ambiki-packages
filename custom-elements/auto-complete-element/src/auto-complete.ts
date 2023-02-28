@@ -42,14 +42,14 @@ export default class AutoComplete {
     }
 
     this.onBlur = this.onBlur.bind(this);
-    this.onPointerdown = this.onPointerdown.bind(this);
+    this.onMousedown = this.onMousedown.bind(this);
     this.onInput = debounce(this.onInput.bind(this), 300);
     this.onCommit = this.onCommit.bind(this);
     this.onKeydown = this.onKeydown.bind(this);
     this.onClear = this.onClear.bind(this);
 
     this.input.addEventListener('blur', this.onBlur);
-    this.input.addEventListener('pointerdown', this.onPointerdown);
+    this.input.addEventListener('mousedown', this.onMousedown);
     this.input.addEventListener('input', this.onInput);
     this.input.addEventListener('keydown', this.onKeydown);
     this.list.addEventListener('combobox:commit', this.onCommit);
@@ -63,7 +63,7 @@ export default class AutoComplete {
     this.hideList();
     this.selectionVariant.destroy();
     this.input.removeEventListener('blur', this.onBlur);
-    this.input.removeEventListener('pointerdown', this.onPointerdown);
+    this.input.removeEventListener('mousedown', this.onMousedown);
     this.input.removeEventListener('input', this.onInput);
     this.input.removeEventListener('keydown', this.onKeydown);
     this.list.removeEventListener('combobox:commit', this.onCommit);
@@ -194,7 +194,7 @@ export default class AutoComplete {
     }
   }
 
-  private onPointerdown() {
+  private onMousedown() {
     this.container.open = true;
   }
 
