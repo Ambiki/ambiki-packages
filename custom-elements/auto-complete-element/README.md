@@ -3,6 +3,7 @@
 ## Installation
 
 ```bash
+npm install @ambiki/combobox
 npm install @ambiki/auto-complete-element
 ```
 
