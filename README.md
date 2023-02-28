@@ -1,15 +1,17 @@
 # Ambiki packages
 
-A collection of everyday web-components and libraries.
+A collection of everyday web-components and libraries from [ambiki.com](https://ambiki.com).
 
-> Used in production at [ambiki.com](https://ambiki.com)
+## Documentation
+
+For full documentation, visit https://ambiki.github.io/ambiki-packages.
 
 ## Collections within the repository
 
 - Custom elements
-  - [auto-complete-element](./custom-elements/auto-complete-element/) - Single and multi auto-complete component.
-  - [clippy-copy-element](./custom-elements/clippy-copy-element/) - A clipboard element to copy text content, input values, and more.
-  - [details-modal-element](./custom-elements/details-modal-element/) - A modal component that works with the `<details>` tag.
+  - [auto-complete-element](./custom-elements/auto-complete-element) - Single and multi auto-complete component.
+  - [clippy-copy-element](./custom-elements/clippy-copy-element) - Copy text content, input values, and more to your clipboard.
+  - [details-modal-element](./custom-elements/details-modal-element) - A modal component that works with the `<details>` tag.
 
 - Packages
   - [combobox](./packages/combobox) - Extend your autocomplete and command palette using the Combobox, which provides robust keyboard navigation and accessibility out of the box.
