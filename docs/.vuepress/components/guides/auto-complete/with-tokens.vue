@@ -6,7 +6,7 @@
     :value="JSON.stringify(this.selections.map((v) => v.value))"
     @auto-complete:select="onSelect"
     @auto-complete:deselect="onDeselect"
-    @pointerdown="onContainerPointerdown"
+    @mousedown="onContainerMousedown"
   >
     <ul class="token" ref="token">
       <token-item
@@ -109,12 +109,12 @@ export default {
       this.selections.splice(index, 1);
       return true;
     },
-    onContainerPointerdown(event) {
+    onContainerMousedown(event) {
       if (event.target !== this.$refs.container && event.target !== this.$refs.token) return;
       event.preventDefault();
       event.stopPropagation();
       this.$refs.input.focus();
-      this.$refs.input.dispatchEvent(new CustomEvent('pointerdown', { bubbles: true }));
+      this.$refs.input.dispatchEvent(new CustomEvent('mousedown'));
     },
   },
 };
