@@ -14,12 +14,14 @@ Single and multi auto-complete component.
 <code-group>
   <code-block title="YARN">
   ```bash
+  yarn add @ambiki/combobox
   yarn add @ambiki/auto-complete-element
   ```
   </code-block>
 
   <code-block title="NPM">
   ```bash
+  npm install @ambiki/combobox
   npm install @ambiki/auto-complete-element
   ```
   </code-block>
