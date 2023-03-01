@@ -255,11 +255,11 @@ export default class Combobox {
   }
 }
 
-function getClosestOptionFrom(target: HTMLElement | null) {
-  if (!(target instanceof HTMLElement)) return false;
+function getClosestOptionFrom(target: Element | null) {
+  if (!target) return false;
 
   const option = target.closest<HTMLElement>('[role="option"]');
-  if (!(option instanceof HTMLElement)) return false;
+  if (!option) return false;
 
   return option;
 }

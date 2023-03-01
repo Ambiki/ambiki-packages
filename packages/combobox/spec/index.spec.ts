@@ -1,5 +1,5 @@
 import { expect, fixture, html } from '@open-wc/testing';
-import { find, findAll, triggerKeyEvent, triggerMouseover } from '@ambiki/test-utils';
+import { find, findAll, triggerEvent, triggerKeyEvent, triggerMouseover } from '@ambiki/test-utils';
 import * as sinon from 'sinon';
 import Combobox from '../src';
 
@@ -156,7 +156,7 @@ describe('Combobox', () => {
   });
 
   it('selects the option on mouse click', async () => {
-    const { container, options, combobox } = await setupFixture({ options: [{ id: 1 }] });
+    const { container, options, combobox } = await setupFixture({ options: [{ id: 1 }, { id: 2 }] });
     const option = options[0];
     combobox.start();
 
@@ -168,6 +168,15 @@ describe('Combobox', () => {
     option.click();
     expect(option).to.have.attribute('aria-selected', 'true');
     expect(commitHandler.calledOnce).to.be.true;
+
+    // Check if elements inside `li` can trigger click
+    const secondOption = options[1];
+    const innerElement = secondOption.querySelector<HTMLElement>('[data-test-id="option-inner"]');
+
+    await triggerEvent(innerElement, 'click');
+    expect(secondOption).to.have.attribute('aria-selected', 'true');
+    expect(commitHandler.called).to.be.true;
+    expect(options[0]).not.to.have.attribute('aria-selected', 'true');
   });
 
   it('does not select a disabled option', async () => {
@@ -360,6 +369,7 @@ async function setupFixture({ options, multiple = false }: SetupFixtureProps) {
               ?disabled="${option.disabled}"
               ?hidden="${option.hidden}"
             >
+              <svg data-test-id="option-inner"></svg>
               ${option.text || 'Option'}
             </li>`
         )}
