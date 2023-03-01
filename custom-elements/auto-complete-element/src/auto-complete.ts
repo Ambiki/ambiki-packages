@@ -1,6 +1,6 @@
 import Combobox from '@ambiki/combobox';
 import type AutoCompleteElement from './index';
-import { enabled, nextTick, debounce } from '@ambiki/utils';
+import { enabled, debounce, outsideClick } from '@ambiki/utils';
 import SingleSelection from './single-selection';
 import MultiSelection from './multi-selection';
 import { dispatchEvent, getValue, getLabel, makeAbortController, toArray } from './utils';
@@ -14,6 +14,7 @@ export default class AutoComplete {
   list: HTMLElement;
   combobox: Combobox;
   clearButton: HTMLButtonElement | null;
+  private initialClickTarget?: HTMLElement;
   private selectionVariant: SingleSelection | MultiSelection;
   private controller?: MakeAbortControllerType;
   private currentQuery?: string;
@@ -41,19 +42,28 @@ export default class AutoComplete {
       this.clearButton.setAttribute('aria-label', 'Clear autocomplete');
     }
 
-    this.onBlur = this.onBlur.bind(this);
     this.onMousedown = this.onMousedown.bind(this);
+    this.onInputBlur = this.onInputBlur.bind(this);
+    this.onInputMousedown = this.onInputMousedown.bind(this);
     this.onInput = debounce(this.onInput.bind(this), 300);
     this.onCommit = this.onCommit.bind(this);
     this.onKeydown = this.onKeydown.bind(this);
     this.onClear = this.onClear.bind(this);
 
-    this.input.addEventListener('blur', this.onBlur);
-    this.input.addEventListener('mousedown', this.onMousedown);
+    this.onDocumentMousedown = this.onDocumentMousedown.bind(this);
+    this.onDocumentClick = this.onDocumentClick.bind(this);
+
+    this.container.addEventListener('mousedown', this.onMousedown);
+    this.input.addEventListener('blur', this.onInputBlur);
+    this.input.addEventListener('mousedown', this.onInputMousedown);
     this.input.addEventListener('input', this.onInput);
     this.input.addEventListener('keydown', this.onKeydown);
     this.list.addEventListener('combobox:commit', this.onCommit);
     this.clearButton?.addEventListener('click', this.onClear);
+
+    // Outside click
+    document.addEventListener('mousedown', this.onDocumentMousedown, true);
+    document.addEventListener('click', this.onDocumentClick, true);
   }
 
   /**
@@ -62,12 +72,17 @@ export default class AutoComplete {
   destroy() {
     this.hideList();
     this.selectionVariant.destroy();
-    this.input.removeEventListener('blur', this.onBlur);
-    this.input.removeEventListener('mousedown', this.onMousedown);
+
+    this.container.removeEventListener('mousedown', this.onMousedown);
+    this.input.removeEventListener('blur', this.onInputBlur);
+    this.input.removeEventListener('mousedown', this.onInputMousedown);
     this.input.removeEventListener('input', this.onInput);
     this.input.removeEventListener('keydown', this.onKeydown);
     this.list.removeEventListener('combobox:commit', this.onCommit);
     this.clearButton?.removeEventListener('click', this.onClear);
+
+    document.removeEventListener('mousedown', this.onDocumentMousedown, true);
+    document.removeEventListener('click', this.onDocumentClick, true);
   }
 
   /**
@@ -172,29 +187,42 @@ export default class AutoComplete {
     return this.combobox.activeOption;
   }
 
-  private async onBlur(event: FocusEvent) {
-    const { relatedTarget } = event;
-    if (!(relatedTarget instanceof HTMLElement)) {
-      this.container.open = false;
-      return;
-    }
-
-    /**
-     * Trick to keep focus on the input field after clicking inside the list. We could've used `this.input.focus()`,
-     * but that blurs the input for a moment and then focuses back which causes a noticeable transition between
-     * the state
-     */
-    const list = relatedTarget.closest<HTMLElement>('[role="listbox"]');
-    if (list) {
-      // Wait for browser to paint before focusing (Firefox edge case)
-      await nextTick();
-      this.input.focus();
-    } else {
-      this.container.open = false;
+  private onDocumentMousedown(event: Event) {
+    if (this.container.open) {
+      this.initialClickTarget = (event.composedPath?.()?.[0] || event.target) as HTMLElement;
     }
   }
 
-  private onMousedown() {
+  // Unfortunately for some reason, Safari does not trigger `blur` event when clicking outside of the input field.
+  // Hence, we need to manually close the list if the click was outside the container.
+  private onDocumentClick(event: Event) {
+    if (!this.initialClickTarget || !this.container.open) return;
+
+    outsideClick(
+      event,
+      () => this.initialClickTarget as HTMLElement,
+      [this.container, this.list],
+      () => {
+        this.container.open = false;
+      }
+    );
+
+    this.initialClickTarget = undefined;
+  }
+
+  // Prevent input blur when interacting with the list.
+  private onMousedown(event: Event) {
+    if (event.target !== this.input) {
+      event.preventDefault();
+    }
+  }
+
+  private onInputBlur() {
+    this.container.open = false;
+    this.initialClickTarget = undefined;
+  }
+
+  private onInputMousedown() {
     this.container.open = true;
   }
 
