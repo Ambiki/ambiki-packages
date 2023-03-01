@@ -27,4 +27,5 @@ export default defineConfig({
       { title: 'Packages', children: ['/packages/combobox/'], collapsable: false, sidebarDepth: 3 },
     ],
   },
+  head: [['meta', { name: 'viewport', content: 'width=device-width' }]],
 });
