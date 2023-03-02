@@ -1,7 +1,7 @@
 /**
  * @description Dispatches a `CustomEvent` with "auto-complete:" prefixed event name
  */
-export function dispatchEvent(element: HTMLElement, name: string, options: CustomEventInit = {}): boolean {
+export function dispatchEvent<T>(element: HTMLElement, name: string, options: CustomEventInit<T> = {}): boolean {
   return element.dispatchEvent(new CustomEvent(`auto-complete:${name}`, { bubbles: true, ...options }));
 }
 

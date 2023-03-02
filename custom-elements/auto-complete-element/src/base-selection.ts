@@ -1,4 +1,4 @@
-import type AutoCompleteElement from './index';
+import type AutoCompleteElement from './element';
 import type AutoComplete from './auto-complete';
 import { getLabel, getValue } from './utils';
 
