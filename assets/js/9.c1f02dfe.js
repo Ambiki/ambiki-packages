@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([[9],{274:function(t,n,s){},298:function(t,n,s){"use strict";s(274)},308:function(t,n,s){"use strict";s.r(n);var o={name:"ComponentBox"},e=(s(298),s(14)),i=Object(e.a)(o,(function(){return(0,this._self._c)("div",{staticClass:"box"},[this._t("default")],2)}),[],!1,null,"8f65f96a",null);n.default=i.exports}}]);
