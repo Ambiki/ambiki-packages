@@ -1,6 +1,7 @@
 import BaseSelection from './base-selection';
 import { dispatchEvent } from './utils';
 import type { SetValueType } from './utils';
+import type { CommitEventType } from './auto-complete';
 
 export default class SingleSelection extends BaseSelection {
   override initialize() {
@@ -37,7 +38,7 @@ export default class SingleSelection extends BaseSelection {
     this.container.label = label;
     this.input.value = label;
     this.container.open = false;
-    dispatchEvent(this.container, 'select', { detail: { option, value, label } });
+    dispatchEvent<CommitEventType>(this.container, 'select', { detail: { option, value, label } });
   }
 
   /**

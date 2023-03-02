@@ -2,6 +2,7 @@ import BaseSelection from './base-selection';
 import { nextTick } from '@ambiki/utils';
 import { dispatchEvent } from './utils';
 import type { SetValueType } from './utils';
+import type { CommitEventType } from './auto-complete';
 
 export default class MultiSelection extends BaseSelection {
   /**
@@ -34,13 +35,14 @@ export default class MultiSelection extends BaseSelection {
 
     const value = this.getValue(option);
     const label = this.getLabel(option);
+    const detail = { option, value, label };
 
     if (this.selectedValues.has(value)) {
       this.removeValue(value);
-      dispatchEvent(this.container, 'deselect', { detail: { option, value, label } });
+      dispatchEvent<CommitEventType>(this.container, 'deselect', { detail });
     } else {
       this.setValue([{ value }]);
-      dispatchEvent(this.container, 'select', { detail: { option, value, label } });
+      dispatchEvent<CommitEventType>(this.container, 'select', { detail });
     }
 
     await this.autocomplete.fetchOptions();

@@ -3,7 +3,7 @@ import { fillIn, find, findAll, triggerEvent, triggerKeyEvent } from '@ambiki/te
 import { nextTick } from '@ambiki/utils';
 import * as sinon from 'sinon';
 import '../src';
-import AutoCompleteElement from '../src';
+import type AutoCompleteElement from '../src';
 
 describe('AutoCompleteElement', () => {
   it('adds attributes after initializing', async () => {

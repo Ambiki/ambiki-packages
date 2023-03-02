@@ -1,10 +1,16 @@
 import Combobox from '@ambiki/combobox';
-import type AutoCompleteElement from './index';
 import { enabled, debounce, outsideClick } from '@ambiki/utils';
 import SingleSelection from './single-selection';
 import MultiSelection from './multi-selection';
 import { dispatchEvent, getValue, getLabel, makeAbortController, toArray } from './utils';
+import type AutoCompleteElement from './element';
 import type { MakeAbortControllerType, SetValueType } from './utils';
+
+export type CommitEventType = {
+  option: HTMLElement;
+  label: string;
+  value: string;
+};
 
 const DATA_EMPTY_ATTR = 'data-empty';
 
@@ -231,7 +237,7 @@ export default class AutoComplete {
     if (!(option instanceof HTMLElement) || !enabled(option)) return;
 
     await this.selectionVariant.onCommit(option);
-    dispatchEvent(this.container, 'commit', {
+    dispatchEvent<CommitEventType>(this.container, 'commit', {
       detail: {
         option,
         value: getValue(option),
