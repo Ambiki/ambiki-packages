@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Export `types` from `index.ts` file
+
 ### Fixed
 
 - List does not close when clicking outside on Safari
