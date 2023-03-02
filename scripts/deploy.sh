@@ -4,7 +4,7 @@
 set -e
 
 # build
-yarn docs:build-safe
+yarn docs:build
 
 # navigate into the build output directory
 cd docs/.vuepress/dist
