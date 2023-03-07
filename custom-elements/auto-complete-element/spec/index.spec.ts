@@ -236,6 +236,67 @@ describe('AutoCompleteElement', () => {
       expect(options[1]).to.have.attribute('aria-selected', 'true');
     });
 
+    describe('when name attribute is present', () => {
+      it('appends hidden input field with value', async () => {
+        await setupFixture({
+          options: [{ id: 1 }, { id: 2, value: 'foo' }],
+          value: 'foo',
+          name: 'event[creator_id]',
+        });
+
+        const hiddenInput = find('input[type="hidden"]');
+        expect(hiddenInput).to.exist;
+        expect(hiddenInput).to.have.attribute('name', 'event[creator_id]');
+        expect(hiddenInput).to.have.attribute('value', 'foo');
+      });
+
+      it('appends hidden input field without value', async () => {
+        await setupFixture({
+          options: [{ id: 1 }, { id: 2, value: 'foo' }],
+          name: 'event[creator_id]',
+        });
+
+        const hiddenInput = find('input[type="hidden"]');
+        expect(hiddenInput).to.exist;
+        expect(hiddenInput).to.have.attribute('name', 'event[creator_id]');
+        expect(hiddenInput).to.have.attribute('value', '');
+      });
+
+      it('updates value after selecting an option', async () => {
+        const { input, list, options } = await setupFixture({
+          options: [
+            { id: 1, value: 'foo' },
+            { id: 2, value: 'bar' },
+          ],
+          name: 'event[creator_id]',
+        });
+
+        const hiddenInput = find('input[type="hidden"]');
+        expect(hiddenInput).to.have.attribute('value', '');
+
+        await openList(input);
+        expect(list.hidden).to.be.false;
+
+        options[1].click();
+        expect(hiddenInput).to.have.attribute('value', 'bar');
+      });
+
+      it('clears the value after clearBtn is clicked', async () => {
+        const { clearBtn } = await setupFixture({
+          options: [{ id: 1, value: 1, label: 'Hero' }, { id: 2 }],
+          value: 1,
+          name: 'event[creator_id]',
+          clearable: true,
+        });
+
+        const hiddenInput = find('input[type="hidden"]');
+        expect(hiddenInput).to.have.attribute('value', '1');
+
+        clearBtn.click();
+        expect(hiddenInput).to.have.attribute('value', '');
+      });
+    });
+
     it('selects an option', async () => {
       const { input, list, options, container } = await setupFixture({
         options: [{ id: 1, label: 'Hero' }, { id: 2 }],
@@ -611,19 +672,28 @@ type SetupFixtureProps = {
     disabled?: boolean;
     hidden?: boolean;
   }>;
+  name?: string;
   value?: string | string[] | number | number[];
   label?: string;
   multiple?: boolean;
   clearable?: boolean;
 };
 
-async function setupFixture({ options, value, label = '', multiple = false, clearable = false }: SetupFixtureProps) {
+async function setupFixture({
+  options,
+  name,
+  value,
+  label = '',
+  multiple = false,
+  clearable = false,
+}: SetupFixtureProps) {
   const _value = Array.isArray(value) ? JSON.stringify(value) : value;
 
   await fixture(html`
     <auto-complete
       for="list"
       ?multiple="${multiple}"
+      .name="${typeof name === 'undefined' ? undefined : name}"
       .value="${typeof _value === 'undefined' ? undefined : _value}"
       data-label="${typeof label === 'undefined' ? undefined : label}"
     >

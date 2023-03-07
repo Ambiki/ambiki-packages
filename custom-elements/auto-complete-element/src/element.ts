@@ -46,6 +46,20 @@ export default class AutoCompleteElement extends HTMLElement {
   }
 
   /**
+   * @description Returns the `name` attribute of the `auto-complete` element.
+   */
+  get name(): string {
+    return this.getAttribute('name') || '';
+  }
+
+  /**
+   * @description Sets the `name` attribute of the `auto-complete` element.
+   */
+  set name(value: string) {
+    this.setAttribute('name', value);
+  }
+
+  /**
    * @description Selected option's value
    */
   get value(): string {
