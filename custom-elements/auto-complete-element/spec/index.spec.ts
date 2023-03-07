@@ -642,6 +642,131 @@ describe('AutoCompleteElement', () => {
         expect(options[1]).to.have.attribute('aria-selected', 'true');
       });
     });
+
+    describe('when name attribute is present', () => {
+      it('appends base hidden input field with empty value', async () => {
+        await setupFixture({
+          options: [
+            { id: 1, value: 'foo' },
+            { id: 2, value: 'bar' },
+          ],
+          name: 'event[creator_ids][]',
+          multiple: true,
+        });
+
+        const hiddenInput = find('input[type="hidden"]');
+        expect(hiddenInput).to.exist;
+        expect(hiddenInput).to.have.attribute('name', 'event[creator_ids][]');
+        expect(hiddenInput).to.have.attribute('value', '');
+      });
+
+      it('appends hidden input field with value', async () => {
+        await setupFixture({
+          options: [
+            { id: 1, value: 'foo' },
+            { id: 2, value: 'bar' },
+          ],
+          name: 'event[creator_ids][]',
+          value: ['bar', 'foo'],
+          multiple: true,
+        });
+
+        const baseHiddenInput = find('input[type="hidden"][data-variant="base"]');
+        expect(baseHiddenInput).to.exist;
+        expect(baseHiddenInput).to.have.attribute('name', 'event[creator_ids][]');
+        expect(baseHiddenInput).to.have.attribute('value', '');
+
+        const itemHiddenInput1 = find('input[type="hidden"][data-value="bar"]');
+        expect(itemHiddenInput1).to.exist;
+        expect(itemHiddenInput1).to.have.attribute('name', 'event[creator_ids][]');
+        expect(itemHiddenInput1).to.have.attribute('value', 'bar');
+
+        const itemHiddenInput2 = find('input[type="hidden"][data-value="foo"]');
+        expect(itemHiddenInput2).to.exist;
+        expect(itemHiddenInput2).to.have.attribute('name', 'event[creator_ids][]');
+        expect(itemHiddenInput2).to.have.attribute('value', 'foo');
+      });
+
+      it('adds/removes hidden input field after selecting an option', async () => {
+        const { input, list, options } = await setupFixture({
+          options: [
+            { id: 1, value: 'foo' },
+            { id: 2, value: 'bar' },
+          ],
+          name: 'event[creator_ids][]',
+          multiple: true,
+        });
+
+        const baseHiddenInput = find('input[type="hidden"][data-variant="base"]');
+        expect(baseHiddenInput).to.exist;
+        expect(baseHiddenInput).to.have.attribute('name', 'event[creator_ids][]');
+        expect(baseHiddenInput).to.have.attribute('value', '');
+
+        // There aren't any selected values, so there shouldn't be any item hidden inputs.
+        expect(findAll('input[type="hidden"][data-variant="item"]').length).to.eq(0);
+
+        await openList(input);
+        expect(list.hidden).to.be.false;
+
+        let itemHiddenInput1: HTMLInputElement;
+
+        options[0].click();
+        itemHiddenInput1 = find('input[type="hidden"][data-value="foo"]');
+        expect(itemHiddenInput1).to.exist;
+        expect(itemHiddenInput1).to.have.attribute('name', 'event[creator_ids][]');
+        expect(itemHiddenInput1).to.have.attribute('value', 'foo');
+
+        options[1].click();
+        const itemHiddenInput2 = find('input[type="hidden"][data-value="bar"]');
+        expect(itemHiddenInput2).to.exist;
+        expect(itemHiddenInput2).to.have.attribute('name', 'event[creator_ids][]');
+        expect(itemHiddenInput2).to.have.attribute('value', 'bar');
+
+        // Should remove the hidden input field after deselecting
+        options[0].click();
+        itemHiddenInput1 = find('input[type="hidden"][data-value="foo"]');
+        expect(itemHiddenInput1).not.to.exist;
+
+        // Base shouldn't have any value
+        // See: "Gotcha" section of https://api.rubyonrails.org/classes/ActionView/Helpers/FormOptionsHelper.html#method-i-select
+        expect(baseHiddenInput).to.have.attribute('value', '');
+      });
+
+      it('removes all hidden input values except for the base hidden input after clicking on clearBtn', async () => {
+        const { clearBtn } = await setupFixture({
+          options: [
+            { id: 1, value: 'foo' },
+            { id: 2, value: 'bar' },
+          ],
+          name: 'event[creator_ids][]',
+          value: ['bar', 'foo'],
+          multiple: true,
+          clearable: true,
+        });
+
+        const baseHiddenInput = find('input[type="hidden"][data-variant="base"]');
+        expect(baseHiddenInput).to.exist;
+        expect(baseHiddenInput).to.have.attribute('name', 'event[creator_ids][]');
+        expect(baseHiddenInput).to.have.attribute('value', '');
+
+        const itemHiddenInput1 = find('input[type="hidden"][data-value="bar"]');
+        expect(itemHiddenInput1).to.exist;
+        expect(itemHiddenInput1).to.have.attribute('name', 'event[creator_ids][]');
+        expect(itemHiddenInput1).to.have.attribute('value', 'bar');
+
+        const itemHiddenInput2 = find('input[type="hidden"][data-value="foo"]');
+        expect(itemHiddenInput2).to.exist;
+        expect(itemHiddenInput2).to.have.attribute('name', 'event[creator_ids][]');
+        expect(itemHiddenInput2).to.have.attribute('value', 'foo');
+
+        clearBtn.click();
+        expect(find('input[type="hidden"][data-value="bar"]')).not.to.exist;
+        expect(find('input[type="hidden"][data-value="foo"]')).not.to.exist;
+        expect(find('input[type="hidden"][data-variant="base"]')).to.exist;
+        expect(find('input[type="hidden"][data-variant="base"]')).to.have.attribute('name', 'event[creator_ids][]');
+        expect(find('input[type="hidden"][data-variant="base"]')).to.have.attribute('value', '');
+      });
+    });
   });
 });
 

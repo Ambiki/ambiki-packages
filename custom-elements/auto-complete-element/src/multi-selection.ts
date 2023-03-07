@@ -12,6 +12,11 @@ export default class MultiSelection extends BaseSelection {
 
   override initialize() {
     this.selectedValues = new Set([...parseJSON(this.container.value)]);
+
+    if (this.container.name) {
+      this.insertHiddenField({ value: '' });
+      this.selectedValues.forEach((value) => this.insertHiddenField({ value, variant: 'item' }));
+    }
   }
 
   override connect() {
@@ -23,6 +28,7 @@ export default class MultiSelection extends BaseSelection {
   }
 
   override destroy() {
+    this.selectedValues.forEach((value) => this.removeHiddenField(value));
     this.selectedValues.clear();
     this.updateContainerWithSelectedValues();
   }
@@ -64,6 +70,7 @@ export default class MultiSelection extends BaseSelection {
 
     for (const _value of value) {
       this.selectedValues.add(_value.value.toString());
+      this.insertHiddenField({ value: _value.value.toString(), variant: 'item' });
     }
 
     this.updateContainerWithSelectedValues();
@@ -76,6 +83,7 @@ export default class MultiSelection extends BaseSelection {
     if (!this.selectedValues.has(value)) return;
 
     this.selectedValues.delete(value);
+    this.removeHiddenField(value);
     this.updateContainerWithSelectedValues();
   }
 
@@ -106,6 +114,24 @@ export default class MultiSelection extends BaseSelection {
     if (this.input.value) {
       this.input.value = '';
     }
+  }
+
+  private insertHiddenField({ value, variant = 'base' }: { value: string; variant?: 'base' | 'item' }) {
+    const hiddenField = document.createElement('input');
+    hiddenField.type = 'hidden';
+    hiddenField.name = this.container.name;
+    hiddenField.value = value;
+    hiddenField.dataset.variant = variant;
+    if (variant === 'item') {
+      hiddenField.dataset.value = value;
+    }
+
+    this.container.append(hiddenField);
+  }
+
+  private removeHiddenField(value: string) {
+    const hiddenField = this.container.querySelector(`input[type="hidden"][data-value="${value}"]`);
+    hiddenField?.remove();
   }
 }
 
