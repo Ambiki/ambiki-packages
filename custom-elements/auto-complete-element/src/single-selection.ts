@@ -58,6 +58,7 @@ export default class SingleSelection extends BaseSelection {
     }
 
     this.container.value = _value.value.toString();
+    this.hiddenFieldValue = _value.value.toString();
     const option = this.selectedOption;
 
     const label = _value.label || (option ? this.getLabel(option) : '');

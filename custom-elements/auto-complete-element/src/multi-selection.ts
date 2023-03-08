@@ -68,6 +68,12 @@ export default class MultiSelection extends BaseSelection {
       return;
     }
 
+    // Remove all hidden fields
+    for (const hiddenField of this.container.querySelectorAll('input[data-variant="item"]')) {
+      hiddenField.remove();
+    }
+
+    // Update state and insert hidden field
     for (const _value of value) {
       this.selectedValues.add(_value.value.toString());
       this.insertHiddenField({ value: _value.value.toString(), variant: 'item' });
