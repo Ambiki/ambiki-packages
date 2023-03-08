@@ -676,12 +676,12 @@ describe('AutoCompleteElement', () => {
         expect(baseHiddenInput).to.have.attribute('name', 'event[creator_ids][]');
         expect(baseHiddenInput).to.have.attribute('value', '');
 
-        const itemHiddenInput1 = find('input[type="hidden"][data-value="bar"]');
+        const itemHiddenInput1 = find('input[type="hidden"][value="bar"]');
         expect(itemHiddenInput1).to.exist;
         expect(itemHiddenInput1).to.have.attribute('name', 'event[creator_ids][]');
         expect(itemHiddenInput1).to.have.attribute('value', 'bar');
 
-        const itemHiddenInput2 = find('input[type="hidden"][data-value="foo"]');
+        const itemHiddenInput2 = find('input[type="hidden"][value="foo"]');
         expect(itemHiddenInput2).to.exist;
         expect(itemHiddenInput2).to.have.attribute('name', 'event[creator_ids][]');
         expect(itemHiddenInput2).to.have.attribute('value', 'foo');
@@ -711,20 +711,20 @@ describe('AutoCompleteElement', () => {
         let itemHiddenInput1: HTMLInputElement;
 
         options[0].click();
-        itemHiddenInput1 = find('input[type="hidden"][data-value="foo"]');
+        itemHiddenInput1 = find('input[type="hidden"][value="foo"]');
         expect(itemHiddenInput1).to.exist;
         expect(itemHiddenInput1).to.have.attribute('name', 'event[creator_ids][]');
         expect(itemHiddenInput1).to.have.attribute('value', 'foo');
 
         options[1].click();
-        const itemHiddenInput2 = find('input[type="hidden"][data-value="bar"]');
+        const itemHiddenInput2 = find('input[type="hidden"][value="bar"]');
         expect(itemHiddenInput2).to.exist;
         expect(itemHiddenInput2).to.have.attribute('name', 'event[creator_ids][]');
         expect(itemHiddenInput2).to.have.attribute('value', 'bar');
 
         // Should remove the hidden input field after deselecting
         options[0].click();
-        itemHiddenInput1 = find('input[type="hidden"][data-value="foo"]');
+        itemHiddenInput1 = find('input[type="hidden"][value="foo"]');
         expect(itemHiddenInput1).not.to.exist;
 
         // Base shouldn't have any value
@@ -749,19 +749,19 @@ describe('AutoCompleteElement', () => {
         expect(baseHiddenInput).to.have.attribute('name', 'event[creator_ids][]');
         expect(baseHiddenInput).to.have.attribute('value', '');
 
-        const itemHiddenInput1 = find('input[type="hidden"][data-value="bar"]');
+        const itemHiddenInput1 = find('input[type="hidden"][value="bar"]');
         expect(itemHiddenInput1).to.exist;
         expect(itemHiddenInput1).to.have.attribute('name', 'event[creator_ids][]');
         expect(itemHiddenInput1).to.have.attribute('value', 'bar');
 
-        const itemHiddenInput2 = find('input[type="hidden"][data-value="foo"]');
+        const itemHiddenInput2 = find('input[type="hidden"][value="foo"]');
         expect(itemHiddenInput2).to.exist;
         expect(itemHiddenInput2).to.have.attribute('name', 'event[creator_ids][]');
         expect(itemHiddenInput2).to.have.attribute('value', 'foo');
 
         clearBtn.click();
-        expect(find('input[type="hidden"][data-value="bar"]')).not.to.exist;
-        expect(find('input[type="hidden"][data-value="foo"]')).not.to.exist;
+        expect(find('input[type="hidden"][value="bar"]')).not.to.exist;
+        expect(find('input[type="hidden"][value="foo"]')).not.to.exist;
         expect(find('input[type="hidden"][data-variant="base"]')).to.exist;
         expect(find('input[type="hidden"][data-variant="base"]')).to.have.attribute('name', 'event[creator_ids][]');
         expect(find('input[type="hidden"][data-variant="base"]')).to.have.attribute('value', '');

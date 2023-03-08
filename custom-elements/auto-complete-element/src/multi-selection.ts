@@ -122,15 +122,11 @@ export default class MultiSelection extends BaseSelection {
     hiddenField.name = this.container.name;
     hiddenField.value = value;
     hiddenField.dataset.variant = variant;
-    if (variant === 'item') {
-      hiddenField.dataset.value = value;
-    }
-
     this.container.append(hiddenField);
   }
 
   private removeHiddenField(value: string) {
-    const hiddenField = this.container.querySelector(`input[type="hidden"][data-value="${value}"]`);
+    const hiddenField = this.container.querySelector(`input[type="hidden"][value="${value}"]`);
     hiddenField?.remove();
   }
 }
