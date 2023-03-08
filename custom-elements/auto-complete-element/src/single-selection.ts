@@ -1,20 +1,20 @@
 import BaseSelection from './base-selection';
 import { dispatchEvent } from './utils';
-import randomId from '@ambiki/utils/src/random-id';
 import type { SetValueType } from './utils';
 import type { CommitEventType } from './auto-complete';
 
 export default class SingleSelection extends BaseSelection {
-  private readonly hiddenFieldId = randomId();
-
   override initialize() {
     // If `data-label` attribute is not passed and we find a selected option, use its label
     if (!this.container.label && this.selectedOption) {
       this.container.label = this.getLabel(this.selectedOption);
     }
 
+    if (this.container.name) {
+      this.insertHiddenField({ value: this.container.value });
+    }
+
     this.input.value = this.container.label;
-    if (this.container.name) this.insertHiddenField();
   }
 
   override connect() {
@@ -106,17 +106,8 @@ export default class SingleSelection extends BaseSelection {
     return this.getValue(option) === this.selectedValue;
   }
 
-  private insertHiddenField() {
-    const hiddenField = document.createElement('input');
-    hiddenField.type = 'hidden';
-    hiddenField.name = this.container.name;
-    hiddenField.value = this.container.value;
-    hiddenField.id = this.hiddenFieldId;
-    this.container.append(hiddenField);
-  }
-
   private get hiddenField() {
-    return this.container.querySelector<HTMLInputElement>(`#${this.hiddenFieldId}`);
+    return this.container.querySelector<HTMLInputElement>(`input[name="${this.container.name}"][data-variant='base']`);
   }
 
   private set hiddenFieldValue(value: string) {

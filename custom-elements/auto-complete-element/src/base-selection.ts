@@ -50,4 +50,16 @@ export default class BaseSelection {
   protected getLabel(option: HTMLElement): string {
     return getLabel(option);
   }
+
+  /**
+   * @description Appends hidden field into the body `auto-complete` element.
+   */
+  protected insertHiddenField({ value, variant = 'base' }: { value: string; variant?: 'base' | 'item' }) {
+    const hiddenField = document.createElement('input');
+    hiddenField.type = 'hidden';
+    hiddenField.name = this.container.name;
+    hiddenField.value = value;
+    hiddenField.dataset.variant = variant;
+    this.container.append(hiddenField);
+  }
 }
