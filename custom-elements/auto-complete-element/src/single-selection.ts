@@ -2,13 +2,23 @@ import BaseSelection from './base-selection';
 import { dispatchEvent } from './utils';
 import type { SetValueType } from './utils';
 import type { CommitEventType } from './auto-complete';
+import { nextTick } from '@ambiki/utils';
 
 export default class SingleSelection extends BaseSelection {
+  defaultValue?: string;
+  defaultLabel?: string;
+  defaultSelectedOption?: HTMLElement;
+
   override initialize() {
+    this.defaultSelectedOption = this.selectedOption;
     // If `data-label` attribute is not passed and we find a selected option, use its label
     if (!this.container.label && this.selectedOption) {
       this.container.label = this.getLabel(this.selectedOption);
     }
+
+    // Store value and label attribute so that we can restore it when the parent form fires a `reset` event.
+    this.defaultValue = this.container.value;
+    this.defaultLabel = this.container.label;
 
     if (this.container.name) {
       this.insertHiddenField({ value: this.container.value });
@@ -75,6 +85,15 @@ export default class SingleSelection extends BaseSelection {
     this.container.label = '';
     this.hiddenFieldValue = '';
     this.input.value = '';
+  }
+
+  async reset() {
+    this.container.value = this.defaultValue;
+    this.container.label = this.defaultLabel || '';
+    this.hiddenFieldValue = this.defaultValue || '';
+
+    await nextTick();
+    this.input.value = this.defaultLabel || '';
   }
 
   /**

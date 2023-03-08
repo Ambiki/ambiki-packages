@@ -55,6 +55,7 @@ export default class AutoComplete {
     this.onCommit = this.onCommit.bind(this);
     this.onKeydown = this.onKeydown.bind(this);
     this.onClear = this.onClear.bind(this);
+    this.onFormReset = this.onFormReset.bind(this);
 
     this.onDocumentMousedown = this.onDocumentMousedown.bind(this);
     this.onDocumentClick = this.onDocumentClick.bind(this);
@@ -66,6 +67,7 @@ export default class AutoComplete {
     this.input.addEventListener('keydown', this.onKeydown);
     this.list.addEventListener('combobox:commit', this.onCommit);
     this.clearButton?.addEventListener('click', this.onClear);
+    this.form?.addEventListener('reset', this.onFormReset);
 
     // Outside click
     document.addEventListener('mousedown', this.onDocumentMousedown, true);
@@ -86,6 +88,7 @@ export default class AutoComplete {
     this.input.removeEventListener('keydown', this.onKeydown);
     this.list.removeEventListener('combobox:commit', this.onCommit);
     this.clearButton?.removeEventListener('click', this.onClear);
+    this.form?.removeEventListener('reset', this.onFormReset);
 
     document.removeEventListener('mousedown', this.onDocumentMousedown, true);
     document.removeEventListener('click', this.onDocumentClick, true);
@@ -289,6 +292,12 @@ export default class AutoComplete {
     this.container.open = true;
   }
 
+  private async onFormReset() {
+    this.currentQuery = undefined;
+    await this.selectionVariant.reset();
+    this.container.open = false;
+  }
+
   async fetchOptions(query = '') {
     if (this.currentQuery === query) return;
     this.currentQuery = query;
@@ -346,6 +355,10 @@ export default class AutoComplete {
 
   private checkIfListIsEmpty() {
     this.list.toggleAttribute(DATA_EMPTY_ATTR, this.visibleOptions.length === 0);
+  }
+
+  private get form() {
+    return this.container.closest('form');
   }
 }
 

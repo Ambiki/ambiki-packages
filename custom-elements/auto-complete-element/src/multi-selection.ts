@@ -59,6 +59,8 @@ export default class MultiSelection extends BaseSelection {
     if (visibleOption) this.autocomplete.activate(visibleOption, { scroll: true });
   }
 
+  reset() {}
+
   /**
    * @description Adds the value to the state and updates the `value` attribute on the `auto-complete` element
    */

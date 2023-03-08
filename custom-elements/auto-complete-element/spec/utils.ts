@@ -34,6 +34,7 @@ export type SetupFixtureProps = {
   label?: string;
   multiple?: boolean;
   clearable?: boolean;
+  form?: boolean;
 };
 
 export async function setupFixture({
@@ -43,10 +44,11 @@ export async function setupFixture({
   label = '',
   multiple = false,
   clearable = false,
+  form = false,
 }: SetupFixtureProps) {
   const _value = Array.isArray(value) ? JSON.stringify(value) : value;
 
-  await fixture(html`
+  const autoComplete = html`
     <auto-complete
       for="list"
       ?multiple="${multiple}"
@@ -74,13 +76,21 @@ export async function setupFixture({
         )}
       </ul>
     </auto-complete>
-  `);
+  `;
+
+  if (form) {
+    await fixture(html`<form action="#">${autoComplete}<button type="reset">Reset button</button></form>`);
+  } else {
+    await fixture(autoComplete);
+  }
 
   return {
+    form: find<HTMLFormElement>('form'),
     container: find<AutoCompleteElement>('auto-complete'),
     input: find<HTMLInputElement>('input'),
     list: find('ul'),
     options: findAll('li[role="option"]'),
     clearBtn: find('button[data-clear]'),
+    resetBtn: find('button[type="reset"]'),
   };
 }

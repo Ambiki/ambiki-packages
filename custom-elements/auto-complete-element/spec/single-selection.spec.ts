@@ -1,5 +1,5 @@
-import { expect } from '@open-wc/testing';
-import { find } from '@ambiki/test-utils';
+import { expect, waitUntil } from '@open-wc/testing';
+import { find, findAll, fillIn } from '@ambiki/test-utils';
 import * as sinon from 'sinon';
 import '../src';
 import { setupFixture, openList } from './utils';
@@ -145,6 +145,98 @@ describe('Single-selection', () => {
 
       clearBtn.click();
       expect(hiddenInput).to.have.attribute('value', '');
+    });
+  });
+
+  describe('form reset', () => {
+    it('clears the selected options if there are no options selected initially', async () => {
+      const { form, container, input, list, options } = await setupFixture({
+        options: [{ id: 1, value: 'foo', label: 'Foo' }],
+        form: true,
+      });
+
+      await openList(input);
+      expect(list.hidden).to.be.false;
+
+      options[0].click();
+      expect(container.value).to.eq('foo');
+      expect(container.label).to.eq('Foo');
+      expect(input.value).to.eq('Foo');
+      expect(list.hidden).to.be.true;
+
+      form.reset();
+      expect(container.value).to.eq('');
+      expect(container.label).to.eq('');
+      expect(input.value).to.eq('');
+
+      await openList(input);
+      expect(findAll('li[role="options"][aria-selected="true"]').length).to.eq(0);
+    });
+
+    it('closes the list', async () => {
+      const { form, input, list } = await setupFixture({
+        options: [{ id: 1, value: 'foo', label: 'Foo' }],
+        form: true,
+      });
+
+      await openList(input);
+      expect(list.hidden).to.be.false;
+
+      form.reset();
+      await waitUntil(() => list.hidden);
+      expect(list.hidden).to.be.true;
+    });
+
+    it('resets the selected options', async () => {
+      const { form, container, input, list, options } = await setupFixture({
+        options: [
+          { id: 1, value: 'foo', label: 'Foo' },
+          { id: 2, value: 'bar', label: 'Bar' },
+        ],
+        value: 'foo',
+        form: true,
+      });
+
+      expect(container.value).to.eq('foo');
+      expect(container.label).to.eq('Foo');
+      expect(input.value).to.eq('Foo');
+
+      await openList(input);
+      expect(list.hidden).to.be.false;
+
+      options[1].click();
+      expect(container.value).to.eq('bar');
+      expect(container.label).to.eq('Bar');
+      // expect(input.value).to.eq('Bar');
+      expect(list.hidden).to.be.true;
+
+      form.reset();
+      expect(container.value).to.eq('foo');
+      expect(container.label).to.eq('Foo');
+      await waitUntil(() => input.value === 'Foo');
+      expect(input.value).to.eq('Foo');
+      expect(list.hidden).to.be.true;
+      // We don't want to select if the list is hidden
+      expect(findAll('li[role="options"][aria-selected="true"]').length).to.eq(0);
+    });
+
+    it('updates the hidden field value', async () => {
+      const { form, container } = await setupFixture({
+        options: [
+          { id: 1, value: 'foo', label: 'Foo' },
+          { id: 2, value: 'bar', label: 'Bar' },
+        ],
+        value: 'foo',
+        name: 'user_id',
+        form: true,
+      });
+
+      expect(find<HTMLInputElement>('input[type="hidden"][name="user_id"]').value).to.eq('foo');
+      container.autocomplete?.setValue([{ value: 'bar' }]);
+      expect(find<HTMLInputElement>('input[type="hidden"][name="user_id"]').value).to.eq('bar');
+
+      form.reset();
+      expect(find<HTMLInputElement>('input[type="hidden"][name="user_id"]').value).to.eq('foo');
     });
   });
 
