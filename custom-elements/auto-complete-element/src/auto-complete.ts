@@ -296,6 +296,7 @@ export default class AutoComplete {
     this.currentQuery = undefined;
     await this.selectionVariant.reset();
     this.container.open = false;
+    dispatchEvent(this.container, 'reset');
   }
 
   async fetchOptions(query = '') {

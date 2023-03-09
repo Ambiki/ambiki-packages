@@ -433,6 +433,24 @@ describe('Multi-selection', () => {
       expect(find('input[type="hidden"][name="user_ids"][value="foo"]')).not.to.exist;
       expect(find('input[type="hidden"][name="user_ids"][value="bar"]')).not.to.exist;
     });
+
+    it('fires the reset event', async () => {
+      const { form, container } = await setupFixture({
+        options: [
+          { id: 1, value: 'foo', label: 'Foo' },
+          { id: 2, value: 'bar', label: 'Bar' },
+        ],
+        form: true,
+        multiple: true,
+      });
+
+      const resetHandler = sinon.spy();
+      container.addEventListener('auto-complete:reset', resetHandler);
+
+      form.reset();
+      await waitUntil(() => resetHandler.called);
+      expect(resetHandler.calledOnce).to.be.true;
+    });
   });
 
   describe('#setValue', () => {

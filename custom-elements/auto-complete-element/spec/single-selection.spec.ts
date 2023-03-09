@@ -238,6 +238,24 @@ describe('Single-selection', () => {
       form.reset();
       expect(find<HTMLInputElement>('input[type="hidden"][name="user_id"]').value).to.eq('foo');
     });
+
+    it('fires the reset event', async () => {
+      const { form, container } = await setupFixture({
+        options: [
+          { id: 1, value: 'foo', label: 'Foo' },
+          { id: 2, value: 'bar', label: 'Bar' },
+        ],
+        value: 'foo',
+        form: true,
+      });
+
+      const resetHandler = sinon.spy();
+      container.addEventListener('auto-complete:reset', resetHandler);
+
+      form.reset();
+      await waitUntil(() => resetHandler.called);
+      expect(resetHandler.calledOnce).to.be.true;
+    });
   });
 
   describe('#setValue', () => {
