@@ -41,7 +41,7 @@ export default class SingleSelection extends BaseSelection {
 
   /**
    * @description Called when `auto-complete` is cleared. This happens when `data-clear` button is
-* clicked.
+   * clicked.
    */
   clear() {
     this.removeValue();
