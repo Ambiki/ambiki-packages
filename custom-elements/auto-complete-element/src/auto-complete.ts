@@ -31,6 +31,10 @@ export default class AutoComplete {
     this.input = input;
     this.list = list;
 
+    // List shouldn't be opened initially because it's a form control.
+    this.list.hidden = true;
+    this.container.open = false;
+
     this.combobox = new Combobox(this.input, this.list, { multiple: this.container.multiple });
     this.selectionVariant = this.container.multiple
       ? new MultiSelection(this.container, this, this.input)

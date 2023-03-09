@@ -62,7 +62,7 @@ export async function setupFixture({
       >
       <input type="text" />
       ${clearable && html`<button type="button" data-clear>X</button>`}
-      <ul id="list" hidden>
+      <ul id="list">
         ${options.map(
           (option) =>
             html`<li
