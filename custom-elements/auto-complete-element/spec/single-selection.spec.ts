@@ -1,5 +1,5 @@
 import { expect, waitUntil } from '@open-wc/testing';
-import { find, findAll, fillIn } from '@ambiki/test-utils';
+import { find, findAll } from '@ambiki/test-utils';
 import * as sinon from 'sinon';
 import '../src';
 import { setupFixture, openList } from './utils';
