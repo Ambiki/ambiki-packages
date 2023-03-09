@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   The main idea here is to avoid user interactions. Functions such as `setValue` and `removeValue` will still work as
   expected.
 
+### Fixed
+
+- List should have the `hidden` attribute and the `auto-complete` element should not have the `open` attribute initially.
+
 ## [2.0.1] - 2023-03-02
 
 ### Added
