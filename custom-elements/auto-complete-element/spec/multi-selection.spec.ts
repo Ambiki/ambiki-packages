@@ -274,6 +274,167 @@ describe('Multi-selection', () => {
     });
   });
 
+  describe('form reset', () => {
+    it('clears the selected options if there are no options selected initially', async () => {
+      const { form, container, input, list, options } = await setupFixture({
+        options: [{ id: 1, value: 'foo', label: 'Foo' }],
+        form: true,
+        multiple: true,
+      });
+
+      await openList(input);
+      expect(list.hidden).to.be.false;
+
+      options[0].click();
+      expect(JSON.parse(container.value)).to.eql(['foo']);
+      expect(list.hidden).to.be.false;
+
+      form.reset();
+      expect(container).not.to.have.attribute('value');
+      expect(input.value).to.eq('');
+      await waitUntil(() => list.hidden);
+      expect(list.hidden).to.be.true;
+
+      await openList(input);
+      options[0].click();
+      expect(JSON.parse(container.value)).to.eql(['foo']);
+
+      form.reset();
+      expect(container).not.to.have.attribute('value');
+
+      await openList(input);
+      expect(findAll('li[role="options"][aria-selected="true"]').length).to.eq(0);
+    });
+
+    it('resets the selected options', async () => {
+      const { form, container, input, list, options } = await setupFixture({
+        options: [
+          { id: 1, value: 'foo', label: 'Foo' },
+          { id: 2, value: 'bar', label: 'Bar' },
+          { id: 3, value: 'baz', label: 'Baz' },
+        ],
+        value: ['foo'],
+        form: true,
+        multiple: true,
+      });
+
+      expect(JSON.parse(container.value)).to.eql(['foo']);
+      expect(input.value).to.eq('');
+
+      await openList(input);
+      expect(list.hidden).to.be.false;
+
+      options[1].click();
+      expect(JSON.parse(container.value)).to.eql(['foo', 'bar']);
+
+      form.reset();
+      expect(JSON.parse(container.value)).to.eql(['foo']);
+      expect(input.value).to.eq('');
+      await waitUntil(() => list.hidden);
+      expect(list.hidden).to.be.true;
+
+      await openList(input);
+      options[2].click();
+      expect(JSON.parse(container.value)).to.eql(['foo', 'baz']);
+      form.reset();
+      expect(JSON.parse(container.value)).to.eql(['foo']);
+    });
+
+    it('clears the search field', async () => {
+      const { form, input } = await setupFixture({
+        options: [
+          { id: 1, value: 'foo', label: 'Foo' },
+          { id: 2, value: 'bar', label: 'Bar' },
+        ],
+        form: true,
+        multiple: true,
+      });
+
+      await fillIn(input, 'Foo');
+      form.reset();
+
+      expect(input.value).to.eq('');
+    });
+
+    it('resets the default values after clearing the auto-complete', async () => {
+      const { form, container, clearBtn } = await setupFixture({
+        options: [
+          { id: 1, value: 'foo', label: 'Foo' },
+          { id: 2, value: 'bar', label: 'Bar' },
+        ],
+        value: ['foo'],
+        form: true,
+        name: 'user_ids',
+        clearable: true,
+        multiple: true,
+      });
+
+      expect(find('input[name="user_ids"][value="foo"]')).to.exist;
+
+      clearBtn.click();
+      expect(container).not.to.have.attribute('value');
+      expect(find('input[name="user_ids"][value="foo"]')).not.to.exist;
+
+      form.reset();
+      expect(JSON.parse(container.value)).to.eql(['foo']);
+      expect(find('input[name="user_ids"][value="foo"]')).to.exist;
+    });
+
+    it('updates the hidden fields', async () => {
+      const { form, container, input, options } = await setupFixture({
+        options: [
+          { id: 1, value: 'foo', label: 'Foo' },
+          { id: 2, value: 'bar', label: 'Bar' },
+        ],
+        value: ['foo'],
+        name: 'user_ids',
+        form: true,
+        multiple: true,
+      });
+
+      expect(find('input[type="hidden"][name="user_ids"][value=""]')).to.exist;
+      expect(find('input[type="hidden"][name="user_ids"][value="foo"]')).to.exist;
+      expect(find('input[type="hidden"][name="user_ids"][value="bar"]')).not.to.exist;
+
+      container.autocomplete?.setValue([{ value: 'bar' }]);
+      expect(find('input[type="hidden"][name="user_ids"][value=""]')).to.exist;
+      expect(find('input[type="hidden"][name="user_ids"][value="foo"]')).not.to.exist;
+      expect(find('input[type="hidden"][name="user_ids"][value="bar"]')).to.exist;
+
+      form.reset();
+      expect(find('input[type="hidden"][name="user_ids"][value=""]')).to.exist;
+      expect(find('input[type="hidden"][name="user_ids"][value="foo"]')).to.exist;
+      expect(find('input[type="hidden"][name="user_ids"][value="bar"]')).not.to.exist;
+
+      await openList(input);
+      expect(findAll('[aria-selected="true"]').length).to.eq(1);
+      expect(options[0]).to.have.attribute('aria-selected', 'true');
+      expect(options[1]).to.have.attribute('aria-selected', 'false');
+    });
+
+    it('clears the hidden fields', async () => {
+      const { form, container } = await setupFixture({
+        options: [
+          { id: 1, value: 'foo', label: 'Foo' },
+          { id: 2, value: 'bar', label: 'Bar' },
+        ],
+        name: 'user_ids',
+        form: true,
+        multiple: true,
+      });
+
+      container.autocomplete?.setValue([{ value: 'bar' }]);
+      expect(find('input[type="hidden"][name="user_ids"][value=""]')).to.exist;
+      expect(find('input[type="hidden"][name="user_ids"][value="foo"]')).not.to.exist;
+      expect(find('input[type="hidden"][name="user_ids"][value="bar"]')).to.exist;
+
+      form.reset();
+      expect(find('input[type="hidden"][name="user_ids"][value=""]')).to.exist;
+      expect(find('input[type="hidden"][name="user_ids"][value="foo"]')).not.to.exist;
+      expect(find('input[type="hidden"][name="user_ids"][value="bar"]')).not.to.exist;
+    });
+  });
+
   describe('#setValue', () => {
     it('sets the value but does not select the option if the list is hidden', async () => {
       const { container, options } = await setupFixture({

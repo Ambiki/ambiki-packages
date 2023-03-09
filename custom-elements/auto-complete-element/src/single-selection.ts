@@ -5,12 +5,10 @@ import type { CommitEventType } from './auto-complete';
 import { nextTick } from '@ambiki/utils';
 
 export default class SingleSelection extends BaseSelection {
-  defaultValue?: string;
-  defaultLabel?: string;
-  defaultSelectedOption?: HTMLElement;
+  private defaultValue?: string;
+  private defaultLabel?: string;
 
   override initialize() {
-    this.defaultSelectedOption = this.selectedOption;
     // If `data-label` attribute is not passed and we find a selected option, use its label
     if (!this.container.label && this.selectedOption) {
       this.container.label = this.getLabel(this.selectedOption);

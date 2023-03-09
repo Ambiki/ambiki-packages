@@ -207,7 +207,7 @@ describe('Single-selection', () => {
       options[1].click();
       expect(container.value).to.eq('bar');
       expect(container.label).to.eq('Bar');
-      // expect(input.value).to.eq('Bar');
+      expect(input.value).to.eq('Bar');
       expect(list.hidden).to.be.true;
 
       form.reset();
