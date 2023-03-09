@@ -192,7 +192,6 @@ export default class AutoComplete {
     }
   }
 
-
   /**
    * @description Disables the input field and the clear button. While disabled, it cannot receive focus.
    */
