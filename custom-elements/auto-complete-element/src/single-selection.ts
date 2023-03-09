@@ -2,12 +2,24 @@ import BaseSelection from './base-selection';
 import { dispatchEvent } from './utils';
 import type { SetValueType } from './utils';
 import type { CommitEventType } from './auto-complete';
+import { nextTick } from '@ambiki/utils';
 
 export default class SingleSelection extends BaseSelection {
+  private defaultValue?: string;
+  private defaultLabel?: string;
+
   override initialize() {
     // If `data-label` attribute is not passed and we find a selected option, use its label
     if (!this.container.label && this.selectedOption) {
       this.container.label = this.getLabel(this.selectedOption);
+    }
+
+    // Store value and label attribute so that we can restore it when the parent form fires a `reset` event.
+    this.defaultValue = this.container.value;
+    this.defaultLabel = this.container.label;
+
+    if (this.container.name) {
+      this.insertHiddenField({ value: this.container.value });
     }
 
     this.input.value = this.container.label;
@@ -24,6 +36,14 @@ export default class SingleSelection extends BaseSelection {
   }
 
   override destroy() {
+    this.clear();
+  }
+
+  /**
+   * @description Called when `auto-complete` is cleared. This happens when `data-clear` button is
+   * clicked.
+   */
+  clear() {
     this.removeValue();
   }
 
@@ -36,6 +56,7 @@ export default class SingleSelection extends BaseSelection {
 
     this.container.value = value;
     this.container.label = label;
+    this.hiddenFieldValue = value;
     this.input.value = label;
     this.container.open = false;
     dispatchEvent<CommitEventType>(this.container, 'select', { detail: { option, value, label } });
@@ -53,6 +74,7 @@ export default class SingleSelection extends BaseSelection {
     }
 
     this.container.value = _value.value.toString();
+    this.hiddenFieldValue = _value.value.toString();
     const option = this.selectedOption;
 
     const label = _value.label || (option ? this.getLabel(option) : '');
@@ -67,12 +89,17 @@ export default class SingleSelection extends BaseSelection {
   removeValue() {
     this.container.value = '';
     this.container.label = '';
+    this.hiddenFieldValue = '';
     this.input.value = '';
   }
 
-  private identifySelectionState() {
-    if (!this.selectedOption) return;
-    this.autocomplete.combobox.select(this.selectedOption);
+  async reset() {
+    this.container.value = this.defaultValue;
+    this.container.label = this.defaultLabel || '';
+    this.hiddenFieldValue = this.defaultValue || '';
+
+    await nextTick();
+    this.input.value = this.defaultLabel || '';
   }
 
   /**
@@ -83,11 +110,6 @@ export default class SingleSelection extends BaseSelection {
     return option || this.autocomplete.visibleOptions[0];
   }
 
-  private maySelect(option: HTMLElement): boolean {
-    if (!this.selectedValue) return false;
-    return this.getValue(option) === this.selectedValue;
-  }
-
   /**
    * @description Returns the `value` attribute of the selected option element
    */
@@ -95,7 +117,26 @@ export default class SingleSelection extends BaseSelection {
     return this.container.value;
   }
 
+  private identifySelectionState() {
+    if (!this.selectedOption) return;
+    this.autocomplete.combobox.select(this.selectedOption);
+  }
+
   private get selectedOption(): HTMLElement | undefined {
     return this.autocomplete.options.find((o) => this.maySelect(o));
+  }
+
+  private maySelect(option: HTMLElement): boolean {
+    if (!this.selectedValue) return false;
+    return this.getValue(option) === this.selectedValue;
+  }
+
+  private get hiddenField() {
+    return this.container.querySelector<HTMLInputElement>(`input[name="${this.container.name}"][data-variant='base']`);
+  }
+
+  private set hiddenFieldValue(value: string) {
+    if (!this.hiddenField) return;
+    this.hiddenField.value = value;
   }
 }

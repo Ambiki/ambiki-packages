@@ -13,7 +13,7 @@
     <div id="app">
       <div>
         <h3>Single</h3>
-        <auto-complete for="ambiki-options" value="3">
+        <auto-complete for="ambiki-options">
           <div class="input-wrapper">
             <input type="text" class="form-control" />
             <div class="clear-btn-wrapper">
@@ -37,8 +37,8 @@
       </div>
 
       <div>
-        <h3>Single persisted</h3>
-        <auto-complete for="ambiki-options-single-persisted" value="2">
+        <h3>Single persisted with name</h3>
+        <auto-complete for="ambiki-options-single-persisted" value="2" name="city[name]">
           <div class="input-wrapper">
             <input type="text" class="form-control" />
             <div class="clear-btn-wrapper">
@@ -98,6 +98,26 @@
             <li class="blankslate">We couldn't find that!</li>
           </ul>
         </auto-complete>
+      </div>
+
+      <div>
+        <h3>Multi persisted with name</h3>
+        <form>
+          <auto-complete for="ambiki-options-multiple-persisted" value="[1,2]" name="event[location_ids][]" multiple>
+            <div class="input-wrapper">
+              <input type="text" class="form-control" />
+              <div class="clear-btn-wrapper">
+                <button type="button" data-clear>X</button>
+              </div>
+            </div>
+            <ul id="ambiki-options-multiple-persisted" class="options" hidden>
+              <li role="option" class="option" data-label="Darjeeling" value="1">Darjeeling <span>(checked)</span></li>
+              <li role="option" class="option" data-label="Kalimpong" value="2">Kalimpong <span>(checked)</span></li>
+              <li class="blankslate">We couldn't find that!</li>
+            </ul>
+          </auto-complete>
+          <button type="reset">Reset button</button>
+        </form>
       </div>
 
       <div>

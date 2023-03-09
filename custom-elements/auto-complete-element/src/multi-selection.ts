@@ -5,6 +5,8 @@ import type { SetValueType } from './utils';
 import type { CommitEventType } from './auto-complete';
 
 export default class MultiSelection extends BaseSelection {
+  private defaultSelectedValues!: Set<string>;
+
   /**
    * @description Returns all the option element's `value` attribute
    */
@@ -12,6 +14,13 @@ export default class MultiSelection extends BaseSelection {
 
   override initialize() {
     this.selectedValues = new Set([...parseJSON(this.container.value)]);
+    // Store values so that we can restore it when the parent form fires a `reset` event.
+    this.defaultSelectedValues = new Set([...parseJSON(this.container.value)]);
+
+    if (this.container.name) {
+      this.insertHiddenField({ value: '' });
+      this.selectedValues.forEach((value) => this.insertHiddenField({ value, variant: 'item' }));
+    }
   }
 
   override connect() {
@@ -23,6 +32,16 @@ export default class MultiSelection extends BaseSelection {
   }
 
   override destroy() {
+    this.clear();
+    this.defaultSelectedValues.clear();
+  }
+
+  /**
+   * @description Called when `auto-complete` is cleared. This happens when `data-clear` button is
+   * clicked.
+   */
+  clear() {
+    this.selectedValues.forEach((value) => this.removeHiddenField(value));
     this.selectedValues.clear();
     this.updateContainerWithSelectedValues();
   }
@@ -53,6 +72,20 @@ export default class MultiSelection extends BaseSelection {
     if (visibleOption) this.autocomplete.activate(visibleOption, { scroll: true });
   }
 
+  reset() {
+    const values = Array.from(this.defaultSelectedValues.values());
+    this.container.value = JSON.stringify(values);
+
+    // Remove all hidden fields
+    for (const hiddenField of this.container.querySelectorAll('input[data-variant="item"]')) {
+      hiddenField.remove();
+    }
+
+    this.defaultSelectedValues.forEach((value) => this.insertHiddenField({ value, variant: 'item' }));
+    // We need to shallow clone `this.defaultSelectedValues` to prevent updating it when committing options.
+    this.selectedValues = new Set(this.defaultSelectedValues);
+  }
+
   /**
    * @description Adds the value to the state and updates the `value` attribute on the `auto-complete` element
    */
@@ -62,8 +95,15 @@ export default class MultiSelection extends BaseSelection {
       return;
     }
 
+    // Remove all hidden fields
+    for (const hiddenField of this.container.querySelectorAll('input[data-variant="item"]')) {
+      hiddenField.remove();
+    }
+
+    // Update state and insert hidden field
     for (const _value of value) {
       this.selectedValues.add(_value.value.toString());
+      this.insertHiddenField({ value: _value.value.toString(), variant: 'item' });
     }
 
     this.updateContainerWithSelectedValues();
@@ -76,6 +116,7 @@ export default class MultiSelection extends BaseSelection {
     if (!this.selectedValues.has(value)) return;
 
     this.selectedValues.delete(value);
+    this.removeHiddenField(value);
     this.updateContainerWithSelectedValues();
   }
 
@@ -106,6 +147,11 @@ export default class MultiSelection extends BaseSelection {
     if (this.input.value) {
       this.input.value = '';
     }
+  }
+
+  private removeHiddenField(value: string) {
+    const hiddenField = this.container.querySelector(`input[type="hidden"][value="${value}"]`);
+    hiddenField?.remove();
   }
 }
 

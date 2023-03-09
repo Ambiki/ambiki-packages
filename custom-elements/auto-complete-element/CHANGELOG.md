@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Support `name` attribute. If present, proper `input[type="hidden"][name="some_name"]` will be appended inside the
+  `auto-complete` element with `value` being the selected option's `value` attribute.
+- Reset `auto-complete` when parent `form` element fires a `reset` event.
+
 ## [2.0.1] - 2023-03-02
 
 ### Added
