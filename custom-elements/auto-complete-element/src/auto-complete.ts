@@ -144,7 +144,7 @@ export default class AutoComplete {
    */
   clear() {
     this.currentQuery = undefined;
-    this.selectionVariant.destroy();
+    this.selectionVariant.clear();
     this.container.open = false;
   }
 

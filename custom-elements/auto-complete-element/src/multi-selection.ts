@@ -32,6 +32,15 @@ export default class MultiSelection extends BaseSelection {
   }
 
   override destroy() {
+    this.clear();
+    this.defaultSelectedValues.clear();
+  }
+
+  /**
+   * @description Called when `auto-complete` is cleared. This happens when `data-clear` button is
+   * clicked.
+   */
+  clear() {
     this.selectedValues.forEach((value) => this.removeHiddenField(value));
     this.selectedValues.clear();
     this.updateContainerWithSelectedValues();
