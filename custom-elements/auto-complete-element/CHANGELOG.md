@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Support `name` attribute. If present, proper `input[type="hidden"][name="some_name"]` will be appended inside the
   `auto-complete` element with `value` being the selected option's `value` attribute.
 - Reset `auto-complete` when parent `form` element fires a `reset` event.
+- Support `disabled` attribute. If present,
+  - disables the input field
+  - disables the clear button if it exists
+
+  The main idea here is to avoid user interactions. Functions such as `setValue` and `removeValue` will still work as
+  expected.
 
 ## [2.0.1] - 2023-03-02
 

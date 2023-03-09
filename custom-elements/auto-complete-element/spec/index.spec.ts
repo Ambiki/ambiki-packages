@@ -6,13 +6,17 @@ import '../src';
 
 describe('AutoCompleteElement', () => {
   it('adds attributes after initializing', async () => {
-    const { input, list, clearBtn } = await setupFixture({ options: [{ id: 1 }], clearable: true });
+    const { container, input, list, clearBtn } = await setupFixture({ options: [{ id: 1 }], clearable: true });
 
+    expect(container.disabled).to.be.false;
     expect(input).to.have.attribute('spellcheck', 'false');
     expect(input).to.have.attribute('autocomplete', 'off');
+    expect(input.disabled).to.be.false;
     expect(list).to.have.attribute('tabindex', '-1');
     expect(list).to.have.attribute('aria-orientation', 'vertical');
     expect(clearBtn).to.have.attribute('aria-label');
+    expect(clearBtn).not.to.have.attribute('tabindex');
+    expect(clearBtn.disabled).to.be.false;
   });
 
   it('adds attributes after opening the list', async () => {
@@ -185,6 +189,73 @@ describe('AutoCompleteElement', () => {
     await waitUntil(() => options[1].hidden); // search is debounced
     expect(options[1].hidden).to.be.true;
     expect(options[0].hidden).to.be.false;
+  });
+
+  describe('disabled', () => {
+    it('list cannot be opened', async () => {
+      const { container, input, list } = await setupFixture({ options: [{ id: 1 }, { id: 2 }], disabled: true });
+
+      expect(container.disabled).to.be.true;
+      expect(input.disabled).to.be.true;
+
+      await openList(input);
+      expect(list.hidden).to.be.true;
+
+      // Setter shouldn't work either
+      container.open = true;
+      expect(list.hidden).to.be.true;
+    });
+
+    it('clear button is disabled', async () => {
+      const { clearBtn } = await setupFixture({
+        options: [{ id: 1, value: 'foo' }, { id: 2 }],
+        value: 'foo',
+        disabled: true,
+        clearable: true,
+      });
+
+      expect(clearBtn).to.have.attribute('tabindex', '-1');
+      expect(clearBtn.disabled).to.be.true;
+    });
+
+    it('can be disabled using the setter function', async () => {
+      const { container, input, clearBtn } = await setupFixture({
+        options: [{ id: 1 }, { id: 2 }],
+        clearable: true,
+      });
+
+      expect(container.disabled).to.be.false;
+      expect(input.disabled).to.be.false;
+      expect(clearBtn.disabled).to.be.false;
+      expect(clearBtn).not.to.have.attribute('tabindex');
+
+      container.disabled = true;
+
+      expect(container.disabled).to.be.true;
+      expect(input.disabled).to.be.true;
+      expect(clearBtn.disabled).to.be.true;
+      expect(clearBtn).to.have.attribute('tabindex', '-1');
+    });
+
+    it('can be enabled using the setter function', async () => {
+      const { container, input, clearBtn } = await setupFixture({
+        options: [{ id: 1 }, { id: 2 }],
+        clearable: true,
+        disabled: true,
+      });
+
+      expect(container.disabled).to.be.true;
+      expect(input.disabled).to.be.true;
+      expect(clearBtn.disabled).to.be.true;
+      expect(clearBtn).to.have.attribute('tabindex', '-1');
+
+      container.disabled = false;
+
+      expect(container.disabled).to.be.false;
+      expect(input.disabled).to.be.false;
+      expect(clearBtn.disabled).to.be.false;
+      expect(clearBtn).not.to.have.attribute('tabindex');
+    });
   });
 
   describe('#deactivate', () => {

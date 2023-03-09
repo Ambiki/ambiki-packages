@@ -27,7 +27,7 @@ export default class AutoCompleteElement extends HTMLElement {
   }
 
   static get observedAttributes(): string[] {
-    return ['open'];
+    return ['open', 'disabled'];
   }
 
   attributeChangedCallback(name: string, oldValue: string, newValue: string) {
@@ -37,6 +37,9 @@ export default class AutoCompleteElement extends HTMLElement {
     switch (name) {
       case 'open':
         newValue === null ? this.autocomplete.hideList() : this.autocomplete.showList();
+        break;
+      case 'disabled':
+        newValue === null ? this.autocomplete.enable() : this.autocomplete.disable();
         break;
     }
   }
@@ -106,6 +109,12 @@ export default class AutoCompleteElement extends HTMLElement {
    * @description Shows/hides the list
    */
   set open(value: boolean) {
+    // Make sure that list is always hidden.
+    if (this.disabled) {
+      this.removeAttribute('open');
+      return;
+    }
+
     if (value) {
       this.setAttribute('open', '');
     } else {
@@ -128,6 +137,24 @@ export default class AutoCompleteElement extends HTMLElement {
       this.setAttribute('multiple', '');
     } else {
       this.removeAttribute('multiple');
+    }
+  }
+
+  /**
+   * @description Whether the `auto-complete` is disabled or not.
+   */
+  get disabled(): boolean {
+    return this.hasAttribute('disabled');
+  }
+
+  /**
+   * @description Enables/disables the `auto-complete` element.
+   */
+  set disabled(value: boolean) {
+    if (value) {
+      this.setAttribute('disabled', '');
+    } else {
+      this.removeAttribute('disabled');
     }
   }
 
