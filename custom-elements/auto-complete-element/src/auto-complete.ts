@@ -48,6 +48,11 @@ export default class AutoComplete {
       this.clearButton.setAttribute('aria-label', 'Clear autocomplete');
     }
 
+    // Disable auto-complete if the `disabled` attribute is present initially.
+    if (this.container.disabled) {
+      this.disable();
+    }
+
     this.onMousedown = this.onMousedown.bind(this);
     this.onInputBlur = this.onInputBlur.bind(this);
     this.onInputMousedown = this.onInputMousedown.bind(this);
@@ -173,6 +178,31 @@ export default class AutoComplete {
     this.selectionVariant.disconnect();
     this.list.hidden = true;
     dispatchEvent(this.container, 'hidden');
+  }
+
+  /**
+   * @description Enables the input field and the clear button so that it can respond to focus and user input.
+   */
+  enable() {
+    this.input.disabled = false;
+
+    if (this.clearButton) {
+      this.clearButton.disabled = false;
+      this.clearButton.removeAttribute('tabindex');
+    }
+  }
+
+
+  /**
+   * @description Disables the input field and the clear button. While disabled, it cannot receive focus.
+   */
+  disable() {
+    this.input.disabled = true;
+
+    if (this.clearButton) {
+      this.clearButton.disabled = true;
+      this.clearButton.setAttribute('tabindex', '-1');
+    }
   }
 
   /**
