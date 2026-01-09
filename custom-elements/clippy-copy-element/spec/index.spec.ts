@@ -116,6 +116,41 @@ describe('ClippyCopyElement', () => {
       expect(text).to.equal('Copying with keyboard interaction');
     });
   });
+
+  it('applies data-prefix-value and data-suffix-value when copying from value', async () => {
+    const el: ClippyCopyElement = await fixture(html`
+    <clippy-copy
+      value="Core text"
+      data-prefix-value="PRE: "
+      data-suffix-value=" :POST"
+    ></clippy-copy>
+  `);
+
+    el.click();
+
+    const text = await whenCopied;
+    expect(text).to.equal('PRE: Core text :POST');
+  });
+
+  it('applies data-prefix-value and data-suffix-value when copying from a target', async () => {
+    const el = await fixture(html`
+    <div>
+      <div id="inner">Target text</div>
+      <clippy-copy
+        for="inner"
+        data-prefix-value="LTG 3.2: "
+        data-suffix-value=" (active)"
+      ></clippy-copy>
+    </div>
+  `);
+
+    const button = el.querySelector('clippy-copy');
+    button.click();
+
+    const text = await whenCopied;
+    expect(text).to.equal('LTG 3.2: Target text (active)');
+  });
+
 });
 
 interface WriteTextProps {

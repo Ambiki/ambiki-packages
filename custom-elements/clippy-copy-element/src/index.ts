@@ -54,19 +54,27 @@ function onKeydown(event: KeyboardEvent) {
 }
 
 async function copy(button: HTMLElement) {
-  const value = button.getAttribute('value');
-  const id = button.getAttribute('for');
+  const value= button.getAttribute('value');
+  const id   = button.getAttribute('for');
+  const prefix   = button.getAttribute('data-prefix-value') || '';
+  const suffix   = button.getAttribute('data-suffix-value') || '';
+
+  let base = '';
 
   if (value) {
-    await copyText(value);
-    dispatchEvent(button);
+    base = value;
   } else if (id) {
     const target = document.getElementById(id);
     if (!(target instanceof HTMLElement)) return;
-
-    await copyNode(target);
-    dispatchEvent(button);
+    base = target.innerText || target.textContent || '';
   }
+
+  const text = `${prefix}${base}${suffix}`;
+
+  if (!text) return;
+
+  await copyText(text);
+  dispatchEvent(button);
 }
 
 function dispatchEvent(element: HTMLElement) {

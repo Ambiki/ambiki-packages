@@ -9,3 +9,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Everything!
+
+## [0.1.1] - 2026-01-09
+
+### Added
+- Support for `data-prefix-value` and `data-suffix-value` attributes on `<clippy-copy>` to allow customizing clipboard output.
+- Clipboard text can now be composed from a prefix, the target or value, and a suffix before being copied.
+
+### Changed
+- Copy behavior now always resolves to a single constructed string before writing to the clipboard, allowing extensions without breaking existing usage.
