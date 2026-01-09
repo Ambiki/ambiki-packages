@@ -54,10 +54,10 @@ function onKeydown(event: KeyboardEvent) {
 }
 
 async function copy(button: HTMLElement) {
-  const value= button.getAttribute('value');
-  const id   = button.getAttribute('for');
-  const prefix   = button.getAttribute('data-prefix-value') || '';
-  const suffix   = button.getAttribute('data-suffix-value') || '';
+  const value = button.getAttribute('value');
+  const id = button.getAttribute('for');
+  const prefix = button.getAttribute('data-prefix-value') || '';
+  const suffix = button.getAttribute('data-suffix-value') || '';
 
   let base = '';
 
