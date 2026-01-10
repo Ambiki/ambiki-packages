@@ -30,11 +30,23 @@
     </section>
 
     <section>
+      <clippy-copy value="Copied from the value attribute" disabled>Disabled</clippy-copy>
+    </section>
+
+    <section>
       <div id="dom">
-        <h1>Copy the contents!</h1>
+        <h2>Copy the contents!</h2>
         <p>All of the contents within the dom node will be copied</p>
       </div>
       <clippy-copy for="dom">Copy it!</clippy-copy>
+    </section>
+
+    <section>
+      <h2>With prefix and suffix</h2>
+      <div id="dom">
+        <p>All of the contents within the dom node will be copied</p>
+      </div>
+      <clippy-copy for="dom" data-prefix-value="Prefix: " data-suffix-value=": Suffix">Copy it!</clippy-copy>
     </section>
 
     <script src="../custom-elements/clippy-copy-element/dist/index.js"></script>

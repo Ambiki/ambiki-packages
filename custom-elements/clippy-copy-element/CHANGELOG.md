@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Copy behavior now always resolves to a single constructed string before writing to the clipboard, allowing extensions without breaking existing usage.
 
+### Fixed
+- `clippy-copy-element` copies even though the `disabled` attribute is present
+
 ## [0.1.0] - 2022-06-13
 
 ### Added
