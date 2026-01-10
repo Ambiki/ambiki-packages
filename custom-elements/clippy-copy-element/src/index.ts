@@ -1,4 +1,4 @@
-import { copyText, copyNode } from './clipboard';
+import { copyText, extractText } from './clipboard';
 
 export default class ClippyCopyElement extends HTMLElement {
   connectedCallback() {
@@ -66,13 +66,13 @@ async function copy(button: HTMLElement) {
   } else if (id) {
     const target = document.getElementById(id);
     if (!(target instanceof HTMLElement)) return;
-    base = target.innerText || target.textContent || '';
+    base = extractText(target);
+    // Clear the selection made by `extractText`
+    const selection = getSelection();
+    selection?.removeAllRanges();
   }
 
   const text = `${prefix}${base}${suffix}`;
-
-  if (!text) return;
-
   await copyText(text);
   dispatchEvent(button);
 }

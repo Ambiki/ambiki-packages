@@ -119,12 +119,8 @@ describe('ClippyCopyElement', () => {
 
   it('applies data-prefix-value and data-suffix-value when copying from value', async () => {
     const el: ClippyCopyElement = await fixture(html`
-    <clippy-copy
-      value="Core text"
-      data-prefix-value="PRE: "
-      data-suffix-value=" :POST"
-    ></clippy-copy>
-  `);
+      <clippy-copy value="Core text" data-prefix-value="PRE: " data-suffix-value=" :POST"></clippy-copy>
+    `);
 
     el.click();
 
@@ -134,15 +130,11 @@ describe('ClippyCopyElement', () => {
 
   it('applies data-prefix-value and data-suffix-value when copying from a target', async () => {
     const el = await fixture(html`
-    <div>
-      <div id="inner">Target text</div>
-      <clippy-copy
-        for="inner"
-        data-prefix-value="LTG 3.2: "
-        data-suffix-value=" (active)"
-      ></clippy-copy>
-    </div>
-  `);
+      <div>
+        <div id="inner">Target text</div>
+        <clippy-copy for="inner" data-prefix-value="LTG 3.2: " data-suffix-value=" (active)"></clippy-copy>
+      </div>
+    `);
 
     const button = el.querySelector('clippy-copy');
     button.click();
@@ -150,7 +142,6 @@ describe('ClippyCopyElement', () => {
     const text = await whenCopied;
     expect(text).to.equal('LTG 3.2: Target text (active)');
   });
-
 });
 
 interface WriteTextProps {

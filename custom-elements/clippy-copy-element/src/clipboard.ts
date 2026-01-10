@@ -34,7 +34,7 @@ function fakeCopy(text: string) {
   document.body.removeChild(node);
 }
 
-function extractText(element: HTMLElement): string {
+export function extractText(element: HTMLElement): string {
   if (
     element instanceof HTMLInputElement ||
     element instanceof HTMLTextAreaElement ||
