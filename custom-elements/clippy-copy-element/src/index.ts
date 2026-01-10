@@ -1,6 +1,10 @@
 import { copyText, extractText } from './clipboard';
 
 export default class ClippyCopyElement extends HTMLElement {
+  static get observedAttributes() {
+    return ['disabled'];
+  }
+
   connectedCallback() {
     if (!this.hasAttribute('tabindex')) {
       this.setAttribute('tabindex', '0');
@@ -19,6 +23,16 @@ export default class ClippyCopyElement extends HTMLElement {
     this.addEventListener('blur', this.onBlur);
   }
 
+  attributeChangedCallback(name: string, _oldValue: string, newValue: string) {
+    if (name === 'disabled') {
+      if (typeof newValue === 'string') {
+        this.setAttribute('tabindex', '-1');
+      } else {
+        this.setAttribute('tabindex', '0');
+      }
+    }
+  }
+
   disconnectedCallback() {
     this.removeEventListener('click', this.onClick);
     this.removeEventListener('focus', this.onFocus);
@@ -27,7 +41,7 @@ export default class ClippyCopyElement extends HTMLElement {
 
   onClick(event: Event) {
     const button = event.currentTarget;
-    if (!(button instanceof HTMLElement)) return;
+    if (!(button instanceof HTMLElement) || button.hasAttribute('disabled')) return;
 
     copy(button);
   }
@@ -40,6 +54,14 @@ export default class ClippyCopyElement extends HTMLElement {
   onBlur(event: Event) {
     const button = event.currentTarget as HTMLElement;
     button.removeEventListener('keydown', onKeydown);
+  }
+
+  get disabled(): boolean {
+    return this.hasAttribute('disabled');
+  }
+
+  set disabled(value: boolean) {
+    this.toggleAttribute('disabled', value);
   }
 }
 

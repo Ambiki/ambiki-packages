@@ -142,6 +142,17 @@ describe('ClippyCopyElement', () => {
     const text = await whenCopied;
     expect(text).to.equal('LTG 3.2: Target text (active)');
   });
+
+  it('does not copy if element is disabled', async () => {
+    const el: ClippyCopyElement = await fixture(html`<clippy-copy value="Core text" disabled></clippy-copy> `);
+    expect(el).to.have.attribute('tabindex', '-1');
+
+    el.disabled = false;
+    expect(el).to.have.attribute('tabindex', '0');
+
+    el.disabled = true;
+    expect(el).to.have.attribute('tabindex', '-1');
+  });
 });
 
 interface WriteTextProps {
